@@ -212,7 +212,17 @@ const COCKTAIL_DATA: CocktailRecipe[] = [
       { name: "Honey-Lavender Syrup", amount: "0.5 oz" },
       { name: "Mint Sprigs", amount: "3-4 leaves" },
     ],
-  },
+  },{
+    name: "Maple Bourbon Cider",
+    garnish: "Green Apple slice, cinnamon stick",
+    method: "Shaken",
+    ingredients: [
+      { name: "Bourbon", amount: "2 oz" },
+      { name: "Apple Cider", amount: "4 oz" },
+      { name: "Lemon Juice", amount: "0.25 oz" },
+      { name: "Maple Syrup", amount: "0.5 oz" },
+    ],
+  }
 ]
 
 // --- UNIT CONVERSION UTILITIES ---
