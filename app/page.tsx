@@ -213,6 +213,27 @@ const COCKTAIL_DATA: CocktailRecipe[] = [
       { name: "Mint Sprigs", amount: "3-4 leaves" },
     ],
   },
+  {
+    name: "Maple Bourbon Cider",
+    garnish: "Green Apple slice, cinnamon stick",
+    method: "Shaken",
+    ingredients: [
+      { name: "Bourbon", amount: "2 oz" },
+      { name: "Apple Cider", amount: "4 oz" },
+      { name: "Lemon Juice", amount: "0.25 oz" },
+      { name: "Maple Syrup", amount: "0.5 oz" },
+    ],
+  },
+{
+    name: "Pear and Cranberry Bellini",
+    garnish: "Pink sugar rim dont batch with sparkling wine",
+    method: "build",
+    ingredients: [
+      { name: "Sparkling wine", amount: "4 oz" },
+      { name: "White Cramberry", amount: "1 oz" },
+      { name: "Pear  Nectar", amount: "1.5 oz" }
+    ],
+  }
 ]
 
 // --- UNIT CONVERSION UTILITIES ---
