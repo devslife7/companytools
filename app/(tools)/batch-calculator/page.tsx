@@ -441,8 +441,22 @@ const BatchItem: React.FC<BatchItemProps> = React.memo(
 
 BatchItem.displayName = "BatchItem"
 
+// Helper function to identify liquor items
+const isLiquorItem = (name: string): boolean => {
+  const liquorKeywords = [
+    "vodka", "gin", "rum", "whiskey", "whisky", "bourbon", "tequila", "pisco",
+    "brandy", "cognac", "liqueur", "liquor", "prosecco", "champagne", "wine",
+    "sparkling wine", "sake", "mezcal", "rye", "scotch", "vermouth", "curacao",
+    "kahlua", "maraschino", "cognac", "armagnac", "port", "sherry", "aperol",
+    "campari", "chartreuse", "benedictine", "drambuie", "frangelico", "baileys",
+    "amaretto", "cointreau", "triple sec", "grand marnier", "chambord", "st germain", "angostura bitters"
+  ]
+  const lowerName = name.toLowerCase()
+  return liquorKeywords.some(keyword => lowerName.includes(keyword))
+}
+
 // Utility to calculate Grand Totals for the PDF Report
-const calculateGrandTotals = (batches: BatchState[]): BatchResult[] => {
+const calculateGrandTotals = (batches: BatchState[]): { liquor: BatchResult[]; other: BatchResult[] } => {
   const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType }> = {}
 
   batches.forEach(batch => {
@@ -466,9 +480,23 @@ const calculateGrandTotals = (batches: BatchState[]): BatchResult[] => {
     }
   })
 
-  return Object.entries(grandTotals)
-    .map(([name, totals]) => ({ name, ...totals, originalUnit: "ml" })) // originalUnit is added for type compliance
+  const allItems = Object.entries(grandTotals)
+    .map(([name, totals]) => ({ name, ...totals, originalUnit: "ml" }))
     .sort((a, b) => b.ml - a.ml)
+
+  // Separate liquor and other items
+  const liquor: BatchResult[] = []
+  const other: BatchResult[] = []
+
+  allItems.forEach(item => {
+    if (isLiquorItem(item.name)) {
+      liquor.push(item)
+    } else {
+      other.push(item)
+    }
+  })
+
+  return { liquor, other }
 }
 
 // --- MAIN APP COMPONENT ---
@@ -628,7 +656,7 @@ export default function BatchCalculatorPage() {
                 </div>
         `
 
-    // 1. Grand Total Summary (Inventory Shopping List)
+    // 1. Grand Total Summary (Inventory Shopping List) - Separated by Liquor and Other Items
     htmlContent += `
             <h2 class="summary-title">Inventory Shopping List (Grand Totals based on Servings)</h2>
             <div class="table-container">
@@ -642,7 +670,13 @@ export default function BatchCalculatorPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${grandTotals
+                        ${grandTotals.liquor.length > 0 ? `
+                        <tr>
+                            <td colspan="4" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: 3px solid #000; border-bottom: 2px solid #000;">
+                                LIQUOR ITEMS
+                            </td>
+                        </tr>
+                        ${grandTotals.liquor
                           .map(
                             ing => `
                             <tr class="total-row">
@@ -654,6 +688,33 @@ export default function BatchCalculatorPage() {
                         `
                           )
                           .join("")}
+                        ` : ""}
+                        ${grandTotals.liquor.length > 0 && grandTotals.other.length > 0 ? `
+                        <tr>
+                            <td colspan="4" style="background-color: #e8e8e8; padding: 8px; border-top: 2px solid #000; border-bottom: 2px solid #000;">
+                                <!-- Divider between sections -->
+                            </td>
+                        </tr>
+                        ` : ""}
+                        ${grandTotals.other.length > 0 ? `
+                        <tr>
+                            <td colspan="4" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: ${grandTotals.liquor.length > 0 ? '2px' : '3px'} solid #000; border-bottom: 2px solid #000;">
+                                OTHER ITEMS
+                            </td>
+                        </tr>
+                        ${grandTotals.other
+                          .map(
+                            ing => `
+                            <tr class="total-row">
+                                <td class="text-left">${ing.name}</td>
+                                <td>${formatMLValue(ing.ml)}</td>
+                                <td>${formatNumber(ing.quart)}</td>
+                                <td>${formatNumber(ing.bottles)}</td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                        ` : ""}
                     </tbody>
                 </table>
             </div>
