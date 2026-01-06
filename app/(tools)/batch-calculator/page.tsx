@@ -455,8 +455,36 @@ const isLiquorItem = (name: string): boolean => {
   return liquorKeywords.some(keyword => lowerName.includes(keyword))
 }
 
+// Helper function to identify soda items
+const isSodaItem = (name: string): boolean => {
+  const sodaKeywords = [
+    "ginger beer", "ginger ale", "soda water", "club soda", "tonic water", "tonic",
+    "seltzer", "sparkling water", "carbonated water", "cola", "sprite", "7up",
+    "fresca", "fanta", "root beer", "dr pepper", "mountain dew", "pepsi", "coca cola"
+  ]
+  const lowerName = name.toLowerCase()
+  return sodaKeywords.some(keyword => lowerName.includes(keyword))
+}
+
+// Helper function to check if item is ginger beer
+const isGingerBeer = (name: string): boolean => {
+  return name.toLowerCase().includes("ginger beer")
+}
+
+// Constants for can calculations
+const CAN_SIZE_12OZ_ML = 354.882 // 12 fluid ounces in milliliters
+
+// Extended BatchResult with can quantity for ginger beer
+interface BatchResultWithCans extends BatchResult {
+  cans12oz?: number
+}
+
 // Utility to calculate Grand Totals for the PDF Report
-const calculateGrandTotals = (batches: BatchState[]): { liquor: BatchResult[]; other: BatchResult[] } => {
+const calculateGrandTotals = (batches: BatchState[]): { 
+  liquor: BatchResultWithCans[]; 
+  soda: BatchResultWithCans[]; 
+  other: BatchResultWithCans[] 
+} => {
   const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType }> = {}
 
   batches.forEach(batch => {
@@ -480,23 +508,34 @@ const calculateGrandTotals = (batches: BatchState[]): { liquor: BatchResult[]; o
     }
   })
 
-  const allItems = Object.entries(grandTotals)
-    .map(([name, totals]) => ({ name, ...totals, originalUnit: "ml" }))
+  const allItems: BatchResultWithCans[] = Object.entries(grandTotals)
+    .map(([name, totals]) => {
+      const item: BatchResultWithCans = { name, ...totals, originalUnit: "ml" }
+      // Add 12oz can quantity for all soda items
+      if (isSodaItem(name)) {
+        item.cans12oz = Math.ceil(item.ml / CAN_SIZE_12OZ_ML)
+      }
+      return item
+    })
     .sort((a, b) => b.ml - a.ml)
 
-  // Separate liquor and other items
-  const liquor: BatchResult[] = []
-  const other: BatchResult[] = []
+  // Separate liquor, soda, and other items
+  const liquor: BatchResultWithCans[] = []
+  const soda: BatchResultWithCans[] = []
+  const other: BatchResultWithCans[] = []
 
   allItems.forEach(item => {
-    if (isLiquorItem(item.name)) {
+    // Check soda items FIRST (more specific) before liquor items (less specific)
+    if (isSodaItem(item.name)) {
+      soda.push(item)
+    } else if (isLiquorItem(item.name)) {
       liquor.push(item)
     } else {
       other.push(item)
     }
   })
 
-  return { liquor, other }
+  return { liquor, soda, other }
 }
 
 // --- MAIN APP COMPONENT ---
@@ -656,7 +695,11 @@ export default function BatchCalculatorPage() {
                 </div>
         `
 
-    // 1. Grand Total Summary (Inventory Shopping List) - Separated by Liquor and Other Items
+    // 1. Grand Total Summary (Inventory Shopping List) - Separated by Liquor, Soda, and Other Items
+    const hasSodaItems = grandTotals.soda.length > 0
+    const totalColumns = hasSodaItems ? 5 : 4
+    const canColumnHeader = hasSodaItems ? '<th>12oz Cans</th>' : ''
+    
     htmlContent += `
             <h2 class="summary-title">Inventory Shopping List (Grand Totals based on Servings)</h2>
             <div class="table-container">
@@ -667,12 +710,13 @@ export default function BatchCalculatorPage() {
                             <th>Total ML (Rounded UP)</th>
                             <th>Total Quarts (Q)</th>
                             <th>Approx. @750 BOTTLES</th>
+                            ${canColumnHeader}
                         </tr>
                     </thead>
                     <tbody>
                         ${grandTotals.liquor.length > 0 ? `
                         <tr>
-                            <td colspan="4" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: 3px solid #000; border-bottom: 2px solid #000;">
+                            <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: 3px solid #000; border-bottom: 2px solid #000;">
                                 LIQUOR ITEMS
                             </td>
                         </tr>
@@ -684,21 +728,49 @@ export default function BatchCalculatorPage() {
                                 <td>${formatMLValue(ing.ml)}</td>
                                 <td>${formatNumber(ing.quart)}</td>
                                 <td>${formatNumber(ing.bottles)}</td>
+                                ${hasSodaItems ? '<td>-</td>' : ''}
                             </tr>
                         `
                           )
                           .join("")}
                         ` : ""}
-                        ${grandTotals.liquor.length > 0 && grandTotals.other.length > 0 ? `
+                        ${grandTotals.liquor.length > 0 && (grandTotals.soda.length > 0 || grandTotals.other.length > 0) ? `
                         <tr>
-                            <td colspan="4" style="background-color: #e8e8e8; padding: 8px; border-top: 2px solid #000; border-bottom: 2px solid #000;">
+                            <td colspan="${totalColumns}" style="background-color: #e8e8e8; padding: 8px; border-top: 2px solid #000; border-bottom: 2px solid #000;">
+                                <!-- Divider between sections -->
+                            </td>
+                        </tr>
+                        ` : ""}
+                        ${grandTotals.soda.length > 0 ? `
+                        <tr>
+                            <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: ${grandTotals.liquor.length > 0 ? '2px' : '3px'} solid #000; border-bottom: 2px solid #000;">
+                                SODA ITEMS
+                            </td>
+                        </tr>
+                        ${grandTotals.soda
+                          .map(
+                            ing => `
+                            <tr class="total-row">
+                                <td class="text-left">${ing.name}</td>
+                                <td>${formatMLValue(ing.ml)}</td>
+                                <td>${formatNumber(ing.quart)}</td>
+                                <td>${formatNumber(ing.bottles)}</td>
+                                ${hasSodaItems ? `<td>${ing.cans12oz ? ing.cans12oz.toFixed(0) : '-'}</td>` : ''}
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                        ` : ""}
+                        ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) && grandTotals.other.length > 0 ? `
+                        <tr>
+                            <td colspan="${totalColumns}" style="background-color: #e8e8e8; padding: 8px; border-top: 2px solid #000; border-bottom: 2px solid #000;">
                                 <!-- Divider between sections -->
                             </td>
                         </tr>
                         ` : ""}
                         ${grandTotals.other.length > 0 ? `
                         <tr>
-                            <td colspan="4" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: ${grandTotals.liquor.length > 0 ? '2px' : '3px'} solid #000; border-bottom: 2px solid #000;">
+                            <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 12px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '2px' : '3px'} solid #000; border-bottom: 2px solid #000;">
                                 OTHER ITEMS
                             </td>
                         </tr>
@@ -710,6 +782,7 @@ export default function BatchCalculatorPage() {
                                 <td>${formatMLValue(ing.ml)}</td>
                                 <td>${formatNumber(ing.quart)}</td>
                                 <td>${formatNumber(ing.bottles)}</td>
+                                ${hasSodaItems ? '<td>-</td>' : ''}
                             </tr>
                         `
                           )
