@@ -1,15 +1,18 @@
 "use client"
 import React, { useState } from "react"
-import { FlaskConical, Calculator, Trash2, Edit2, Check } from "lucide-react"
-import type { BatchState, Ingredient } from "../types"
+import { FlaskConical, Calculator, Trash2, Edit2 } from "lucide-react"
+import type { BatchState, Ingredient, CocktailRecipe } from "../types"
 import { ServingsInput } from "@/components/ui"
 import { SingleBatchDisplay } from "./SingleBatchDisplay"
+import { EditRecipeModal } from "./EditRecipeModal"
 
 interface BatchItemProps {
   batch: BatchState
   onServingsChange: (id: number, value: string) => void
   onIngredientChange: (id: number, newIngredients: Ingredient[]) => void
   onNameChange: (id: number, newName: string) => void
+  onGarnishChange: (id: number, newGarnish: string) => void
+  onMethodChange: (id: number, newMethod: string) => void
   onRemove: (id: number) => void
   isOnlyItem: boolean
   hasError?: boolean
@@ -17,9 +20,10 @@ interface BatchItemProps {
 
 // New memoized component for each slot (Crucial for performance fix)
 export const BatchItem: React.FC<BatchItemProps> = React.memo(
-  ({ batch, onServingsChange, onIngredientChange, onNameChange, onRemove, isOnlyItem, hasError = false }) => {
+  ({ batch, onServingsChange, onIngredientChange, onNameChange, onGarnishChange, onMethodChange, onRemove, isOnlyItem, hasError = false }) => {
     const { servings, editableRecipe, id, selectedCocktail } = batch
     const [isEditing, setIsEditing] = useState(false)
+    const [showEditModal, setShowEditModal] = useState(false)
 
     return (
       <div className="p-3 sm:p-4 bg-white border border-gray-300 rounded-xl shadow-xl mb-4 transition-all duration-500 hover:border-orange-500">
@@ -31,13 +35,11 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
             </h2>
             {editableRecipe && (
               <button
-                onClick={() => setIsEditing(!isEditing)}
-                className={`p-2 rounded-full transition duration-200 shadow-sm border ${
-                  isEditing ? "bg-green-100 border-green-500" : "bg-white border-gray-300 hover:bg-gray-200"
-                }`}
-                title={isEditing ? "Save Changes" : "Edit Recipe"}
+                onClick={() => setShowEditModal(true)}
+                className="p-2 rounded-full transition duration-200 shadow-sm border bg-white border-gray-300 hover:bg-gray-200"
+                title="Edit Recipe"
               >
-                {isEditing ? <Check className="w-5 h-5 text-green-600" /> : <Edit2 className="w-5 h-5 text-gray-600" />}
+                <Edit2 className="w-5 h-5 text-gray-600" />
               </button>
             )}
           </div>
@@ -73,6 +75,23 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
           isEditing={isEditing}
           onEditToggle={() => setIsEditing(!isEditing)}
         />
+
+        {/* Edit Recipe Modal */}
+        {editableRecipe && (
+          <EditRecipeModal
+            isOpen={showEditModal}
+            onClose={() => setShowEditModal(false)}
+            recipe={editableRecipe}
+            onSave={(updatedRecipe: CocktailRecipe) => {
+              // Update all recipe fields
+              onNameChange(id, updatedRecipe.name)
+              onGarnishChange(id, updatedRecipe.garnish)
+              onMethodChange(id, updatedRecipe.method)
+              onIngredientChange(id, updatedRecipe.ingredients)
+              setShowEditModal(false)
+            }}
+          />
+        )}
       </div>
     )
   }

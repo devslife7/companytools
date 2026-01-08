@@ -143,6 +143,38 @@ export default function BatchCalculatorPage() {
     )
   }, [])
 
+  const handleGarnishChange = useCallback((id: number, newGarnish: string) => {
+    setBatches(prev =>
+      prev.map(batch => {
+        if (batch.id === id) {
+          if (batch.editableRecipe) {
+            return {
+              ...batch,
+              editableRecipe: { ...batch.editableRecipe, garnish: newGarnish },
+            }
+          }
+        }
+        return batch
+      })
+    )
+  }, [])
+
+  const handleMethodChange = useCallback((id: number, newMethod: string) => {
+    setBatches(prev =>
+      prev.map(batch => {
+        if (batch.id === id) {
+          if (batch.editableRecipe) {
+            return {
+              ...batch,
+              editableRecipe: { ...batch.editableRecipe, method: newMethod },
+            }
+          }
+        }
+        return batch
+      })
+    )
+  }, [])
+
   const canExport = batches.some(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
@@ -229,6 +261,8 @@ export default function BatchCalculatorPage() {
               onServingsChange={handleServingsChange}
               onIngredientChange={handleIngredientChange}
               onNameChange={handleNameChange}
+              onGarnishChange={handleGarnishChange}
+              onMethodChange={handleMethodChange}
               onRemove={handleRemoveBatch}
               isOnlyItem={batches.length === 1}
               hasError={batchesWithMissingServings.has(batch.id)}
