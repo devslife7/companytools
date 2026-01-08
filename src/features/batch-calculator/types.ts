@@ -36,7 +36,6 @@ export interface BatchState {
   editableRecipe: CocktailRecipe | null
   servings: number | ""
   targetLiters: number // Fixed to 20L
-  searchTerm: string
 }
 
 export interface CombinedIngredient extends Ingredient {

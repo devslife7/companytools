@@ -1,6 +1,5 @@
 "use client"
-import React, { useState, useEffect, useCallback } from "react"
-import { Wine, PlusCircle } from "lucide-react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 
 // Import types
 import type { Ingredient, CocktailRecipe, BatchState } from "@/features/batch-calculator/types"
@@ -8,23 +7,58 @@ import type { Ingredient, CocktailRecipe, BatchState } from "@/features/batch-ca
 // Import utilities
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
 import { generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
+import { COCKTAIL_DATA } from "@/features/batch-calculator/data/cocktails"
 
 // Import components
 import { BatchItem } from "@/features/batch-calculator/components/BatchItem"
+import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
-  const defaultServings: number = 120
   const [batches, setBatches] = useState<BatchState[]>([])
-  const [nextId, setNextId] = useState<number>(1)
+  const nextIdRef = React.useRef<number>(1)
+  const [selectedCocktails, setSelectedCocktails] = useState<CocktailRecipe[]>([])
+  const [showServingsModal, setShowServingsModal] = useState(false)
+  const [missingServingsMessage, setMissingServingsMessage] = useState("")
+  const [batchesWithMissingServings, setBatchesWithMissingServings] = useState<Set<number>>(new Set())
 
-  // Initialize with one empty batch slot on load
+  // Sync batches with selected cocktails
   useEffect(() => {
-    if (batches.length === 0) {
-      handleAddBatch()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    setBatches(prevBatches => {
+      // Create a map of existing batches by cocktail name
+      const existingBatchesMap = new Map<string, BatchState>()
+      prevBatches.forEach(batch => {
+        if (batch.selectedCocktail) {
+          existingBatchesMap.set(batch.selectedCocktail.name, batch)
+        }
+      })
+
+      // Create new batches for selected cocktails that don't have a batch yet
+      const newBatches: BatchState[] = []
+
+      selectedCocktails.forEach(cocktail => {
+        if (!existingBatchesMap.has(cocktail.name)) {
+          // Deep copy of the recipe for editing
+          const editableRecipe = JSON.parse(JSON.stringify(cocktail)) as CocktailRecipe
+          newBatches.push({
+            id: nextIdRef.current++,
+            selectedCocktail: cocktail,
+            editableRecipe: editableRecipe,
+            servings: "",
+            targetLiters: FIXED_BATCH_LITERS,
+          })
+        }
+      })
+
+      // Remove batches for cocktails that are no longer selected
+      const selectedCocktailNames = new Set(selectedCocktails.map(c => c.name))
+      const filteredBatches = prevBatches.filter(
+        batch => !batch.selectedCocktail || selectedCocktailNames.has(batch.selectedCocktail.name)
+      )
+
+      return [...filteredBatches, ...newBatches]
+    })
+  }, [selectedCocktails])
 
   // --- CRUD Handlers for Batches Array (Memoized using useCallback) ---
 
@@ -32,42 +66,36 @@ export default function BatchCalculatorPage() {
     setBatches(prev => prev.map(batch => (batch.id === id ? { ...batch, ...updates } : batch)))
   }, [])
 
-  const handleAddBatch = useCallback(() => {
-    const newBatch: BatchState = {
-      id: nextId,
-      selectedCocktail: null,
-      editableRecipe: null,
-      servings: defaultServings,
-      targetLiters: FIXED_BATCH_LITERS, // Fixed to 20L
-      searchTerm: "",
-    }
-    setBatches(prev => [...prev, newBatch])
-    setNextId(prev => prev + 1)
-  }, [nextId, defaultServings])
+  const handleRemoveBatch = useCallback(
+    (idToRemove: number) => {
+      const batchToRemove = batches.find(b => b.id === idToRemove)
+      if (batchToRemove?.selectedCocktail) {
+        // Remove from selected cocktails
+        setSelectedCocktails(prev => prev.filter(c => c.name !== batchToRemove.selectedCocktail!.name))
+      }
+      setBatches(prev => prev.filter(batch => batch.id !== idToRemove))
+    },
+    [batches]
+  )
 
-  const handleRemoveBatch = useCallback((idToRemove: number) => {
-    setBatches(prev => prev.filter(batch => batch.id !== idToRemove))
+  // Handler for when cocktails are selected/deselected from the search bar
+  const handleCocktailSelectionChange = useCallback((selected: CocktailRecipe[]) => {
+    setSelectedCocktails(selected)
   }, [])
 
   // --- Specific Data Handlers (Memoized using useCallback) ---
 
-  const handleSelectCocktail = useCallback(
-    (id: number, cocktail: CocktailRecipe) => {
-      // Deep copy of the recipe for editing
-      const editableRecipe = JSON.parse(JSON.stringify(cocktail)) as CocktailRecipe
-      handleUpdateBatch(id, {
-        selectedCocktail: cocktail,
-        editableRecipe: editableRecipe,
-        searchTerm: "",
-        servings: defaultServings,
-        targetLiters: FIXED_BATCH_LITERS,
-      })
-    },
-    [handleUpdateBatch, defaultServings]
-  )
-
   const handleServingsChange = useCallback(
     (id: number, value: string) => {
+      // Clear error state when user starts typing
+      if (batchesWithMissingServings.has(id)) {
+        setBatchesWithMissingServings(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(id)
+          return newSet
+        })
+      }
+
       // Allow empty string to clear the input
       if (value === "") {
         handleUpdateBatch(id, { servings: "" })
@@ -80,14 +108,7 @@ export default function BatchCalculatorPage() {
         handleUpdateBatch(id, { servings: num })
       }
     },
-    [handleUpdateBatch]
-  )
-
-  const handleSearchTermChange = useCallback(
-    (id: number, term: string) => {
-      handleUpdateBatch(id, { searchTerm: term })
-    },
-    [handleUpdateBatch]
+    [handleUpdateBatch, batchesWithMissingServings]
   )
 
   const handleIngredientChange = useCallback((id: number, newIngredients: Ingredient[]) => {
@@ -127,17 +148,77 @@ export default function BatchCalculatorPage() {
   )
 
   const handleGeneratePdfReport = () => {
+    // Check if any batch is missing servings
+    const batchesWithoutServings = batches.filter(
+      b => b.editableRecipe && (b.servings === "" || b.servings === 0 || (typeof b.servings === "number" && b.servings <= 0))
+    )
+
+    if (batchesWithoutServings.length > 0) {
+      const cocktailNames = batchesWithoutServings
+        .map(b => b.selectedCocktail?.name || `Batch #${b.id}`)
+        .join(", ")
+      
+      // Highlight batches with missing servings
+      const missingIds = new Set(batchesWithoutServings.map(b => b.id))
+      setBatchesWithMissingServings(missingIds)
+      
+      setMissingServingsMessage(
+        `Please enter servings for all cocktails before downloading.\n\nMissing servings for: ${cocktailNames}\n\nServings are required to generate accurate batch calculations.`
+      )
+      setShowServingsModal(true)
+      return
+    }
+
+    // Clear error state if all servings are entered
+    setBatchesWithMissingServings(new Set())
+
     if (!canExport) return
     generatePdfReport(batches)
   }
 
+  // Favorite cocktails to show when no cocktails are selected
+  const favoriteCocktails = useMemo(() => {
+    return COCKTAIL_DATA.filter(
+      cocktail => 
+        cocktail.name === "Espresso Martini" || 
+        cocktail.name === "Blackberry Collins" ||
+        cocktail.name === "Maple Bourbon Cider"
+    )
+  }, [])
+
+  const hasSelectedCocktails = selectedCocktails.length > 0
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans py-1 sm:py-2 px-0">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 flex items-center border-b border-gray-300 pb-2 px-0">
-          <Wine className="w-10 h-10 mr-3 text-orange-600" />
-          Batch Calculator
-        </h1>
+        {/* Multi-Select Cocktail Search */}
+        <div className="mb-6 px-0">
+          <MultiSelectCocktailSearch
+            cocktails={COCKTAIL_DATA}
+            selectedCocktails={selectedCocktails}
+            onSelectionChange={handleCocktailSelectionChange}
+            label="Search and Add Cocktails"
+          />
+        </div>
+
+        {/* Show favorite cocktails if no cocktails are selected */}
+        {!hasSelectedCocktails && (
+          <div className="mb-6 px-0">
+            <p className="text-sm font-medium text-gray-600 mb-3">Popular Cocktails</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {favoriteCocktails.map(cocktail => (
+                <button
+                  key={cocktail.name}
+                  onClick={() => handleCocktailSelectionChange([cocktail])}
+                  className="p-4 bg-white border border-gray-300 rounded-lg hover:border-orange-500 hover:shadow-md transition-all duration-200 text-left"
+                >
+                  <h3 className="font-semibold text-gray-900 mb-1">{cocktail.name}</h3>
+                  <p className="text-sm text-gray-600">{cocktail.garnish}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6 sm:space-y-8 mb-4">
           {/* Render all independent cocktail batch slots */}
@@ -145,44 +226,41 @@ export default function BatchCalculatorPage() {
             <BatchItem
               key={batch.id}
               batch={batch}
-              onSelect={handleSelectCocktail}
               onServingsChange={handleServingsChange}
-              onSearchTermChange={handleSearchTermChange}
               onIngredientChange={handleIngredientChange}
               onNameChange={handleNameChange}
               onRemove={handleRemoveBatch}
               isOnlyItem={batches.length === 1}
+              hasError={batchesWithMissingServings.has(batch.id)}
             />
           ))}
         </div>
 
-        {/* "Add New" Button */}
-        <div className="mt-4 pt-3 border-t border-gray-300 px-0">
-          <button
-            onClick={handleAddBatch}
-            className={`w-full py-4 text-xl font-bold rounded-xl transition duration-300 shadow-lg uppercase tracking-widest flex items-center justify-center space-x-3 
-                            bg-gray-200 hover:bg-gray-300 border border-gray-400 text-gray-800`}
-          >
-            <PlusCircle className="w-6 h-6 text-orange-600" />
-            <span>Add New Cocktail Slot</span>
-          </button>
-        </div>
+        {/* Final Export Button - Only show if cocktails are selected */}
+        {hasSelectedCocktails && (
+          <div className="mt-3 space-y-3 px-0">
+            <button
+              className={`w-full py-4 text-xl font-bold rounded-xl transition duration-300 shadow-xl uppercase tracking-widest
+                              ${
+                                canExport
+                                  ? "bg-orange-600 text-white border border-orange-700 hover:bg-orange-700 shadow-orange-600/30"
+                                  : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
+                              }`}
+              onClick={handleGeneratePdfReport}
+              disabled={!canExport}
+            >
+              Download All Batch Sheets (Print-Ready PDF)
+            </button>
+          </div>
+        )}
 
-        {/* Final Export Button */}
-        <div className="mt-3 space-y-3 px-0">
-          <button
-            className={`w-full py-4 text-xl font-bold rounded-xl transition duration-300 shadow-xl uppercase tracking-widest
-                            ${
-                              canExport
-                                ? "bg-orange-600 text-white border border-orange-700 hover:bg-orange-700 shadow-orange-600/30"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
-                            }`}
-            onClick={handleGeneratePdfReport}
-            disabled={!canExport}
-          >
-            Download All Batch Sheets (Print-Ready PDF)
-          </button>
-        </div>
+        {/* Servings Required Modal */}
+        <Modal
+          isOpen={showServingsModal}
+          onClose={() => setShowServingsModal(false)}
+          title="Servings Required"
+          message={missingServingsMessage}
+        />
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useMemo } from "react"
-import { FlaskConical, Ruler, Edit2, Check, PlusCircle, X } from "lucide-react"
+import { FlaskConical, Ruler, Edit2, Check, PlusCircle, X, ChevronDown, ChevronUp } from "lucide-react"
 import type { Ingredient, BatchState, BatchResult, CombinedIngredient } from "../types"
 import {
   LITER_TO_ML,
@@ -19,12 +19,17 @@ interface SingleBatchDisplayProps {
   batch: BatchState
   onIngredientChange: (id: number, newIngredients: Ingredient[]) => void
   onNameChange: (id: number, newName: string) => void
+  isEditing?: boolean
+  onEditToggle?: () => void
 }
 
 export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
-  ({ batch, onIngredientChange, onNameChange }) => {
+  ({ batch, onIngredientChange, onNameChange, isEditing: externalIsEditing, onEditToggle }) => {
     const { editableRecipe: recipe, servings, id } = batch
-    const [isEditing, setIsEditing] = useState(false)
+    const [internalIsEditing, setInternalIsEditing] = useState(false)
+    const isEditing = externalIsEditing !== undefined ? externalIsEditing : internalIsEditing
+    const setIsEditing = onEditToggle || setInternalIsEditing
+    const [showBatchTotals, setShowBatchTotals] = useState(false)
 
     // Ensure servings is treated as a number for calculation
     const servingsNum = typeof servings === "number" ? servings : servings === "" ? 0 : parseInt(servings, 10) || 0
@@ -144,10 +149,10 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
       )
 
     return (
-      <div className="mt-4 border border-gray-300 rounded-xl overflow-hidden shadow-lg">
-        {/* Header/Control Panel */}
-        <div className="p-3 bg-gray-100 flex justify-between items-center border-b border-gray-300">
-          {isEditing ? (
+      <div className="mt-4">
+        {/* Name editing input when in edit mode */}
+        {isEditing && (
+          <div className="mb-4 pb-4 border-b border-gray-300">
             <input
               type="text"
               value={recipe.name}
@@ -155,26 +160,10 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
               className="text-xl font-extrabold text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 w-full max-w-md focus:ring-2 focus:ring-orange-500"
               placeholder="Cocktail Name"
             />
-          ) : (
-            <h3 className="text-xl font-extrabold text-gray-900">
-              Batch #{id}: {recipe.name}
-            </h3>
-          )}
-
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className={`p-2 rounded-full transition duration-200 shadow-sm border ${
-                isEditing ? "bg-green-100 border-green-500" : "bg-white border-gray-300 hover:bg-gray-200"
-              }`}
-              title={isEditing ? "Save Changes" : "Edit Recipe"}
-            >
-              {isEditing ? <Check className="w-5 h-5 text-green-600" /> : <Edit2 className="w-5 h-5 text-gray-600" />}
-            </button>
           </div>
-        </div>
+        )}
 
-        <div className="p-3 sm:p-4 bg-white">
+        <div className="p-3 sm:p-4">
           <p className="text-sm text-gray-600 mb-3 border-b border-gray-200 pb-1">
             **Garnish:** {recipe.garnish || "N/A"} | **Method:** {recipe.method || "N/A"}
           </p>
@@ -227,13 +216,29 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
             )}
           </div>
 
-          {/* Batch Totals Table */}
+          {/* Batch Totals Toggle Button */}
           {(servingsNum > 0 || singleServingVolumeML > 0) && (
-            <div className="mt-6 p-3 bg-gray-50 border border-gray-200 rounded-xl shadow-inner">
-              <div className="flex items-center space-x-2 mb-3">
-                <Ruler className="w-6 h-6 text-orange-600" />
-                <h4 className="text-xl font-bold text-gray-900">Batch Totals</h4>
-              </div>
+            <div className="mt-6">
+              <button
+                onClick={() => setShowBatchTotals(!showBatchTotals)}
+                className="w-full flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition duration-200 shadow-sm"
+              >
+                <div className="flex items-center space-x-2">
+                  <Ruler className="w-6 h-6 text-orange-600" />
+                  <h4 className="text-xl font-bold text-gray-900">Batch Totals</h4>
+                </div>
+                {showBatchTotals ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Batch Totals Table */}
+          {showBatchTotals && (servingsNum > 0 || singleServingVolumeML > 0) && (
+            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl shadow-inner">
               <p className="text-sm text-gray-600 mb-3 border-b border-gray-200 pb-2">
                 1 Serving Liquid Volume: {formatNumber(singleServingVolumeML / 29.5735)} oz (
                 {formatNumber(singleServingVolumeML)} ml)
@@ -352,6 +357,16 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
           )}
         </div>
       </div>
+    )
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison for memoization
+    return (
+      prevProps.batch.id === nextProps.batch.id &&
+      prevProps.batch.servings === nextProps.batch.servings &&
+      prevProps.batch.editableRecipe?.name === nextProps.batch.editableRecipe?.name &&
+      JSON.stringify(prevProps.batch.editableRecipe?.ingredients) ===
+        JSON.stringify(nextProps.batch.editableRecipe?.ingredients)
     )
   }
 )
