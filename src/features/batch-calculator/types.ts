@@ -39,3 +39,15 @@ export interface BatchState {
   searchTerm: string
 }
 
+export interface CombinedIngredient extends Ingredient {
+  isLiquid: boolean
+  isCount: boolean
+  isSpecial: boolean
+  servings: BatchResult
+  target: BatchResult
+}
+
+export interface BatchResultWithCans extends BatchResult {
+  cans12oz?: number
+}
+
