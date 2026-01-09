@@ -13,6 +13,20 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
       { name: "Cinnamon Syrup", amount: "0.75 oz" },
     ],
   },
+
+{
+    name: "Pear Bourbon Sour",
+    garnish: "pear and dry cherry skewer",
+    method:
+      "Shaken",
+    ingredients: [
+      { name: "Bourbon", amount: "2 oz" },
+      { name: "Pear Liqueur", amount: "1 oz" },
+      { name: "Simple syrup", amount: "0.5 oz" },
+      { name: "Lemon Juice", amount: "0.5 oz" },
+      { name: "Angostura Bitters", amount: "2 dashes" },
+    ],
+  },
   {
     name: "Blackberry Collins",
     garnish: "Blackberry Wrapped in Mint Leaf on a Skewer",
