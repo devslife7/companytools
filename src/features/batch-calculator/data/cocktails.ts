@@ -22,7 +22,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
       { name: "Vodka", amount: "1.5 oz" },
       { name: "Lemon Juice", amount: "0.75 oz" },
       { name: "Simple Syrup", amount: "0.75 oz" },
-      { name: "Blackberry Puree", amount: "25 oz" },
+      { name: "Blackberry Puree", amount: "0.5 oz" },
       { name: "Ginger Beer", amount: "3 oz" },
     ],
   },
