@@ -6,6 +6,7 @@ export interface Ingredient {
 }
 
 export interface CocktailRecipe {
+  id?: number  // Database ID (optional for backward compatibility)
   name: string
   garnish: string
   method: string

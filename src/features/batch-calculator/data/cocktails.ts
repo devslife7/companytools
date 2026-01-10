@@ -31,7 +31,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     name: "Blackberry Collins",
     garnish: "Blackberry Wrapped in Mint Leaf on a Skewer",
     method:
-      "1. Combine vodka, lemon juice, simple syrup, and blackberry puree into a cocktail shaker filled with ice. 2. Shake until ingredients are properly chilled and strain into a collins glass filled with ice. 3. Top off with ginger beer. 4. Add edible gold dust.",
+      "1. Combine vodkka, lemon juice, simple syrup, and blackberry puree into a cocktail shaker filled with ice. 2. Shake until ingredients are properly chilled and strain into a collins glass filled with ice. 3. Top off with ginger beer. 4. Add edible gold dust.",
     ingredients: [
       { name: "Vodka", amount: "1.5 oz" },
       { name: "Lemon Juice", amount: "0.75 oz" },

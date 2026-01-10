@@ -10,14 +10,14 @@ import { generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator
 import { COCKTAIL_DATA } from "@/features/batch-calculator/data/cocktails"
 
 // Import hooks
-import { useCocktails } from "@/features/batch-calculator/hooks"
+import { useCocktails, useCreateCocktail } from "@/features/batch-calculator/hooks"
+import { useToast, ToastContainer } from "@/components/ui"
 
 // Import components
 import { BatchItem } from "@/features/batch-calculator/components/BatchItem"
+import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
-
-// Feature flag: Set to true to use database, false to use static data
-const USE_DATABASE = process.env.NEXT_PUBLIC_USE_DATABASE === 'true'
+import { Plus } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -27,16 +27,35 @@ export default function BatchCalculatorPage() {
   const [showServingsModal, setShowServingsModal] = useState(false)
   const [missingServingsMessage, setMissingServingsMessage] = useState("")
   const [batchesWithMissingServings, setBatchesWithMissingServings] = useState<Set<number>>(new Set())
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingCocktail, setEditingCocktail] = useState<CocktailRecipe | null>(null)
+  const [editingCocktailId, setEditingCocktailId] = useState<number | undefined>()
 
-  // Fetch cocktails from API or use static data
-  const { cocktails: apiCocktails, loading: cocktailsLoading, error: cocktailsError } = useCocktails({
-    enabled: USE_DATABASE,
+  // Toast notifications
+  const { toasts, removeToast, success, error: showError } = useToast()
+
+  // Fetch cocktails from database (primary source)
+  const { cocktails: apiCocktails, loading: cocktailsLoading, error: cocktailsError, refetch: refetchCocktails } = useCocktails({
+    enabled: true, // Always try to use database
   })
 
-  // Use API cocktails if available, otherwise fallback to static data
-  const availableCocktails = USE_DATABASE && !cocktailsLoading && apiCocktails.length > 0
-    ? apiCocktails
-    : COCKTAIL_DATA
+  // Create cocktail mutation
+  const { createCocktail, loading: createLoading } = useCreateCocktail()
+
+  // Use database cocktails if available, fallback to static data only if database fails
+  const availableCocktails = useMemo(() => {
+    // If we have cocktails from database, use them
+    if (!cocktailsLoading && apiCocktails.length > 0) {
+      return apiCocktails
+    }
+    // If database failed or returned empty, fallback to static data
+    if (cocktailsError || (!cocktailsLoading && apiCocktails.length === 0)) {
+      return COCKTAIL_DATA
+    }
+    // While loading, show static data so UI doesn't break
+    return COCKTAIL_DATA
+  }, [apiCocktails, cocktailsLoading, cocktailsError])
 
   // Sync batches with selected cocktails
   useEffect(() => {
@@ -225,6 +244,76 @@ export default function BatchCalculatorPage() {
   }
 
   // Favorite cocktails to show when no cocktails are selected
+  // Handle create new recipe
+  const handleCreateCocktail = useCallback(async (recipe: CocktailRecipe) => {
+    const newRecipe = await createCocktail({
+      name: recipe.name,
+      garnish: recipe.garnish,
+      method: recipe.method,
+      ingredients: recipe.ingredients,
+    })
+
+    if (newRecipe) {
+      success(`Recipe "${newRecipe.name}" created successfully!`)
+      await refetchCocktails()
+      // Optionally add to selected cocktails
+      setSelectedCocktails(prev => [...prev, newRecipe])
+      setShowAddModal(false)
+    } else {
+      showError("Failed to create recipe. Please try again.")
+    }
+  }, [createCocktail, refetchCocktails, success, showError])
+
+  // Handle update recipe
+  const handleUpdateCocktail = useCallback(async (updatedRecipe: CocktailRecipe) => {
+    // Update local batches if this recipe is in use
+    setBatches(prev =>
+      prev.map(batch => {
+        if (batch.selectedCocktail?.name === updatedRecipe.name || batch.editableRecipe?.name === updatedRecipe.name) {
+          return {
+            ...batch,
+            selectedCocktail: updatedRecipe,
+            editableRecipe: updatedRecipe,
+          }
+        }
+        return batch
+      })
+    )
+
+    // Update selected cocktails list
+    setSelectedCocktails(prev =>
+      prev.map(cocktail => (cocktail.name === updatedRecipe.name ? updatedRecipe : cocktail))
+    )
+
+    // Refresh cocktails list from database
+    await refetchCocktails()
+    success(`Recipe "${updatedRecipe.name}" updated successfully!`)
+    setShowEditModal(false)
+  }, [refetchCocktails, success])
+
+  // Handle delete recipe
+  const handleDeleteCocktail = useCallback(async () => {
+    if (!editingCocktail) return
+
+    // Remove from selected cocktails if it's selected
+    setSelectedCocktails(prev => prev.filter(c => c.name !== editingCocktail.name))
+
+    // Remove batches using this recipe
+    setBatches(prev => prev.filter(batch => batch.selectedCocktail?.name !== editingCocktail.name))
+
+    // Refresh cocktails list
+    await refetchCocktails()
+    success(`Recipe "${editingCocktail.name}" deleted successfully!`)
+    setShowEditModal(false)
+  }, [editingCocktail, refetchCocktails, success])
+
+  // Open edit modal
+  const handleOpenEditModal = useCallback((cocktail: CocktailRecipe, cocktailId?: number) => {
+    setEditingCocktail(cocktail)
+    setEditingCocktailId(cocktailId)
+    setShowEditModal(true)
+  }, [])
+
   const favoriteCocktails = useMemo(() => {
     return availableCocktails.filter(
       cocktail => 
@@ -239,15 +328,36 @@ export default function BatchCalculatorPage() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans py-1 sm:py-2 px-0">
       <div className="max-w-4xl mx-auto">
+        {/* Toast Notifications */}
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+        {/* Header with Add Recipe Button */}
+        <div className="mb-6 px-0 flex justify-between items-center gap-4">
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Batch Calculator</h1>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-200 shadow-md flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Add Recipe
+          </button>
+        </div>
+
         {/* Multi-Select Cocktail Search */}
         <div className="mb-6 px-0">
-          {cocktailsLoading && USE_DATABASE ? (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm">
+          {cocktailsLoading ? (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
               Loading cocktails from database...
             </div>
-          ) : cocktailsError && USE_DATABASE ? (
+          ) : cocktailsError ? (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-600 text-sm mb-4">
-              ⚠️ Database unavailable, using static data. Error: {cocktailsError}
+              ⚠️ Database unavailable, using static data fallback. Error: {cocktailsError}
+            </div>
+          ) : apiCocktails.length > 0 ? (
+            <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-2">
+              ✓ Loaded {apiCocktails.length} cocktails from database
             </div>
           ) : null}
           <MultiSelectCocktailSearch
@@ -289,6 +399,7 @@ export default function BatchCalculatorPage() {
               onGarnishChange={handleGarnishChange}
               onMethodChange={handleMethodChange}
               onRemove={handleRemoveBatch}
+              onEditRecipe={handleOpenEditModal}
               isOnlyItem={batches.length === 1}
               hasError={batchesWithMissingServings.has(batch.id)}
             />
@@ -320,6 +431,40 @@ export default function BatchCalculatorPage() {
           title="Servings Required"
           message={missingServingsMessage}
         />
+
+        {/* Add Recipe Modal */}
+        <EditRecipeModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          recipe={null}
+          mode="create"
+          onSave={handleCreateCocktail}
+          onSaveSuccess={() => {
+            setShowAddModal(false)
+          }}
+        />
+
+        {/* Edit Recipe Modal */}
+        {editingCocktail && (
+          <EditRecipeModal
+            isOpen={showEditModal}
+            onClose={() => {
+              setShowEditModal(false)
+              setEditingCocktail(null)
+              setEditingCocktailId(undefined)
+            }}
+            recipe={editingCocktail}
+            cocktailId={editingCocktailId}
+            mode="edit"
+            onSave={handleUpdateCocktail}
+            onDelete={handleDeleteCocktail}
+            onSaveSuccess={() => {
+              setShowEditModal(false)
+              setEditingCocktail(null)
+              setEditingCocktailId(undefined)
+            }}
+          />
+        )}
       </div>
     </div>
   )

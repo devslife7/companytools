@@ -14,13 +14,14 @@ interface BatchItemProps {
   onGarnishChange: (id: number, newGarnish: string) => void
   onMethodChange: (id: number, newMethod: string) => void
   onRemove: (id: number) => void
+  onEditRecipe?: (cocktail: CocktailRecipe, cocktailId?: number) => void  // Optional callback for database edit
   isOnlyItem: boolean
   hasError?: boolean
 }
 
 // New memoized component for each slot (Crucial for performance fix)
 export const BatchItem: React.FC<BatchItemProps> = React.memo(
-  ({ batch, onServingsChange, onIngredientChange, onNameChange, onGarnishChange, onMethodChange, onRemove, isOnlyItem, hasError = false }) => {
+  ({ batch, onServingsChange, onIngredientChange, onNameChange, onGarnishChange, onMethodChange, onRemove, onEditRecipe, isOnlyItem, hasError = false }) => {
     const { servings, editableRecipe, id, selectedCocktail } = batch
     const [isEditing, setIsEditing] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
@@ -35,7 +36,15 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
             </h2>
             {editableRecipe && (
               <button
-                onClick={() => setShowEditModal(true)}
+                onClick={() => {
+                  // If onEditRecipe callback is provided, use it (for database save)
+                  // Otherwise, use local modal
+                  if (onEditRecipe) {
+                    onEditRecipe(editableRecipe, editableRecipe.id)
+                  } else {
+                    setShowEditModal(true)
+                  }
+                }}
                 className="p-2 rounded-full transition duration-200 shadow-sm border bg-white border-gray-300 hover:bg-gray-200"
                 title="Edit Recipe"
               >

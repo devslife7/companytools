@@ -16,6 +16,7 @@ function transformCocktailToRecipe(cocktail: {
   }[]
 }): CocktailRecipe {
   return {
+    id: cocktail.id,  // Include database ID
     name: cocktail.name,
     garnish: cocktail.garnish,
     method: cocktail.method,
