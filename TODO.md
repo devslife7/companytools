@@ -1,1 +1,0 @@
-[] - enable user to edit garnishes
