@@ -9,9 +9,15 @@ import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations
 import { generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
 import { COCKTAIL_DATA } from "@/features/batch-calculator/data/cocktails"
 
+// Import hooks
+import { useCocktails } from "@/features/batch-calculator/hooks"
+
 // Import components
 import { BatchItem } from "@/features/batch-calculator/components/BatchItem"
 import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
+
+// Feature flag: Set to true to use database, false to use static data
+const USE_DATABASE = process.env.NEXT_PUBLIC_USE_DATABASE === 'true'
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -21,6 +27,16 @@ export default function BatchCalculatorPage() {
   const [showServingsModal, setShowServingsModal] = useState(false)
   const [missingServingsMessage, setMissingServingsMessage] = useState("")
   const [batchesWithMissingServings, setBatchesWithMissingServings] = useState<Set<number>>(new Set())
+
+  // Fetch cocktails from API or use static data
+  const { cocktails: apiCocktails, loading: cocktailsLoading, error: cocktailsError } = useCocktails({
+    enabled: USE_DATABASE,
+  })
+
+  // Use API cocktails if available, otherwise fallback to static data
+  const availableCocktails = USE_DATABASE && !cocktailsLoading && apiCocktails.length > 0
+    ? apiCocktails
+    : COCKTAIL_DATA
 
   // Sync batches with selected cocktails
   useEffect(() => {
@@ -210,13 +226,13 @@ export default function BatchCalculatorPage() {
 
   // Favorite cocktails to show when no cocktails are selected
   const favoriteCocktails = useMemo(() => {
-    return COCKTAIL_DATA.filter(
+    return availableCocktails.filter(
       cocktail => 
         cocktail.name === "Espresso Martini" || 
         cocktail.name === "Blackberry Collins" ||
         cocktail.name === "Maple Bourbon Cider"
     )
-  }, [])
+  }, [availableCocktails])
 
   const hasSelectedCocktails = selectedCocktails.length > 0
 
@@ -225,8 +241,17 @@ export default function BatchCalculatorPage() {
       <div className="max-w-4xl mx-auto">
         {/* Multi-Select Cocktail Search */}
         <div className="mb-6 px-0">
+          {cocktailsLoading && USE_DATABASE ? (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm">
+              Loading cocktails from database...
+            </div>
+          ) : cocktailsError && USE_DATABASE ? (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-600 text-sm mb-4">
+              ⚠️ Database unavailable, using static data. Error: {cocktailsError}
+            </div>
+          ) : null}
           <MultiSelectCocktailSearch
-            cocktails={COCKTAIL_DATA}
+            cocktails={availableCocktails}
             selectedCocktails={selectedCocktails}
             onSelectionChange={handleCocktailSelectionChange}
             label="Search and Add Cocktails"

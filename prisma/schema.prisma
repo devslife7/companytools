@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Cocktail {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique @db.VarChar(255)
+  garnish    String      @db.Text
+  method     String      @db.Text
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  createdBy  String?     @map("created_by") @db.VarChar(255)
+  isActive   Boolean     @default(true) @map("is_active")
+  tags       String[]    @default([])
+  category   String?     @db.VarChar(100)
+  
+  ingredients Ingredient[]
+  
+  @@index([name])
+  @@index([isActive])
+  @@index([category])
+  @@map("cocktails")
+}
+
+model Ingredient {
+  id         Int      @id @default(autoincrement())
+  cocktailId Int      @map("cocktail_id")
+  name       String   @db.VarChar(255)
+  amount     String   @db.VarChar(100)
+  orderIndex Int      @map("order_index")
+  
+  cocktail   Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
+  
+  @@index([cocktailId])
+  @@index([name])
+  @@map("ingredients")
+}
