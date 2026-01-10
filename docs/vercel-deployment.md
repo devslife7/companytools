@@ -16,11 +16,11 @@
      - Get this from: Supabase Dashboard → Settings → Database → Connection String → Transaction Pooler
    - **Environment**: Select all environments (Production, Preview, Development)
    
-   - **Name**: `DIRECT_URL` (Optional, for migrations)
-   - **Value**: Use Supabase's **Direct** connection string (port 5432)
+   - **Name**: `DIRECT_URL` (Optional, for local development only)
+     - **⚠️ DO NOT SET THIS IN VERCEL** - The direct connection (port 5432) is not reachable from Vercel
+     - Only set this locally if you want to use direct connections for faster migrations
      - Format: `postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require`
      - Get this from: Supabase Dashboard → Settings → Database → Connection String → Direct Connection
-   - **Environment**: Select all environments (Production, Preview, Development)
    
    **For Other PostgreSQL Databases:**
    
@@ -88,6 +88,8 @@ This is a common issue when deploying to Vercel with Supabase. Solutions:
 
 4. **Verify Environment Variables**:
    - Check that `DATABASE_URL` is set correctly in Vercel environment variables
+   - **IMPORTANT**: Do NOT set `DIRECT_URL` in Vercel - it will cause migration failures
+   - Ensure `DATABASE_URL` uses the Transaction Pooler (port 6543), not the direct connection (port 5432)
    - Ensure it's set for the correct environment (Production, Preview, Development)
    - Redeploy after updating environment variables
 

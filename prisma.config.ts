@@ -3,14 +3,27 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
-// For migrations, use DIRECT_URL if available (for Supabase direct connection),
-// otherwise fall back to DATABASE_URL
-// DIRECT_URL should point to the direct database connection (port 5432)
-// DATABASE_URL should point to the connection pooler (port 6543) for serverless environments
-const migrationUrl = process.env["DIRECT_URL"] || process.env["DATABASE_URL"];
+// For migrations:
+// - In Vercel/serverless: Always use DATABASE_URL (pooler connection, port 6543)
+// - In local dev: Prefer DIRECT_URL if available, otherwise use DATABASE_URL
+// 
+// IMPORTANT: For Supabase on Vercel, DATABASE_URL must use the Transaction Pooler (port 6543)
+// The direct connection (port 5432) is not reachable from Vercel's build environment
+const isVercel = process.env.VERCEL === "1" || !!process.env.VERCEL_ENV;
+let migrationUrl: string | undefined;
 
-if (!migrationUrl) {
-  throw new Error("Either DIRECT_URL or DATABASE_URL must be set for Prisma migrations");
+if (isVercel) {
+  // In Vercel, always use DATABASE_URL (should be pooler connection)
+  migrationUrl = process.env["DATABASE_URL"];
+  if (!migrationUrl) {
+    throw new Error("DATABASE_URL must be set in Vercel environment variables");
+  }
+} else {
+  // In local dev, prefer DIRECT_URL for faster migrations, fallback to DATABASE_URL
+  migrationUrl = process.env["DIRECT_URL"] || process.env["DATABASE_URL"];
+  if (!migrationUrl) {
+    throw new Error("Either DIRECT_URL or DATABASE_URL must be set for Prisma migrations");
+  }
 }
 
 export default defineConfig({
