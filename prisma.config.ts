@@ -3,12 +3,22 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// For migrations, use DIRECT_URL if available (for Supabase direct connection),
+// otherwise fall back to DATABASE_URL
+// DIRECT_URL should point to the direct database connection (port 5432)
+// DATABASE_URL should point to the connection pooler (port 6543) for serverless environments
+const migrationUrl = process.env["DIRECT_URL"] || process.env["DATABASE_URL"];
+
+if (!migrationUrl) {
+  throw new Error("Either DIRECT_URL or DATABASE_URL must be set for Prisma migrations");
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: migrationUrl,
   },
 });

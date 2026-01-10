@@ -13,13 +13,28 @@ if (!process.env.DATABASE_URL) {
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL!
   
-  // Ensure SSL is enabled for Supabase connections if not already specified
-  // Supabase requires SSL connections
+  // For Supabase connections, ensure proper configuration for serverless environments
   let finalConnectionString = connectionString
-  if (connectionString.includes('supabase.co') && !connectionString.includes('sslmode')) {
-    // Add SSL mode if not present (use 'require' for basic SSL, 'verify-full' for full verification)
-    const separator = connectionString.includes('?') ? '&' : '?'
-    finalConnectionString = `${connectionString}${separator}sslmode=require`
+  
+  if (connectionString.includes('supabase.co') || connectionString.includes('pooler.supabase.com')) {
+    // Ensure SSL is enabled for Supabase connections
+    if (!connectionString.includes('sslmode')) {
+      const separator = connectionString.includes('?') ? '&' : '?'
+      finalConnectionString = `${connectionString}${separator}sslmode=require`
+    }
+    
+    // For connection pooler (port 6543), ensure pgbouncer=true and connection_limit=1
+    // This is required for Supabase's Transaction Mode pooler used in serverless environments
+    if (connectionString.includes(':6543') || connectionString.includes('pooler.supabase.com')) {
+      if (!connectionString.includes('pgbouncer=true')) {
+        const separator = finalConnectionString.includes('?') ? '&' : '?'
+        finalConnectionString = `${finalConnectionString}${separator}pgbouncer=true`
+      }
+      if (!connectionString.includes('connection_limit')) {
+        const separator = finalConnectionString.includes('?') ? '&' : '?'
+        finalConnectionString = `${finalConnectionString}${separator}connection_limit=1`
+      }
+    }
   }
   
   const adapter = new PrismaPg({ connectionString: finalConnectionString })

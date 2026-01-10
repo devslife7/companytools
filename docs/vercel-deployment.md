@@ -6,9 +6,26 @@
 
 1. Go to your Vercel project settings
 2. Navigate to **Settings** → **Environment Variables**
-3. Add the following environment variable:
+3. Add the following environment variables:
+
+   **For Supabase (Recommended for Serverless):**
+   
    - **Name**: `DATABASE_URL`
-   - **Value**: Your PostgreSQL connection string (e.g., `postgresql://user:password@host:port/database?sslmode=require`)
+   - **Value**: Use Supabase's **Transaction Pooler** connection string (port 6543)
+     - Format: `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require`
+     - Get this from: Supabase Dashboard → Settings → Database → Connection String → Transaction Pooler
+   - **Environment**: Select all environments (Production, Preview, Development)
+   
+   - **Name**: `DIRECT_URL` (Optional, for migrations)
+   - **Value**: Use Supabase's **Direct** connection string (port 5432)
+     - Format: `postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require`
+     - Get this from: Supabase Dashboard → Settings → Database → Connection String → Direct Connection
+   - **Environment**: Select all environments (Production, Preview, Development)
+   
+   **For Other PostgreSQL Databases:**
+   
+   - **Name**: `DATABASE_URL`
+   - **Value**: Your PostgreSQL connection string with SSL (e.g., `postgresql://user:password@host:port/database?sslmode=require`)
    - **Environment**: Select all environments (Production, Preview, Development)
 
 ### 2. Database Migrations
@@ -52,9 +69,27 @@ npm run db:seed
 
 #### Database Connection Issues
 
-- **Check DATABASE_URL**: Ensure it's set correctly in Vercel environment variables
-- **Check SSL**: Most cloud databases require SSL. Add `?sslmode=require` to your connection string
-- **Check Network**: Ensure your database allows connections from Vercel's IP ranges
+**P1001 Error (Can't reach database server):**
+
+This is a common issue when deploying to Vercel with Supabase. Solutions:
+
+1. **Use Connection Pooler (Recommended)**: 
+   - Use Supabase's Transaction Pooler connection string (port 6543) instead of direct connection (port 5432)
+   - The pooler is designed for serverless environments and handles connection management
+   - Format: `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require`
+
+2. **Check Connection String Format**:
+   - Ensure `pgbouncer=true` and `connection_limit=1` are included for pooler connections
+   - Ensure `sslmode=require` is included for SSL connections
+
+3. **Check IP Allowlist**:
+   - If using direct connection, ensure Supabase allows connections from Vercel's IP ranges
+   - Better: Use the connection pooler which doesn't require IP allowlisting
+
+4. **Verify Environment Variables**:
+   - Check that `DATABASE_URL` is set correctly in Vercel environment variables
+   - Ensure it's set for the correct environment (Production, Preview, Development)
+   - Redeploy after updating environment variables
 
 #### Migration Issues
 
@@ -73,15 +108,27 @@ npm run db:seed
   npm install
   ```
 
-### 6. Connection Pooling (Recommended for Production)
+### 6. Connection Pooling (Required for Supabase on Vercel)
 
-For better performance and connection management in serverless environments, consider using:
+**For Supabase Deployments:**
 
-- **Prisma Data Proxy** (recommended)
-- **PgBouncer** connection pooler
-- **Supabase** or **Neon** (they provide built-in connection pooling)
+Supabase provides built-in connection pooling via Supavisor. For serverless environments like Vercel, you **must** use the Transaction Pooler connection string:
 
-To use Prisma Data Proxy:
-1. Set up Prisma Data Proxy
-2. Update `DATABASE_URL` to use the proxy URL
-3. No code changes needed
+- **Transaction Pooler (Port 6543)**: Use for application runtime (DATABASE_URL)
+  - Designed for serverless/short-lived connections
+  - Requires `pgbouncer=true&connection_limit=1` parameters
+  - Format: `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require`
+
+- **Direct Connection (Port 5432)**: Use for migrations (DIRECT_URL, optional)
+  - Can be used for migrations if needed
+  - Format: `postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres?sslmode=require`
+
+**Why use the pooler?**
+- Vercel serverless functions have short-lived connections
+- The pooler manages connections efficiently
+- Avoids "too many connections" errors
+- Works without IP allowlisting
+
+**Other Options:**
+- **Prisma Data Proxy**: Alternative pooling solution
+- **PgBouncer**: Self-hosted connection pooler
