@@ -33,8 +33,12 @@ export async function GET(
     return NextResponse.json(cocktail)
   } catch (error) {
     console.error('Error fetching cocktail:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to fetch cocktail' },
+      { 
+        error: 'Failed to fetch cocktail',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
@@ -101,8 +105,12 @@ export async function PUT(
       )
     }
 
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to update cocktail' },
+      { 
+        error: 'Failed to update cocktail',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
@@ -138,8 +146,12 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting cocktail:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to delete cocktail' },
+      { 
+        error: 'Failed to delete cocktail',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
