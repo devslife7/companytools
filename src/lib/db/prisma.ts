@@ -23,10 +23,10 @@ function createPrismaClient() {
     const [baseUrl, queryString] = connectionString.split('?')
     const params = new URLSearchParams(queryString || '')
     
-    // For Supabase pooler connections, use 'no-verify' SSL mode to handle certificate issues
-    // This is safe for Supabase as they use valid certificates, but helps with connection issues
-    // In production, you may want to use 'require' and configure proper certificate validation
-    const sslMode = process.env.NODE_ENV === 'production' ? 'require' : 'no-verify'
+    // For Supabase pooler connections, use proper SSL mode
+    // Production: require SSL (secure)
+    // Development: prefer no-verify for local testing, but can use require
+    const sslMode = process.env.NODE_ENV === 'production' ? 'require' : (params.get('sslmode') || 'require')
     params.set('sslmode', sslMode)
     
     // For connection pooler (port 6543), ensure pgbouncer=true and connection_limit=1
@@ -40,16 +40,18 @@ function createPrismaClient() {
     finalConnectionString = `${baseUrl}?${params.toString()}`
     
     // Create a pg Pool with proper SSL configuration for Supabase
+    // Supabase requires SSL, so we configure it explicitly
     pool = new Pool({
       connectionString: finalConnectionString,
       max: 1, // Important for serverless/connection pooler
+      ssl: process.env.NODE_ENV === 'production' 
+        ? { rejectUnauthorized: true } // Strict SSL in production
+        : { rejectUnauthorized: false }, // Allow self-signed in development
     })
     
-    // Log the modified connection string in development (without password)
-    if (process.env.NODE_ENV === 'development') {
-      const maskedUrl = finalConnectionString.replace(/:[^:@]+@/, ':****@')
-      console.log('[Prisma] Using Supabase connection:', maskedUrl)
-    }
+    // Log connection info (without password) for debugging
+    const maskedUrl = finalConnectionString.replace(/:[^:@]+@/, ':****@')
+    console.log(`[Prisma] Using Supabase connection (${process.env.NODE_ENV || 'unknown'}):`, maskedUrl)
   }
   
   const adapter = pool 
