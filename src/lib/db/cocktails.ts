@@ -37,40 +37,49 @@ export async function getAllCocktails(filters?: {
   category?: string
   active?: boolean
 }): Promise<CocktailRecipe[]> {
-  const where: any = {}
+  try {
+    const where: any = {}
 
-  if (filters?.active !== undefined) {
-    where.isActive = filters.active
-  } else {
-    where.isActive = true // Default to active only
-  }
-
-  if (filters?.category) {
-    where.category = filters.category
-  }
-
-  if (filters?.search) {
-    where.name = {
-      contains: filters.search,
-      mode: 'insensitive',
+    if (filters?.active !== undefined) {
+      where.isActive = filters.active
+    } else {
+      where.isActive = true // Default to active only
     }
-  }
 
-  const cocktails = await prisma.cocktail.findMany({
-    where,
-    include: {
-      ingredients: {
-        orderBy: {
-          orderIndex: 'asc',
+    if (filters?.category) {
+      where.category = filters.category
+    }
+
+    if (filters?.search) {
+      where.name = {
+        contains: filters.search,
+        mode: 'insensitive',
+      }
+    }
+
+    const cocktails = await prisma.cocktail.findMany({
+      where,
+      include: {
+        ingredients: {
+          orderBy: {
+            orderIndex: 'asc',
+          },
         },
       },
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  })
+      orderBy: {
+        name: 'asc',
+      },
+    })
 
-  return cocktails.map(transformCocktailToRecipe)
+    return cocktails.map(transformCocktailToRecipe)
+  } catch (error) {
+    console.error('Database error in getAllCocktails:', error)
+    // Re-throw with more context
+    if (error instanceof Error) {
+      throw new Error(`Database query failed: ${error.message}`)
+    }
+    throw error
+  }
 }
 
 /**

@@ -25,6 +25,19 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error fetching cocktails:', error)
+    
+    // Log detailed error information for debugging
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+      
+      // Check for common connection errors
+      if (error.message.includes('connect') || error.message.includes('timeout') || error.message.includes('ECONNREFUSED')) {
+        console.error('Database connection error detected')
+      }
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
       { 
