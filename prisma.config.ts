@@ -3,6 +3,34 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Helper function to ensure pgbouncer=true is set for connection poolers
+// This prevents "prepared statement already exists" errors during migrations
+function ensurePgbouncerParam(connectionString: string): string {
+  const isPooler = connectionString.includes(':6543') || 
+                   connectionString.includes('pooler.supabase.com') || 
+                   connectionString.includes('pooler');
+  
+  if (!isPooler) {
+    return connectionString;
+  }
+  
+  // Check if pgbouncer is already set
+  if (connectionString.includes('pgbouncer=')) {
+    return connectionString;
+  }
+  
+  // Parse and add pgbouncer parameter
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.set('pgbouncer', 'true');
+    return url.toString();
+  } catch (error) {
+    // If URL parsing fails, try string manipulation
+    const separator = connectionString.includes('?') ? '&' : '?';
+    return `${connectionString}${separator}pgbouncer=true`;
+  }
+}
+
 // For migrations:
 // - In Vercel/serverless: Always use DATABASE_URL (pooler connection, port 6543)
 // - In local dev: Prefer DIRECT_URL if available, otherwise use DATABASE_URL
@@ -18,12 +46,14 @@ if (isVercel) {
   if (!migrationUrl) {
     throw new Error("DATABASE_URL must be set in Vercel environment variables");
   }
+  migrationUrl = ensurePgbouncerParam(migrationUrl);
 } else {
   // In local dev, prefer DIRECT_URL for faster migrations, fallback to DATABASE_URL
   migrationUrl = process.env["DIRECT_URL"] || process.env["DATABASE_URL"];
   if (!migrationUrl) {
     throw new Error("Either DIRECT_URL or DATABASE_URL must be set for Prisma migrations");
   }
+  migrationUrl = ensurePgbouncerParam(migrationUrl);
 }
 
 export default defineConfig({
