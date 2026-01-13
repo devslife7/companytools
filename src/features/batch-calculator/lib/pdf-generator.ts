@@ -56,8 +56,12 @@ export const generatePdfReport = (batches: BatchState[]) => {
 
   // 1. Grand Total Summary (Inventory Shopping List) - Separated by Liquor, Soda, and Other Items
   const hasSodaItems = grandTotals.soda.length > 0
-  const totalColumns = hasSodaItems ? 5 : 4
+  const hasAngosturaBitters = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
+    item => item.bottles4oz !== undefined
+  )
+  const totalColumns = hasSodaItems && hasAngosturaBitters ? 6 : hasSodaItems || hasAngosturaBitters ? 5 : 4
   const canColumnHeader = hasSodaItems ? '<th>12oz Cans</th>' : ''
+  const bottle4ozColumnHeader = hasAngosturaBitters ? '<th>4oz Bottles</th>' : ''
   
   htmlContent += `
             <h2 class="summary-title">Inventory Shopping List (Grand Totals based on Servings)</h2>
@@ -70,6 +74,7 @@ export const generatePdfReport = (batches: BatchState[]) => {
                             <th>Total Quarts (Q)</th>
                             <th>Approx. @750 BOTTLES</th>
                             ${canColumnHeader}
+                            ${bottle4ozColumnHeader}
                         </tr>
                     </thead>
                     <tbody>
@@ -88,6 +93,7 @@ export const generatePdfReport = (batches: BatchState[]) => {
                                 <td>${formatNumber(ing.quart)}</td>
                                 <td>${formatNumber(ing.bottles)}</td>
                                 ${hasSodaItems ? '<td>-</td>' : ''}
+                                ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
                             </tr>
                         `
                           )
@@ -115,6 +121,7 @@ export const generatePdfReport = (batches: BatchState[]) => {
                                 <td>${formatNumber(ing.quart)}</td>
                                 <td>${formatNumber(ing.bottles)}</td>
                                 ${hasSodaItems ? `<td>${ing.cans12oz ? ing.cans12oz.toFixed(0) : '-'}</td>` : ''}
+                                ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
                             </tr>
                         `
                           )
@@ -142,6 +149,7 @@ export const generatePdfReport = (batches: BatchState[]) => {
                                 <td>${formatNumber(ing.quart)}</td>
                                 <td>${formatNumber(ing.bottles)}</td>
                                 ${hasSodaItems ? '<td>-</td>' : ''}
+                                ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
                             </tr>
                         `
                           )

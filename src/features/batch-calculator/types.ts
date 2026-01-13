@@ -49,5 +49,6 @@ export interface CombinedIngredient extends Ingredient {
 
 export interface BatchResultWithCans extends BatchResult {
   cans12oz?: number
+  bottles4oz?: number
 }
 

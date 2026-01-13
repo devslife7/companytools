@@ -27,3 +27,8 @@ export const isSodaItem = (name: string): boolean => {
 export const isGingerBeer = (name: string): boolean => {
   return name.toLowerCase().includes("ginger beer")
 }
+
+// Helper function to check if item is Angostura bitters
+export const isAngosturaBitters = (name: string): boolean => {
+  return name.toLowerCase().includes("angostura bitters")
+}

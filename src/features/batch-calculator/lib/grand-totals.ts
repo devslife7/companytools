@@ -1,9 +1,10 @@
 import type { BatchState, BatchResultWithCans, UnitType } from "../types"
 import { calculateBatch } from "./calculations"
-import { isLiquorItem, isSodaItem } from "./ingredient-helpers"
+import { isLiquorItem, isSodaItem, isAngosturaBitters } from "./ingredient-helpers"
 
 // Constants for can calculations
 const CAN_SIZE_12OZ_ML = 354.882 // 12 fluid ounces in milliliters
+const BOTTLE_SIZE_4OZ_ML = 118.294 // 4 fluid ounces in milliliters
 
 // Utility to calculate Grand Totals for the PDF Report
 export const calculateGrandTotals = (batches: BatchState[]): { 
@@ -40,6 +41,10 @@ export const calculateGrandTotals = (batches: BatchState[]): {
       // Add 12oz can quantity for all soda items
       if (isSodaItem(name)) {
         item.cans12oz = Math.ceil(item.ml / CAN_SIZE_12OZ_ML)
+      }
+      // Add 4oz bottle quantity for Angostura bitters
+      if (isAngosturaBitters(name)) {
+        item.bottles4oz = Math.ceil(item.ml / BOTTLE_SIZE_4OZ_ML)
       }
       return item
     })
