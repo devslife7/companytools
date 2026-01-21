@@ -6,7 +6,7 @@ import type { Ingredient, CocktailRecipe, BatchState } from "@/features/batch-ca
 
 // Import utilities
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
-import { generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
+import { generatePdfReport, generateShoppingListPdf, generateBatchCalculationsPdf } from "@/features/batch-calculator/lib/pdf-generator"
 import { COCKTAIL_DATA } from "@/features/batch-calculator/data/cocktails"
 
 // Import hooks
@@ -14,10 +14,10 @@ import { useCocktails, useCreateCocktail } from "@/features/batch-calculator/hoo
 import { useToast, ToastContainer } from "@/components/ui"
 
 // Import components
-import { BatchItem } from "@/features/batch-calculator/components/BatchItem"
+import { BatchItem, FavoritesMultiSelect } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
-import { Plus } from "lucide-react"
+import { Plus, ShoppingCart, Calculator, FileText } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -214,6 +214,44 @@ export default function BatchCalculatorPage() {
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
 
+  // Calculate progress for servings
+  const servingsProgress = useMemo(() => {
+    const totalBatches = batches.filter(b => b.editableRecipe).length
+    const batchesWithServings = batches.filter(
+      b => b.editableRecipe && typeof b.servings === "number" && b.servings > 0
+    ).length
+    return { completed: batchesWithServings, total: totalBatches }
+  }, [batches])
+
+  const handleGenerateShoppingList = () => {
+    generateShoppingListPdf(batches)
+  }
+
+  const handleGenerateBatchCalculations = () => {
+    // Check if any batch is missing servings
+    const batchesWithoutServings = batches.filter(
+      b => b.editableRecipe && (b.servings === "" || b.servings === 0 || (typeof b.servings === "number" && b.servings <= 0))
+    )
+
+    if (batchesWithoutServings.length > 0) {
+      const cocktailNames = batchesWithoutServings
+        .map(b => b.selectedCocktail?.name || `Batch #${b.id}`)
+        .join(", ")
+      
+      const missingIds = new Set(batchesWithoutServings.map(b => b.id))
+      setBatchesWithMissingServings(missingIds)
+      
+      setMissingServingsMessage(
+        `Please enter servings for all cocktails before generating batch calculations.\n\nMissing servings for: ${cocktailNames}\n\nServings are required to generate accurate batch calculations.`
+      )
+      setShowServingsModal(true)
+      return
+    }
+
+    setBatchesWithMissingServings(new Set())
+    generateBatchCalculationsPdf(batches)
+  }
+
   const handleGeneratePdfReport = () => {
     // Check if any batch is missing servings
     const batchesWithoutServings = batches.filter(
@@ -345,8 +383,14 @@ export default function BatchCalculatorPage() {
           </button>
         </div>
 
-        {/* Multi-Select Cocktail Search */}
-        <div className="mb-6 px-0">
+        {/* Section 1: Select Cocktails */}
+        <div className="mb-8 px-0">
+          <div className="mb-4 pb-2 border-b-2 border-gray-300">
+            <h2 className="text-xl font-bold text-gray-900">Step 1: Select Cocktails</h2>
+            <p className="text-sm text-gray-600 mt-1">Choose cocktails from favorites or search for others</p>
+          </div>
+
+          {/* Database Status */}
           {cocktailsLoading ? (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
               Loading cocktails from database...
@@ -356,33 +400,52 @@ export default function BatchCalculatorPage() {
               ⚠️ Database unavailable, using static data fallback. Error: {cocktailsError}
             </div>
           ) : apiCocktails.length > 0 ? (
-            <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-2">
+            <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-4">
               ✓ Loaded {apiCocktails.length} cocktails from database
             </div>
           ) : null}
-          <MultiSelectCocktailSearch
-            cocktails={availableCocktails}
+
+          {/* Favorites Multi-Select */}
+          <FavoritesMultiSelect
+            favoriteCocktails={favoriteCocktails}
             selectedCocktails={selectedCocktails}
             onSelectionChange={handleCocktailSelectionChange}
-            label="Search and Add Cocktails"
           />
+
+          {/* Multi-Select Cocktail Search */}
+          <div className="mb-6">
+            <MultiSelectCocktailSearch
+              cocktails={availableCocktails}
+              selectedCocktails={selectedCocktails}
+              onSelectionChange={handleCocktailSelectionChange}
+              label="Search and Add More Cocktails"
+            />
+          </div>
         </div>
 
-        {/* Show favorite cocktails if no cocktails are selected */}
-        {!hasSelectedCocktails && (
-          <div className="mb-6 px-0">
-            <p className="text-sm font-medium text-gray-600 mb-3">Popular Cocktails</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {favoriteCocktails.map(cocktail => (
-                <button
-                  key={cocktail.name}
-                  onClick={() => handleCocktailSelectionChange([cocktail])}
-                  className="p-4 bg-white border border-gray-300 rounded-lg hover:border-orange-500 hover:shadow-md transition-all duration-200 text-left"
-                >
-                  <h3 className="font-semibold text-gray-900 mb-1">{cocktail.name}</h3>
-                  <p className="text-sm text-gray-600">{cocktail.garnish}</p>
-                </button>
-              ))}
+        {/* Section 2: Configure Servings */}
+        {hasSelectedCocktails && (
+          <div className="mb-8 px-0">
+            <div className="mb-4 pb-2 border-b-2 border-gray-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Step 2: Set Servings</h2>
+                  <p className="text-sm text-gray-600 mt-1">Enter the number of servings for each cocktail</p>
+                </div>
+                {servingsProgress.total > 0 && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
+                    <span className="text-sm font-medium text-gray-700">
+                      {servingsProgress.completed} / {servingsProgress.total}
+                    </span>
+                    <div className="w-24 h-2 bg-gray-300 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-orange-600 transition-all duration-300"
+                        style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -406,21 +469,73 @@ export default function BatchCalculatorPage() {
           ))}
         </div>
 
-        {/* Final Export Button - Only show if cocktails are selected */}
+        {/* Section 3: Print Options */}
         {hasSelectedCocktails && (
-          <div className="mt-3 space-y-3 px-0">
-            <button
-              className={`w-full py-4 text-xl font-bold rounded-xl transition duration-300 shadow-xl uppercase tracking-widest
-                              ${
-                                canExport
-                                  ? "bg-orange-600 text-white border border-orange-700 hover:bg-orange-700 shadow-orange-600/30"
-                                  : "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
-                              }`}
-              onClick={handleGeneratePdfReport}
-              disabled={!canExport}
-            >
-              Download All Batch Sheets (Print-Ready PDF)
-            </button>
+          <div className="mt-8 px-0">
+            <div className="mb-4 pb-2 border-b-2 border-gray-300">
+              <h2 className="text-xl font-bold text-gray-900">Step 3: Print</h2>
+              <p className="text-sm text-gray-600 mt-1">Choose what you want to print</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Shopping List Button */}
+              <button
+                onClick={handleGenerateShoppingList}
+                className="flex flex-col items-center justify-center p-6 bg-white border-2 border-gray-300 rounded-xl hover:border-orange-500 hover:shadow-lg transition-all duration-200 group"
+              >
+                <ShoppingCart className="w-8 h-8 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-gray-900 mb-1">Shopping List</span>
+                <span className="text-xs text-gray-600 text-center">Grand totals of all ingredients</span>
+              </button>
+
+              {/* Batch Calculations Button */}
+              <button
+                onClick={handleGenerateBatchCalculations}
+                disabled={!canExport}
+                className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl transition-all duration-200 group ${
+                  canExport
+                    ? "bg-white border-gray-300 hover:border-orange-500 hover:shadow-lg"
+                    : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
+                }`}
+              >
+                <Calculator className={`w-8 h-8 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
+                <span className={`font-bold mb-1 ${canExport ? "text-gray-900" : "text-gray-500"}`}>
+                  Batch Calculations
+                </span>
+                <span className={`text-xs text-center ${canExport ? "text-gray-600" : "text-gray-400"}`}>
+                  Individual batch sheets
+                </span>
+              </button>
+
+              {/* Full Report Button */}
+              <button
+                onClick={handleGeneratePdfReport}
+                disabled={!canExport}
+                className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl transition-all duration-200 group ${
+                  canExport
+                    ? "bg-white border-gray-300 hover:border-orange-500 hover:shadow-lg"
+                    : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
+                }`}
+              >
+                <FileText className={`w-8 h-8 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
+                <span className={`font-bold mb-1 ${canExport ? "text-gray-900" : "text-gray-500"}`}>
+                  Full Report
+                </span>
+                <span className={`text-xs text-center ${canExport ? "text-gray-600" : "text-gray-400"}`}>
+                  Shopping list + batch sheets
+                </span>
+              </button>
+            </div>
+
+            {/* Progress indicator message */}
+            {servingsProgress.total > 0 && servingsProgress.completed < servingsProgress.total && (
+              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> Enter servings for all cocktails to enable batch calculations and full report printing.
+                  ({servingsProgress.completed} of {servingsProgress.total} completed)
+                </p>
+              </div>
+            )}
           </div>
         )}
 
