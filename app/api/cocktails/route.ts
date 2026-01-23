@@ -12,11 +12,13 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || undefined
     const category = searchParams.get('category') || undefined
     const active = searchParams.get('active') !== 'false' // Default to true
+    const featured = searchParams.get('featured') === 'true' ? true : searchParams.get('featured') === 'false' ? false : undefined
 
     const cocktails = await getAllCocktails({
       search,
       category,
       active,
+      featured,
     })
 
     return NextResponse.json({
@@ -53,7 +55,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, garnish, method, ingredients, category, tags, createdBy } = body
+    const { name, garnish, method, ingredients, category, tags, createdBy, featured } = body
 
     // Validate required fields
     if (!name || !garnish || !method || !ingredients || !Array.isArray(ingredients)) {
@@ -86,6 +88,7 @@ export async function POST(request: NextRequest) {
       category,
       tags,
       createdBy,
+      featured,
     })
 
     return NextResponse.json(cocktail, { status: 201 })

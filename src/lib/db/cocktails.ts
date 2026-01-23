@@ -9,6 +9,7 @@ function transformCocktailToRecipe(cocktail: {
   name: string
   garnish: string
   method: string
+  featured: boolean
   ingredients: {
     name: string
     amount: string
@@ -20,6 +21,7 @@ function transformCocktailToRecipe(cocktail: {
     name: cocktail.name,
     garnish: cocktail.garnish,
     method: cocktail.method,
+    featured: cocktail.featured,
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(ing => ({
@@ -36,6 +38,7 @@ export async function getAllCocktails(filters?: {
   search?: string
   category?: string
   active?: boolean
+  featured?: boolean
 }): Promise<CocktailRecipe[]> {
   try {
     const where: any = {}
@@ -48,6 +51,10 @@ export async function getAllCocktails(filters?: {
 
     if (filters?.category) {
       where.category = filters.category
+    }
+
+    if (filters?.featured !== undefined) {
+      where.featured = filters.featured
     }
 
     if (filters?.search) {
@@ -140,6 +147,7 @@ export async function createCocktail(
       category: data.category,
       tags: data.tags || [],
       createdBy: data.createdBy,
+      featured: data.featured ?? false,
       ingredients: {
         create: data.ingredients.map((ing, index) => ({
           name: ing.name,
@@ -194,6 +202,7 @@ export async function updateCocktail(
   if (data.method) updateData.method = data.method
   if (data.category !== undefined) updateData.category = data.category
   if (data.tags) updateData.tags = data.tags
+  if (data.featured !== undefined) updateData.featured = data.featured
 
   const cocktail = await prisma.cocktail.update({
     where: { id },

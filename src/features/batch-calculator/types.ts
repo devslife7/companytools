@@ -11,6 +11,7 @@ export interface CocktailRecipe {
   garnish: string
   method: string
   ingredients: Ingredient[]
+  featured?: boolean
 }
 
 export type UnitType = "liquid" | "count" | "special"

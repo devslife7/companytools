@@ -20,12 +20,14 @@ model Cocktail {
   isActive   Boolean     @default(true) @map("is_active")
   tags       String[]    @default([])
   category   String?     @db.VarChar(100)
+  featured   Boolean     @default(false)
   
   ingredients Ingredient[]
   
   @@index([name])
   @@index([isActive])
   @@index([category])
+  @@index([featured])
   @@map("cocktails")
 }
 
