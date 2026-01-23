@@ -433,12 +433,12 @@ export default function BatchCalculatorPage() {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="mb-4 flex flex-wrap gap-2 items-center">
+          <div className="mb-4 flex overflow-x-auto scrollbar-hide gap-2 items-center">
             {/* Featured/All Filter Dropdown */}
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
-              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
             >
               <option value="featured">Featured</option>
               <option value="all">All Cocktails</option>
@@ -448,7 +448,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedLiquor}
               onChange={(e) => setSelectedLiquor(e.target.value)}
-              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
             >
               <option value="">All Liquors</option>
               {availableLiquors.map((liquor) => (
