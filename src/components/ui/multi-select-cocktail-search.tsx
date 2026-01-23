@@ -10,7 +10,7 @@ interface MultiSelectCocktailSearchProps {
 }
 
 export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps> = React.memo(
-  ({ cocktails, selectedCocktails, onSelectionChange, label = "Search and Add Cocktails" }) => {
+  ({ cocktails, selectedCocktails, onSelectionChange }) => {
     const [searchTerm, setSearchTerm] = useState("")
     const [isOpen, setIsOpen] = useState(false)
     const searchRef = useRef<HTMLDivElement>(null)
@@ -56,9 +56,7 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
 
     return (
       <div className="flex flex-col space-y-3" ref={searchRef}>
-        <label htmlFor="multi-search" className="text-lg font-bold text-gray-900">
-          {label}
-        </label>
+   
         
         {/* Search Input */}
         <div className="relative">

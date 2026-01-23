@@ -376,12 +376,11 @@ export default function BatchCalculatorPage() {
 
         {/* Section 1: Select Cocktails */}
         <div className="mb-8 px-0">
-          <div className="mb-4 pb-2 border-b-2 border-gray-300">
+          <div className="mb-2">
             <h2 className="text-xl font-bold text-gray-900">Step 1: Select Cocktails</h2>
-            <p className="text-sm text-gray-600 mt-1">Choose cocktails from favorites or search for others</p>
           </div>
 
-          {/* Database Status */}
+          {/* Database Status
           {cocktailsLoading ? (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
               Loading cocktails from database...
@@ -394,7 +393,7 @@ export default function BatchCalculatorPage() {
             <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-4">
               ✓ Loaded {apiCocktails.length} cocktails from database
             </div>
-          ) : null}
+          ) : null} */}
 
           {/* Multi-Select Cocktail Search */}
           <div className="mb-6">
