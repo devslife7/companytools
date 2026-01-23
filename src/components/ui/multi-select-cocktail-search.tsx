@@ -60,7 +60,7 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
         
         {/* Search Input */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 z-10" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
           <input
             id="multi-search"
             type="text"
@@ -71,7 +71,7 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
               setIsOpen(true)
             }}
             onFocus={() => setIsOpen(true)}
-            className="w-full py-2 pl-10 pr-4 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200"
+            className="w-full py-2 pl-10 pr-4 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal"
           />
         </div>
 
