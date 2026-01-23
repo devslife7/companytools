@@ -31,13 +31,21 @@ export default function BatchCalculatorPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingCocktail, setEditingCocktail] = useState<CocktailRecipe | null>(null)
   const [editingCocktailId, setEditingCocktailId] = useState<number | undefined>()
+  const [filter, setFilter] = useState<'featured' | 'all'>('featured')
 
   // Toast notifications
   const { toasts, removeToast, success, error: showError } = useToast()
 
-  // Fetch cocktails from database (primary source)
+  // Fetch cocktails from database (primary source) - for search/selection
   const { cocktails: apiCocktails, loading: cocktailsLoading, error: cocktailsError, refetch: refetchCocktails } = useCocktails({
     enabled: true, // Always try to use database
+  })
+
+  // Fetch cocktails for display list with filter
+  const { cocktails: filteredCocktails, loading: filteredLoading } = useCocktails({
+    enabled: true,
+    featured: filter === 'featured' ? true : undefined,
+    active: true,
   })
 
   // Create cocktail mutation
@@ -403,6 +411,84 @@ export default function BatchCalculatorPage() {
               onSelectionChange={handleCocktailSelectionChange}
               label="Search and Add More Cocktails"
             />
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="mb-4 flex gap-2">
+            <button
+              onClick={() => setFilter('featured')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                filter === 'featured'
+                  ? 'bg-orange-600 text-white shadow-md'
+                  : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400'
+              }`}
+            >
+              Featured
+            </button>
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                filter === 'all'
+                  ? 'bg-orange-600 text-white shadow-md'
+                  : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400'
+              }`}
+            >
+              All Cocktails
+            </button>
+          </div>
+
+          {/* Cocktails List */}
+          <div className="mb-6">
+            {filteredLoading ? (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
+                Loading cocktails...
+              </div>
+            ) : filteredCocktails.length === 0 ? (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
+                {filter === 'featured' ? 'No featured cocktails found.' : 'No cocktails found.'}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {filteredCocktails.map(cocktail => {
+                  const isSelected = selectedCocktails.some(c => c.name === cocktail.name)
+                  return (
+                    <button
+                      key={cocktail.id || cocktail.name}
+                      onClick={() => {
+                        if (isSelected) {
+                          handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))
+                        } else {
+                          handleCocktailSelectionChange([...selectedCocktails, cocktail])
+                        }
+                      }}
+                      className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
+                        isSelected
+                          ? 'bg-orange-100 border-orange-500 shadow-md'
+                          : 'bg-white border-gray-300 hover:border-orange-400 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-1">{cocktail.name}</h3>
+                          {cocktail.featured && (
+                            <span className="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-xs font-semibold rounded">
+                              Featured
+                            </span>
+                          )}
+                        </div>
+                        {isSelected && (
+                          <div className="ml-2 text-orange-600">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
 

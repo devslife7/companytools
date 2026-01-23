@@ -5,6 +5,7 @@ interface UseCocktailsOptions {
   search?: string
   category?: string
   active?: boolean
+  featured?: boolean
   enabled?: boolean
 }
 
@@ -16,7 +17,7 @@ interface UseCocktailsResult {
 }
 
 export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsResult {
-  const { search, category, active = true, enabled = true } = options
+  const { search, category, active = true, featured, enabled = true } = options
   const [cocktails, setCocktails] = useState<CocktailRecipe[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,6 +36,7 @@ export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsRes
       if (search) params.append('search', search)
       if (category) params.append('category', category)
       if (active !== undefined) params.append('active', String(active))
+      if (featured !== undefined) params.append('featured', String(featured))
 
       const response = await fetch(`/api/cocktails?${params.toString()}`)
       
@@ -55,7 +57,7 @@ export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsRes
   useEffect(() => {
     fetchCocktails()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category, active, enabled])
+  }, [search, category, active, featured, enabled])
 
   return {
     cocktails,
