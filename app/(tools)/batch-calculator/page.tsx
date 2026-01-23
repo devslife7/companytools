@@ -432,44 +432,31 @@ export default function BatchCalculatorPage() {
             />
           </div>
 
-          {/* Filter Buttons and Liquor Dropdown */}
+          {/* Filter Dropdowns */}
           <div className="mb-4 flex flex-wrap gap-2 items-center">
-            <button
-              onClick={() => setFilter('featured')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                filter === 'featured'
-                  ? 'bg-orange-600 text-white shadow-md'
-                  : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400'
-              }`}
+            {/* Featured/All Filter Dropdown */}
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
+              className="px-4 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200 cursor-pointer"
             >
-              Featured
-            </button>
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                filter === 'all'
-                  ? 'bg-orange-600 text-white shadow-md'
-                  : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400'
-              }`}
-            >
-              All Cocktails
-            </button>
+              <option value="featured">Featured</option>
+              <option value="all">All Cocktails</option>
+            </select>
             
             {/* Liquor Filter Dropdown */}
-            <div className="ml-auto">
-              <select
-                value={selectedLiquor}
-                onChange={(e) => setSelectedLiquor(e.target.value)}
-                className="px-4 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200 cursor-pointer"
-              >
-                <option value="">All Liquors</option>
-                {availableLiquors.map((liquor) => (
-                  <option key={liquor} value={liquor}>
-                    {liquor}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={selectedLiquor}
+              onChange={(e) => setSelectedLiquor(e.target.value)}
+              className="px-4 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200 cursor-pointer"
+            >
+              <option value="">All Liquors</option>
+              {availableLiquors.map((liquor) => (
+                <option key={liquor} value={liquor}>
+                  {liquor}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Cocktails List */}
