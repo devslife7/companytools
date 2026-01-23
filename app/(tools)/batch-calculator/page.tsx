@@ -493,10 +493,13 @@ export default function BatchCalculatorPage() {
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 mb-1">{cocktail.name}</h3>
                           {cocktail.featured && (
-                            <span className="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-xs font-semibold rounded">
+                            <span className="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-xs font-semibold rounded mb-2">
                               Featured
                             </span>
                           )}
+                          <p className="text-xs text-gray-600 mt-1">
+                            {cocktail.ingredients.map(ing => ing.name).join(', ')}
+                          </p>
                         </div>
                         {isSelected && (
                           <div className="ml-2 text-orange-600">
