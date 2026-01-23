@@ -10,7 +10,7 @@ interface MultiSelectCocktailSearchProps {
 }
 
 export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps> = React.memo(
-  ({ cocktails, selectedCocktails, onSelectionChange, label = "Search and Add Cocktails" }) => {
+  ({ cocktails, selectedCocktails, onSelectionChange }) => {
     const [searchTerm, setSearchTerm] = useState("")
     const [isOpen, setIsOpen] = useState(false)
     const searchRef = useRef<HTMLDivElement>(null)
@@ -56,24 +56,22 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
 
     return (
       <div className="flex flex-col space-y-3" ref={searchRef}>
-        <label htmlFor="multi-search" className="text-lg font-bold text-gray-900">
-          {label}
-        </label>
+   
         
         {/* Search Input */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-orange-600 z-10" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
           <input
             id="multi-search"
             type="text"
-            placeholder="Search for cocktails to add..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={e => {
               setSearchTerm(e.target.value)
               setIsOpen(true)
             }}
             onFocus={() => setIsOpen(true)}
-            className="w-full py-4 pl-12 pr-4 text-lg bg-white text-gray-900 border-2 border-orange-300 rounded-xl focus:ring-4 focus:ring-orange-200 focus:border-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:border-orange-400"
+            className="w-full py-2 pl-10 pr-4 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal"
           />
         </div>
 

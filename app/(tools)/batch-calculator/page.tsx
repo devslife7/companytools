@@ -14,7 +14,7 @@ import { useCocktails, useCreateCocktail } from "@/features/batch-calculator/hoo
 import { useToast, ToastContainer } from "@/components/ui"
 
 // Import components
-import { BatchItem, FavoritesMultiSelect } from "@/features/batch-calculator/components"
+import { BatchItem } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
 import { Plus, ShoppingCart, Calculator, FileText } from "lucide-react"
@@ -31,13 +31,40 @@ export default function BatchCalculatorPage() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingCocktail, setEditingCocktail] = useState<CocktailRecipe | null>(null)
   const [editingCocktailId, setEditingCocktailId] = useState<number | undefined>()
+  const [filter, setFilter] = useState<'featured' | 'all'>('featured')
+  const [selectedLiquor, setSelectedLiquor] = useState<string>('')
+  const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
 
   // Toast notifications
   const { toasts, removeToast, success, error: showError } = useToast()
 
-  // Fetch cocktails from database (primary source)
+  // Fetch cocktails from database (primary source) - for search/selection
   const { cocktails: apiCocktails, loading: cocktailsLoading, error: cocktailsError, refetch: refetchCocktails } = useCocktails({
     enabled: true, // Always try to use database
+  })
+
+  // Fetch unique liquors
+  useEffect(() => {
+    const fetchLiquors = async () => {
+      try {
+        const response = await fetch('/api/cocktails?liquors=true')
+        if (response.ok) {
+          const data = await response.json()
+          setAvailableLiquors(data.liquors || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch liquors:', err)
+      }
+    }
+    fetchLiquors()
+  }, [])
+
+  // Fetch cocktails for display list with filter
+  const { cocktails: filteredCocktails, loading: filteredLoading } = useCocktails({
+    enabled: true,
+    featured: filter === 'featured' ? true : undefined,
+    active: true,
+    liquor: selectedLiquor || undefined,
   })
 
   // Create cocktail mutation
@@ -352,20 +379,11 @@ export default function BatchCalculatorPage() {
     setShowEditModal(true)
   }, [])
 
-  const favoriteCocktails = useMemo(() => {
-    return availableCocktails.filter(
-      cocktail => 
-        cocktail.name === "Espresso Martini" || 
-        cocktail.name === "Blackberry Collins" ||
-        cocktail.name === "Maple Bourbon Cider"
-    )
-  }, [availableCocktails])
-
   const hasSelectedCocktails = selectedCocktails.length > 0
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans py-1 sm:py-2 px-0">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-gray-900 font-sans py-6 sm:py-8 px-4">
+      <div className="max-w-4xl mx-auto p-6 sm:p-8">
         {/* Toast Notifications */}
         <ToastContainer toasts={toasts} onRemove={removeToast} />
 
@@ -385,12 +403,11 @@ export default function BatchCalculatorPage() {
 
         {/* Section 1: Select Cocktails */}
         <div className="mb-8 px-0">
-          <div className="mb-4 pb-2 border-b-2 border-gray-300">
+          <div className="mb-2">
             <h2 className="text-xl font-bold text-gray-900">Step 1: Select Cocktails</h2>
-            <p className="text-sm text-gray-600 mt-1">Choose cocktails from favorites or search for others</p>
           </div>
 
-          {/* Database Status */}
+          {/* Database Status
           {cocktailsLoading ? (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
               Loading cocktails from database...
@@ -403,23 +420,100 @@ export default function BatchCalculatorPage() {
             <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-4">
               ✓ Loaded {apiCocktails.length} cocktails from database
             </div>
-          ) : null}
-
-          {/* Favorites Multi-Select */}
-          <FavoritesMultiSelect
-            favoriteCocktails={favoriteCocktails}
-            selectedCocktails={selectedCocktails}
-            onSelectionChange={handleCocktailSelectionChange}
-          />
+          ) : null} */}
 
           {/* Multi-Select Cocktail Search */}
-          <div className="mb-6">
+          <div className="mb-4">
             <MultiSelectCocktailSearch
               cocktails={availableCocktails}
               selectedCocktails={selectedCocktails}
               onSelectionChange={handleCocktailSelectionChange}
               label="Search and Add More Cocktails"
             />
+          </div>
+
+          {/* Filter Dropdowns */}
+          <div className="mb-4 flex flex-wrap gap-2 items-center">
+            {/* Featured/All Filter Dropdown */}
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
+              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer"
+            >
+              <option value="featured">Featured</option>
+              <option value="all">All Cocktails</option>
+            </select>
+            
+            {/* Liquor Filter Dropdown */}
+            <select
+              value={selectedLiquor}
+              onChange={(e) => setSelectedLiquor(e.target.value)}
+              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer"
+            >
+              <option value="">All Liquors</option>
+              {availableLiquors.map((liquor) => (
+                <option key={liquor} value={liquor}>
+                  {liquor}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Cocktails List */}
+          <div className="mb-6">
+            {filteredLoading ? (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
+                Loading cocktails...
+              </div>
+            ) : filteredCocktails.length === 0 ? (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
+                {filter === 'featured' ? 'No featured cocktails found.' : 'No cocktails found.'}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {filteredCocktails.map(cocktail => {
+                  const isSelected = selectedCocktails.some(c => c.name === cocktail.name)
+                  return (
+                    <button
+                      key={cocktail.id || cocktail.name}
+                      onClick={() => {
+                        if (isSelected) {
+                          handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))
+                        } else {
+                          handleCocktailSelectionChange([...selectedCocktails, cocktail])
+                        }
+                      }}
+                      className={`p-6 rounded-xl border text-left transition-all duration-200 ${
+                        isSelected
+                          ? 'bg-orange-50 border-orange-300'
+                          : 'bg-white border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-2 text-lg">{cocktail.name}</h3>
+                          {cocktail.featured && (
+                            <span className="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-xs font-semibold rounded mb-2">
+                              Featured
+                            </span>
+                          )}
+                          <p className="text-sm text-gray-600 mt-2">
+                            {cocktail.ingredients.map(ing => ing.name).join(', ')}
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <div className="ml-2 text-orange-600">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
 

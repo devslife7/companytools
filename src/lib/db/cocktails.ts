@@ -9,6 +9,7 @@ function transformCocktailToRecipe(cocktail: {
   name: string
   garnish: string
   method: string
+  featured: boolean
   ingredients: {
     name: string
     amount: string
@@ -20,6 +21,7 @@ function transformCocktailToRecipe(cocktail: {
     name: cocktail.name,
     garnish: cocktail.garnish,
     method: cocktail.method,
+    featured: cocktail.featured,
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(ing => ({
@@ -36,6 +38,8 @@ export async function getAllCocktails(filters?: {
   search?: string
   category?: string
   active?: boolean
+  featured?: boolean
+  liquor?: string
 }): Promise<CocktailRecipe[]> {
   try {
     const where: any = {}
@@ -50,10 +54,25 @@ export async function getAllCocktails(filters?: {
       where.category = filters.category
     }
 
+    if (filters?.featured !== undefined) {
+      where.featured = filters.featured
+    }
+
     if (filters?.search) {
       where.name = {
         contains: filters.search,
         mode: 'insensitive',
+      }
+    }
+
+    if (filters?.liquor) {
+      where.ingredients = {
+        some: {
+          name: {
+            contains: filters.liquor,
+            mode: 'insensitive',
+          },
+        },
       }
     }
 
@@ -140,6 +159,7 @@ export async function createCocktail(
       category: data.category,
       tags: data.tags || [],
       createdBy: data.createdBy,
+      featured: data.featured ?? false,
       ingredients: {
         create: data.ingredients.map((ing, index) => ({
           name: ing.name,
@@ -194,6 +214,7 @@ export async function updateCocktail(
   if (data.method) updateData.method = data.method
   if (data.category !== undefined) updateData.category = data.category
   if (data.tags) updateData.tags = data.tags
+  if (data.featured !== undefined) updateData.featured = data.featured
 
   const cocktail = await prisma.cocktail.update({
     where: { id },
@@ -258,4 +279,55 @@ export async function searchCocktails(query: string): Promise<CocktailRecipe[]> 
   })
 
   return cocktails.map(transformCocktailToRecipe)
+}
+
+/**
+ * Get unique liquors/spirits from all cocktails
+ */
+export async function getUniqueLiquors(): Promise<string[]> {
+  try {
+    const cocktails = await prisma.cocktail.findMany({
+      where: {
+        isActive: true,
+      },
+      include: {
+        ingredients: {
+          orderBy: {
+            orderIndex: 'asc',
+          },
+        },
+      },
+    })
+
+    // Common liquors/spirits keywords to look for
+    const liquorKeywords = [
+      'vodka', 'bourbon', 'whiskey', 'whisky', 'rye', 'gin', 'rum', 'tequila',
+      'pisco', 'brandy', 'cognac', 'prosecco', 'champagne', 'wine', 'cider',
+      'mezcal', 'scotch', 'irish', 'japanese', 'liqueur', 'sake', 'vermouth',
+      'aperol', 'campari', 'amaretto', 'baileys', 'kahlua', 'curacao'
+    ]
+
+    const foundLiquors = new Set<string>()
+    
+    cocktails.forEach(cocktail => {
+      cocktail.ingredients.forEach(ingredient => {
+        const ingredientNameLower = ingredient.name.toLowerCase()
+        // Check if ingredient name contains any liquor keyword
+        const hasLiquorKeyword = liquorKeywords.some(keyword => 
+          ingredientNameLower.includes(keyword)
+        )
+        
+        if (hasLiquorKeyword) {
+          // Add the ingredient name as-is (preserving original capitalization)
+          foundLiquors.add(ingredient.name)
+        }
+      })
+    })
+
+    // Sort and return unique liquors
+    return Array.from(foundLiquors).sort()
+  } catch (error) {
+    console.error('Database error in getUniqueLiquors:', error)
+    throw error
+  }
 }

@@ -61,7 +61,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { name, garnish, method, ingredients, category, tags } = body
+    const { name, garnish, method, ingredients, category, tags, featured } = body
 
     // Check if cocktail exists
     const existing = await getCocktailById(cocktailId)
@@ -90,6 +90,7 @@ export async function PUT(
     }
     if (category !== undefined) updateData.category = category
     if (tags !== undefined) updateData.tags = tags
+    if (featured !== undefined) updateData.featured = featured
 
     const cocktail = await updateCocktail(cocktailId, updateData)
 
