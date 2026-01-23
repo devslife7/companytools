@@ -423,7 +423,7 @@ export default function BatchCalculatorPage() {
           ) : null} */}
 
           {/* Multi-Select Cocktail Search */}
-          <div className="mb-6">
+          <div className="mb-4">
             <MultiSelectCocktailSearch
               cocktails={availableCocktails}
               selectedCocktails={selectedCocktails}

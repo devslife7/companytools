@@ -60,18 +60,18 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
         
         {/* Search Input */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-orange-600 z-10" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 z-10" />
           <input
             id="multi-search"
             type="text"
-            placeholder="Search for cocktails to add..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={e => {
               setSearchTerm(e.target.value)
               setIsOpen(true)
             }}
             onFocus={() => setIsOpen(true)}
-            className="w-full py-4 pl-12 pr-4 text-lg bg-white text-gray-900 border-2 border-orange-300 rounded-xl focus:ring-4 focus:ring-orange-200 focus:border-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:border-orange-400"
+            className="w-full py-2 pl-10 pr-4 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200"
           />
         </div>
 
