@@ -383,7 +383,7 @@ export default function BatchCalculatorPage() {
 
   return (
     <div className="min-h-screen text-gray-900 font-sans py-6 sm:py-8 px-4">
-      <div className="max-w-4xl mx-auto p-6 sm:p-8">
+      <div className="max-w-4xl mx-auto">
         {/* Toast Notifications */}
         <ToastContainer toasts={toasts} onRemove={removeToast} />
 
