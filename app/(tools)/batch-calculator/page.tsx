@@ -14,7 +14,7 @@ import { useCocktails, useCreateCocktail } from "@/features/batch-calculator/hoo
 import { useToast, ToastContainer } from "@/components/ui"
 
 // Import components
-import { BatchItem, FavoritesMultiSelect } from "@/features/batch-calculator/components"
+import { BatchItem } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
 import { Plus, ShoppingCart, Calculator, FileText } from "lucide-react"
@@ -352,15 +352,6 @@ export default function BatchCalculatorPage() {
     setShowEditModal(true)
   }, [])
 
-  const favoriteCocktails = useMemo(() => {
-    return availableCocktails.filter(
-      cocktail => 
-        cocktail.name === "Espresso Martini" || 
-        cocktail.name === "Blackberry Collins" ||
-        cocktail.name === "Maple Bourbon Cider"
-    )
-  }, [availableCocktails])
-
   const hasSelectedCocktails = selectedCocktails.length > 0
 
   return (
@@ -404,13 +395,6 @@ export default function BatchCalculatorPage() {
               ✓ Loaded {apiCocktails.length} cocktails from database
             </div>
           ) : null}
-
-          {/* Favorites Multi-Select */}
-          <FavoritesMultiSelect
-            favoriteCocktails={favoriteCocktails}
-            selectedCocktails={selectedCocktails}
-            onSelectionChange={handleCocktailSelectionChange}
-          />
 
           {/* Multi-Select Cocktail Search */}
           <div className="mb-6">
