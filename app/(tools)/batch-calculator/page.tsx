@@ -32,6 +32,8 @@ export default function BatchCalculatorPage() {
   const [editingCocktail, setEditingCocktail] = useState<CocktailRecipe | null>(null)
   const [editingCocktailId, setEditingCocktailId] = useState<number | undefined>()
   const [filter, setFilter] = useState<'featured' | 'all'>('featured')
+  const [selectedLiquor, setSelectedLiquor] = useState<string>('')
+  const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
 
   // Toast notifications
   const { toasts, removeToast, success, error: showError } = useToast()
@@ -41,11 +43,28 @@ export default function BatchCalculatorPage() {
     enabled: true, // Always try to use database
   })
 
+  // Fetch unique liquors
+  useEffect(() => {
+    const fetchLiquors = async () => {
+      try {
+        const response = await fetch('/api/cocktails?liquors=true')
+        if (response.ok) {
+          const data = await response.json()
+          setAvailableLiquors(data.liquors || [])
+        }
+      } catch (err) {
+        console.error('Failed to fetch liquors:', err)
+      }
+    }
+    fetchLiquors()
+  }, [])
+
   // Fetch cocktails for display list with filter
   const { cocktails: filteredCocktails, loading: filteredLoading } = useCocktails({
     enabled: true,
     featured: filter === 'featured' ? true : undefined,
     active: true,
+    liquor: selectedLiquor || undefined,
   })
 
   // Create cocktail mutation
@@ -413,8 +432,8 @@ export default function BatchCalculatorPage() {
             />
           </div>
 
-          {/* Filter Buttons */}
-          <div className="mb-4 flex gap-2">
+          {/* Filter Buttons and Liquor Dropdown */}
+          <div className="mb-4 flex flex-wrap gap-2 items-center">
             <button
               onClick={() => setFilter('featured')}
               className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
@@ -435,6 +454,22 @@ export default function BatchCalculatorPage() {
             >
               All Cocktails
             </button>
+            
+            {/* Liquor Filter Dropdown */}
+            <div className="ml-auto">
+              <select
+                value={selectedLiquor}
+                onChange={(e) => setSelectedLiquor(e.target.value)}
+                className="px-4 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200 cursor-pointer"
+              >
+                <option value="">All Liquors</option>
+                {availableLiquors.map((liquor) => (
+                  <option key={liquor} value={liquor}>
+                    {liquor}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Cocktails List */}

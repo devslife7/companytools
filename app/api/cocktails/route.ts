@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   getAllCocktails,
   createCocktail,
+  getUniqueLiquors,
 } from '@/lib/db/cocktails'
 import type { CocktailRecipe } from '@/features/batch-calculator/types'
 
@@ -9,16 +10,25 @@ import type { CocktailRecipe } from '@/features/batch-calculator/types'
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
+    
+    // Check if requesting unique liquors
+    if (searchParams.get('liquors') === 'true') {
+      const liquors = await getUniqueLiquors()
+      return NextResponse.json({ liquors })
+    }
+    
     const search = searchParams.get('search') || undefined
     const category = searchParams.get('category') || undefined
     const active = searchParams.get('active') !== 'false' // Default to true
     const featured = searchParams.get('featured') === 'true' ? true : searchParams.get('featured') === 'false' ? false : undefined
+    const liquor = searchParams.get('liquor') || undefined
 
     const cocktails = await getAllCocktails({
       search,
       category,
       active,
       featured,
+      liquor,
     })
 
     return NextResponse.json({
