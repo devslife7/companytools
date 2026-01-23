@@ -382,8 +382,8 @@ export default function BatchCalculatorPage() {
   const hasSelectedCocktails = selectedCocktails.length > 0
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans py-1 sm:py-2 px-0">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-gray-900 font-sans py-6 sm:py-8 px-4">
+      <div className="max-w-4xl mx-auto p-6 sm:p-8">
         {/* Toast Notifications */}
         <ToastContainer toasts={toasts} onRemove={removeToast} />
 
@@ -438,7 +438,7 @@ export default function BatchCalculatorPage() {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
-              className="px-4 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer"
             >
               <option value="featured">Featured</option>
               <option value="all">All Cocktails</option>
@@ -448,7 +448,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedLiquor}
               onChange={(e) => setSelectedLiquor(e.target.value)}
-              className="px-4 py-2 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200 cursor-pointer"
+              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer"
             >
               <option value="">All Liquors</option>
               {availableLiquors.map((liquor) => (
@@ -470,7 +470,7 @@ export default function BatchCalculatorPage() {
                 {filter === 'featured' ? 'No featured cocktails found.' : 'No cocktails found.'}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {filteredCocktails.map(cocktail => {
                   const isSelected = selectedCocktails.some(c => c.name === cocktail.name)
                   return (
@@ -483,21 +483,21 @@ export default function BatchCalculatorPage() {
                           handleCocktailSelectionChange([...selectedCocktails, cocktail])
                         }
                       }}
-                      className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
+                      className={`p-6 rounded-xl border text-left transition-all duration-200 ${
                         isSelected
-                          ? 'bg-orange-100 border-orange-500 shadow-md'
-                          : 'bg-white border-gray-300 hover:border-orange-400 hover:shadow-md'
+                          ? 'bg-orange-50 border-orange-300'
+                          : 'bg-white border-gray-200 hover:border-gray-300'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-1">{cocktail.name}</h3>
+                          <h3 className="font-semibold text-gray-900 mb-2 text-lg">{cocktail.name}</h3>
                           {cocktail.featured && (
                             <span className="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-xs font-semibold rounded mb-2">
                               Featured
                             </span>
                           )}
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-sm text-gray-600 mt-2">
                             {cocktail.ingredients.map(ing => ing.name).join(', ')}
                           </p>
                         </div>

@@ -71,7 +71,7 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
               setIsOpen(true)
             }}
             onFocus={() => setIsOpen(true)}
-            className="w-full py-2 pl-10 pr-4 rounded-lg font-semibold bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-400 focus:border-orange-500 focus:outline-none transition-all duration-200"
+            className="w-full py-2 pl-10 pr-4 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200"
           />
         </div>
 
