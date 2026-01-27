@@ -21,9 +21,9 @@ const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitVal
   
   const unit = preferredUnit.toLowerCase().trim()
   
-  // For cans and bottles, round up and show as whole number
+  // For cans and bottles, round up and show as whole number with * separator
   if (unit === "12oz cans" || unit === "4oz bottle") {
-    return `${Math.ceil(preferredUnitValue).toFixed(0)} ${preferredUnit}`
+    return `${Math.ceil(preferredUnitValue).toFixed(0)} * ${preferredUnit}`
   }
   
   // For liters, quarts, gallons, show with 2 decimals
@@ -81,7 +81,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
     item => (item as any).preferredUnit
   )
   const totalColumns = hasPreferredUnits ? 4 : 3
-  const preferredUnitHeader = hasPreferredUnits ? '<th>Preferred Unit</th>' : ''
+  const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
   
   return `
     <h2 class="summary-title">Inventory Shopping List (Grand Totals based on Servings)</h2>
@@ -107,9 +107,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        ${hasPreferredUnits ? `<td>${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatNumber(ing.bottles)}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
+                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        <td>${formatNumber(ing.bottles)} @750ml bottles</td>
+                        <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
                   )
@@ -133,9 +133,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        ${hasPreferredUnits ? `<td>${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatNumber(ing.bottles)}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
+                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        <td>-</td>
+                        <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
                   )
@@ -159,9 +159,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        ${hasPreferredUnits ? `<td>${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatNumber(ing.bottles)}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
+                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        <td>-</td>
+                        <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
                   )
