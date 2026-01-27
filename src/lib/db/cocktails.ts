@@ -10,11 +10,12 @@ function transformCocktailToRecipe(cocktail: {
   garnish: string
   method: string
   featured: boolean
-  ingredients: {
+  ingredients: Array<{
     name: string
     amount: string
     orderIndex: number
-  }[]
+    preferredUnit?: string | null
+  }>
 }): CocktailRecipe {
   return {
     id: cocktail.id,  // Include database ID
@@ -27,6 +28,7 @@ function transformCocktailToRecipe(cocktail: {
       .map(ing => ({
         name: ing.name,
         amount: ing.amount,
+        ...(ing.preferredUnit && { preferredUnit: ing.preferredUnit }),
       })),
   }
 }
@@ -165,6 +167,7 @@ export async function createCocktail(
           name: ing.name,
           amount: ing.amount,
           orderIndex: index,
+          preferredUnit: ing.preferredUnit || null,
         })),
       },
     },
@@ -204,6 +207,7 @@ export async function updateCocktail(
         name: ing.name,
         amount: ing.amount,
         orderIndex: index,
+        preferredUnit: ing.preferredUnit || null,
       })),
     })
   }

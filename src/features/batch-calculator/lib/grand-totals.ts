@@ -12,7 +12,7 @@ export const calculateGrandTotals = (batches: BatchState[]): {
   soda: BatchResultWithCans[]; 
   other: BatchResultWithCans[] 
 } => {
-  const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType }> = {}
+  const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType; preferredUnit?: string }> = {}
 
   batches.forEach(batch => {
     const servingsNum =
@@ -30,6 +30,10 @@ export const calculateGrandTotals = (batches: BatchState[]): {
           grandTotals[key].ml += result.ml
           grandTotals[key].bottles += result.bottles
           grandTotals[key].quart += result.quart
+          // Store preferred unit if not already set (use first one found)
+          if (item.preferredUnit && !grandTotals[key].preferredUnit) {
+            grandTotals[key].preferredUnit = item.preferredUnit
+          }
         }
       })
     }
@@ -37,7 +41,12 @@ export const calculateGrandTotals = (batches: BatchState[]): {
 
   const allItems: BatchResultWithCans[] = Object.entries(grandTotals)
     .map(([name, totals]) => {
-      const item: BatchResultWithCans = { name, ...totals, originalUnit: "ml" }
+      const item: BatchResultWithCans = { 
+        name, 
+        ...totals, 
+        originalUnit: "ml",
+        ...(totals.preferredUnit && { preferredUnit: totals.preferredUnit })
+      }
       // Add 12oz can quantity for all soda items
       if (isSodaItem(name)) {
         item.cans12oz = Math.ceil(item.ml / CAN_SIZE_12OZ_ML)

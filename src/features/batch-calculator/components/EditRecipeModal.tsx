@@ -46,7 +46,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         name: '',
         garnish: '',
         method: '',
-        ingredients: [{ name: '', amount: '' }],
+        ingredients: [{ name: '', amount: '', preferredUnit: '' }],
       })
     }
     setValidationError(null)
@@ -75,7 +75,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const handleAddIngredient = () => {
     setEditedRecipe({
       ...editedRecipe,
-      ingredients: [...editedRecipe.ingredients, { name: "", amount: "" }],
+      ingredients: [...editedRecipe.ingredients, { name: "", amount: "", preferredUnit: "" }],
     })
   }
 
@@ -101,7 +101,13 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       return
     }
 
-    const validIngredients = editedRecipe.ingredients.filter(ing => ing.name.trim())
+    const validIngredients = editedRecipe.ingredients
+      .filter(ing => ing.name.trim())
+      .map(ing => ({
+        name: ing.name.trim(),
+        amount: ing.amount.trim(),
+        ...(ing.preferredUnit?.trim() && { preferredUnit: ing.preferredUnit.trim() }),
+      }))
     if (validIngredients.length === 0) {
       setValidationError("At least one ingredient is required")
       return
@@ -280,6 +286,21 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm text-right"
                       placeholder="Amount"
                     />
+                  </div>
+                  <div className="w-36">
+                    <select
+                      value={ingredient.preferredUnit || ""}
+                      onChange={e => handleIngredientChange(index, "preferredUnit", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm bg-white"
+                    >
+                      <option value="">Preferred Unit</option>
+                      <option value="liters">Liters</option>
+                      <option value="quarts">Quarts</option>
+                      <option value="gallons">Gallons</option>
+                      <option value="each">Each</option>
+                      <option value="12oz cans">12oz Cans</option>
+                      <option value="4oz bottle">4oz Bottle</option>
+                    </select>
                   </div>
                   <button
                     onClick={() => handleRemoveIngredient(index)}
