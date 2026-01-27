@@ -1,5 +1,5 @@
 import type { BatchState, BatchResultWithCans, UnitType } from "../types"
-import { calculateBatch } from "./calculations"
+import { calculateBatch, convertMLToPreferredUnit } from "./calculations"
 import { isLiquorItem, isSodaItem, isAngosturaBitters } from "./ingredient-helpers"
 
 // Constants for can calculations
@@ -54,6 +54,15 @@ export const calculateGrandTotals = (batches: BatchState[]): {
       // Add 4oz bottle quantity for Angostura bitters
       if (isAngosturaBitters(name)) {
         item.bottles4oz = Math.ceil(item.ml / BOTTLE_SIZE_4OZ_ML)
+      }
+      // Calculate preferred unit value if preferred unit is set
+      if (totals.preferredUnit) {
+        item.preferredUnitValue = convertMLToPreferredUnit(
+          item.ml,
+          totals.preferredUnit,
+          item.cans12oz,
+          item.bottles4oz
+        )
       }
       return item
     })

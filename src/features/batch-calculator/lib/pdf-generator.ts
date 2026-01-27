@@ -13,6 +13,23 @@ import {
 } from "./calculations"
 import { calculateGrandTotals } from "./grand-totals"
 
+// Helper function to format preferred unit display
+const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitValue: number | null | undefined): string => {
+  if (!preferredUnit || preferredUnitValue === null || preferredUnitValue === undefined) {
+    return "-"
+  }
+  
+  const unit = preferredUnit.toLowerCase().trim()
+  
+  // For cans and bottles, round up and show as whole number
+  if (unit === "12oz cans" || unit === "4oz bottle") {
+    return `${Math.ceil(preferredUnitValue).toFixed(0)} ${preferredUnit}`
+  }
+  
+  // For liters, quarts, gallons, show with 2 decimals
+  return `${formatNumber(preferredUnitValue)} ${preferredUnit}`
+}
+
 // Helper function to generate HTML header
 const generateHtmlHeader = (title: string) => {
   return `
@@ -60,20 +77,10 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
   )
   const grandTotals = calculateGrandTotals(reportData)
 
-  const hasSodaItems = grandTotals.soda.length > 0
-  const hasAngosturaBitters = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
-    item => item.bottles4oz !== undefined
-  )
   const hasPreferredUnits = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
     item => (item as any).preferredUnit
   )
-  const totalColumns = hasSodaItems && hasAngosturaBitters && hasPreferredUnits ? 7 
-    : hasSodaItems && hasAngosturaBitters ? 6
-    : hasSodaItems && hasPreferredUnits ? 6
-    : hasAngosturaBitters && hasPreferredUnits ? 6
-    : hasSodaItems || hasAngosturaBitters || hasPreferredUnits ? 5 : 4
-  const canColumnHeader = hasSodaItems ? '<th>12oz Cans</th>' : ''
-  const bottle4ozColumnHeader = hasAngosturaBitters ? '<th>4oz Bottles</th>' : ''
+  const totalColumns = hasPreferredUnits ? 4 : 3
   const preferredUnitHeader = hasPreferredUnits ? '<th>Preferred Unit</th>' : ''
   
   return `
@@ -83,12 +90,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
             <thead>
                 <tr>
                     <th class="text-left">INGREDIENT</th>
-                    <th>Total ML (Rounded UP)</th>
-                    <th>Total Quarts (Q)</th>
-                    <th>Approx. @750 BOTTLES</th>
-                    ${canColumnHeader}
-                    ${bottle4ozColumnHeader}
                     ${preferredUnitHeader}
+                    <th>Approx. @750 BOTTLES</th>
+                    <th>Total ML (Rounded UP)</th>
                 </tr>
             </thead>
             <tbody>
@@ -103,12 +107,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
-                        <td>${formatNumber(ing.quart)}</td>
+                        ${hasPreferredUnits ? `<td>${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
                         <td>${formatNumber(ing.bottles)}</td>
-                        ${hasSodaItems ? '<td>-</td>' : ''}
-                        ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
-                        ${hasPreferredUnits ? `<td>${ing.preferredUnit || '-'}</td>` : ''}
+                        <td>${formatMLValue(ing.ml)}</td>
                     </tr>
                 `
                   )
@@ -132,12 +133,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
-                        <td>${formatNumber(ing.quart)}</td>
+                        ${hasPreferredUnits ? `<td>${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
                         <td>${formatNumber(ing.bottles)}</td>
-                        ${hasSodaItems ? `<td>${ing.cans12oz ? ing.cans12oz.toFixed(0) : '-'}</td>` : ''}
-                        ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
-                        ${hasPreferredUnits ? `<td>${ing.preferredUnit || '-'}</td>` : ''}
+                        <td>${formatMLValue(ing.ml)}</td>
                     </tr>
                 `
                   )
@@ -161,12 +159,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
-                        <td>${formatNumber(ing.quart)}</td>
+                        ${hasPreferredUnits ? `<td>${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
                         <td>${formatNumber(ing.bottles)}</td>
-                        ${hasSodaItems ? '<td>-</td>' : ''}
-                        ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
-                        ${hasPreferredUnits ? `<td>${ing.preferredUnit || '-'}</td>` : ''}
+                        <td>${formatMLValue(ing.ml)}</td>
                     </tr>
                 `
                   )
