@@ -22,7 +22,7 @@ const generateHtmlHeader = (title: string) => {
         <title>${title}</title>
         <style>
             /* Compact B&W Styles for Print - Optimized for more content per page */
-            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10pt; }
+            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10pt; max-width: 216mm; margin: 0 auto; }
             h1 { font-size: 18pt; color: #000; margin: 0 0 5px 0; page-break-after: avoid; }
             h2 { font-size: 14pt; color: #000; margin: 12px 0 4px 0; page-break-after: avoid; }
             h3 { font-size: 12pt; color: #000; margin: 8px 0 3px 0; page-break-after: avoid; }

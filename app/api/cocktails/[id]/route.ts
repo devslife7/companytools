@@ -86,6 +86,7 @@ export async function PUT(
       updateData.ingredients = ingredients.map((ing: any) => ({
         name: ing.name,
         amount: ing.amount,
+        preferredUnit: ing.preferredUnit || null,
       }))
     }
     if (category !== undefined) updateData.category = category
