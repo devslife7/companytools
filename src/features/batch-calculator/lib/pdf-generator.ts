@@ -13,6 +13,23 @@ import {
 } from "./calculations"
 import { calculateGrandTotals } from "./grand-totals"
 
+// Helper function to format preferred unit display
+const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitValue: number | null | undefined): string => {
+  if (!preferredUnit || preferredUnitValue === null || preferredUnitValue === undefined) {
+    return "-"
+  }
+  
+  const unit = preferredUnit.toLowerCase().trim()
+  
+  // For cans and bottles, round up and show as whole number with * separator
+  if (unit === "12oz cans" || unit === "4oz bottle") {
+    return `${Math.ceil(preferredUnitValue).toFixed(0)} * ${preferredUnit}`
+  }
+  
+  // For liters, quarts, gallons, show with 2 decimals
+  return `${formatNumber(preferredUnitValue)} ${preferredUnit}`
+}
+
 // Helper function to generate HTML header
 const generateHtmlHeader = (title: string) => {
   return `
@@ -22,7 +39,7 @@ const generateHtmlHeader = (title: string) => {
         <title>${title}</title>
         <style>
             /* Compact B&W Styles for Print - Optimized for more content per page */
-            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10pt; }
+            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10pt; max-width: 216mm; margin: 0 auto; }
             h1 { font-size: 18pt; color: #000; margin: 0 0 5px 0; page-break-after: avoid; }
             h2 { font-size: 14pt; color: #000; margin: 12px 0 4px 0; page-break-after: avoid; }
             h3 { font-size: 12pt; color: #000; margin: 8px 0 3px 0; page-break-after: avoid; }
@@ -37,6 +54,9 @@ const generateHtmlHeader = (title: string) => {
             .total-row td { font-weight: bold; background-color: #e0e0e0; }
             .summary-title { margin-top: 15px; border-bottom: 1px solid #000; padding-bottom: 3px; }
             .text-left { text-align: left; }
+            .batch-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+            .batch-title { flex: 1; }
+            .batch-method { text-align: right; font-size: 9pt; margin-top: 2px; }
         </style>
     </head>
     <body>
@@ -60,13 +80,11 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
   )
   const grandTotals = calculateGrandTotals(reportData)
 
-  const hasSodaItems = grandTotals.soda.length > 0
-  const hasAngosturaBitters = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
-    item => item.bottles4oz !== undefined
+  const hasPreferredUnits = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
+    item => (item as any).preferredUnit
   )
-  const totalColumns = hasSodaItems && hasAngosturaBitters ? 6 : hasSodaItems || hasAngosturaBitters ? 5 : 4
-  const canColumnHeader = hasSodaItems ? '<th>12oz Cans</th>' : ''
-  const bottle4ozColumnHeader = hasAngosturaBitters ? '<th>4oz Bottles</th>' : ''
+  const totalColumns = hasPreferredUnits ? 4 : 3
+  const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
   
   return `
     <h2 class="summary-title">Inventory Shopping List (Grand Totals based on Servings)</h2>
@@ -75,11 +93,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
             <thead>
                 <tr>
                     <th class="text-left">INGREDIENT</th>
-                    <th>Total ML (Rounded UP)</th>
-                    <th>Total Quarts (Q)</th>
+                    ${preferredUnitHeader}
                     <th>Approx. @750 BOTTLES</th>
-                    ${canColumnHeader}
-                    ${bottle4ozColumnHeader}
+                    <th>Total ML (Rounded UP)</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,11 +110,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
-                        <td>${formatNumber(ing.quart)}</td>
-                        <td>${formatNumber(ing.bottles)}</td>
-                        ${hasSodaItems ? '<td>-</td>' : ''}
-                        ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
+                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        <td>${formatNumber(ing.bottles)} @750ml bottles</td>
+                        <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
                   )
@@ -122,11 +136,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
-                        <td>${formatNumber(ing.quart)}</td>
-                        <td>${formatNumber(ing.bottles)}</td>
-                        ${hasSodaItems ? `<td>${ing.cans12oz ? ing.cans12oz.toFixed(0) : '-'}</td>` : ''}
-                        ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
+                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        <td>-</td>
+                        <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
                   )
@@ -150,11 +162,9 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        <td>${formatMLValue(ing.ml)}</td>
-                        <td>${formatNumber(ing.quart)}</td>
-                        <td>${formatNumber(ing.bottles)}</td>
-                        ${hasSodaItems ? '<td>-</td>' : ''}
-                        ${hasAngosturaBitters ? `<td>${ing.bottles4oz ? ing.bottles4oz.toFixed(0) : '-'}</td>` : ''}
+                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        <td>-</td>
+                        <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
                   )
@@ -236,8 +246,11 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
 
     htmlContent += `
             <div class="batch-section">
-                <h3>${recipe.name} (Batch #${batch.id})</h3>
-                <p style="margin: 2px 0;"><strong>1-Serving:</strong> ${formatNumber(singleServingVolumeML)} ML | <strong>Garnish:</strong> ${recipe.garnish || "N/A"} | <strong>Method:</strong> ${recipe.method || "N/A"}</p>
+                <div class="batch-header">
+                    <h3 class="batch-title">${recipe.name}${recipe.id ? ` #${recipe.id}` : ""}</h3>
+                    <div class="batch-method"><strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
+                </div>
+                <p style="margin: 2px 0;"><strong>1-Serving:</strong> ${formatNumber(singleServingVolumeML)} ML | <strong>Garnish:</strong> ${recipe.garnish || "N/A"}</p>
                 <h4 style="margin-top: 4px;">Ingredient Amounts</h4>
                 <div class="table-container">
                     <table>
@@ -289,13 +302,6 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                         </tbody>
                     </table>
                 </div>
-                ${
-                  servingsNum > 0
-                    ? `<p style="margin-top: 4px; margin-bottom: 0;"><strong>Total:</strong> ${formatNumber(
-                        totalServingsLiquidML / LITER_TO_ML
-                      )} L</p>`
-                    : ""
-                }
             </div>
         `
   })

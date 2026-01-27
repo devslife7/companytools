@@ -3,6 +3,7 @@
 export interface Ingredient {
   name: string
   amount: string
+  preferredUnit?: string
 }
 
 export interface CocktailRecipe {
@@ -51,5 +52,7 @@ export interface CombinedIngredient extends Ingredient {
 export interface BatchResultWithCans extends BatchResult {
   cans12oz?: number
   bottles4oz?: number
+  preferredUnit?: string
+  preferredUnitValue?: number | null
 }
 

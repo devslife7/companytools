@@ -12,6 +12,9 @@ export const CONVERSION_FACTORS: Record<string, number> = {
 }
 export const QUART_TO_ML = 946.353
 export const BOTTLE_SIZE_ML = 750
+export const GALLON_TO_ML = 3785.41
+export const CAN_SIZE_12OZ_ML = 354.882 // 12 fluid ounces in milliliters
+export const BOTTLE_SIZE_4OZ_ML = 118.294 // 4 fluid ounces in milliliters
 
 // --- PARSING UTILITIES ---
 
@@ -154,5 +157,32 @@ export const formatMLValue = (num: number): string => {
   if (typeof num !== "number" || isNaN(num) || !isFinite(num) || num <= 0) return "0"
   // Round up (Math.ceil) to the nearest whole number (milliliter) and ensure no decimals are displayed
   return Math.ceil(num).toFixed(0)
+}
+
+// Convert ML to preferred unit
+export const convertMLToPreferredUnit = (ml: number, preferredUnit: string | null | undefined, existingCans12oz?: number, existingBottles4oz?: number): number | null => {
+  if (!preferredUnit || ml <= 0) return null
+
+  const unit = preferredUnit.toLowerCase().trim()
+
+  switch (unit) {
+    case "liters":
+      return ml / LITER_TO_ML
+    case "quarts":
+      return ml / QUART_TO_ML
+    case "gallons":
+      return ml / GALLON_TO_ML
+    case "12oz cans":
+      // Use existing cans12oz if available (already rounded up), otherwise calculate
+      return existingCans12oz !== undefined ? existingCans12oz : Math.ceil(ml / CAN_SIZE_12OZ_ML)
+    case "4oz bottle":
+      // Use existing bottles4oz if available (already rounded up), otherwise calculate
+      return existingBottles4oz !== undefined ? existingBottles4oz : Math.ceil(ml / BOTTLE_SIZE_4OZ_ML)
+    case "each":
+      // "each" doesn't have a conversion, return null
+      return null
+    default:
+      return null
+  }
 }
 
