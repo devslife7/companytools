@@ -54,6 +54,9 @@ const generateHtmlHeader = (title: string) => {
             .total-row td { font-weight: bold; background-color: #e0e0e0; }
             .summary-title { margin-top: 15px; border-bottom: 1px solid #000; padding-bottom: 3px; }
             .text-left { text-align: left; }
+            .batch-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+            .batch-title { flex: 1; }
+            .batch-method { text-align: right; font-size: 9pt; margin-top: 2px; }
         </style>
     </head>
     <body>
@@ -243,8 +246,11 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
 
     htmlContent += `
             <div class="batch-section">
-                <h3>${recipe.name} (Batch #${batch.id})</h3>
-                <p style="margin: 2px 0;"><strong>1-Serving:</strong> ${formatNumber(singleServingVolumeML)} ML | <strong>Garnish:</strong> ${recipe.garnish || "N/A"} | <strong>Method:</strong> ${recipe.method || "N/A"}</p>
+                <div class="batch-header">
+                    <h3 class="batch-title">${recipe.name}${recipe.id ? ` #${recipe.id}` : ""}</h3>
+                    <div class="batch-method"><strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
+                </div>
+                <p style="margin: 2px 0;"><strong>1-Serving:</strong> ${formatNumber(singleServingVolumeML)} ML | <strong>Garnish:</strong> ${recipe.garnish || "N/A"}</p>
                 <h4 style="margin-top: 4px;">Ingredient Amounts</h4>
                 <div class="table-container">
                     <table>
@@ -296,13 +302,6 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                         </tbody>
                     </table>
                 </div>
-                ${
-                  servingsNum > 0
-                    ? `<p style="margin-top: 4px; margin-bottom: 0;"><strong>Total:</strong> ${formatNumber(
-                        totalServingsLiquidML / LITER_TO_ML
-                      )} L</p>`
-                    : ""
-                }
             </div>
         `
   })
