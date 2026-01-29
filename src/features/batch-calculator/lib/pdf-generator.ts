@@ -23,7 +23,7 @@ const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitVal
   
   // For cans and bottles, round up and show as whole number with * separator
   if (unit === "12oz cans" || unit === "4oz bottle") {
-    return `${Math.ceil(preferredUnitValue).toFixed(0)} * ${preferredUnit}`
+    return `${Math.ceil(preferredUnitValue).toFixed(0)} (${preferredUnit})`
   }
   
   // For liters, quarts, gallons, show with 2 decimals
@@ -94,8 +94,8 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                 <tr>
                     <th class="text-left">INGREDIENT</th>
                     ${preferredUnitHeader}
-                    <th>Approx. @750 BOTTLES</th>
-                    <th>Total ML (Rounded UP)</th>
+                    <th>Approx. @750ml</th>
+                    <th>Total ML</th>
                 </tr>
             </thead>
             <tbody>
@@ -111,7 +111,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatNumber(ing.bottles)} @750ml bottles</td>
+                        <td>${formatNumber(ing.bottles)} bottles</td>
                         <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
