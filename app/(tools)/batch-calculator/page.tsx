@@ -60,7 +60,7 @@ export default function BatchCalculatorPage() {
   }, [])
 
   // Fetch cocktails for display list with filter
-  const { cocktails: filteredCocktails, loading: filteredLoading } = useCocktails({
+  const { cocktails: filteredCocktailsFromDb, loading: filteredLoading, error: filteredError } = useCocktails({
     enabled: true,
     featured: filter === 'featured' ? true : undefined,
     active: true,
@@ -83,6 +83,43 @@ export default function BatchCalculatorPage() {
     // While loading, show static data so UI doesn't break
     return COCKTAIL_DATA
   }, [apiCocktails, cocktailsLoading, cocktailsError])
+
+  // Apply filters to static data and merge with database cocktails
+  const filteredCocktails = useMemo(() => {
+    // Helper function to apply filters to static data
+    const applyFiltersToStatic = (data: typeof COCKTAIL_DATA) => {
+      let filtered = data
+      
+      // Apply featured filter
+      if (filter === 'featured') {
+        filtered = filtered.filter(c => c.featured === true)
+      }
+      
+      // Apply liquor filter
+      if (selectedLiquor) {
+        filtered = filtered.filter(c =>
+          c.ingredients.some(ing =>
+            ing.name.toLowerCase().includes(selectedLiquor.toLowerCase())
+          )
+        )
+      }
+      
+      return filtered
+    }
+
+    // If database is loaded and has cocktails, use them
+    if (!filteredLoading && filteredCocktailsFromDb.length > 0) {
+      return filteredCocktailsFromDb
+    }
+    
+    // If database error or empty, fallback to filtered static data
+    if (filteredError || (!filteredLoading && filteredCocktailsFromDb.length === 0)) {
+      return applyFiltersToStatic(COCKTAIL_DATA)
+    }
+    
+    // While loading, show filtered static data so UI doesn't break
+    return applyFiltersToStatic(COCKTAIL_DATA)
+  }, [filteredCocktailsFromDb, filteredLoading, filteredError, filter, selectedLiquor])
 
   // Sync batches with selected cocktails
   useEffect(() => {

@@ -43,12 +43,18 @@ export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsRes
       const response = await fetch(`/api/cocktails?${params.toString()}`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch cocktails')
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || errorData.details || `HTTP ${response.status}: Failed to fetch cocktails`
+        console.error('Cocktails API error:', errorMessage, errorData)
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
-      setCocktails(data.cocktails || [])
+      const cocktails = data.cocktails || []
+      console.log(`Fetched ${cocktails.length} cocktails from database`, { filters: { search, category, active, featured, liquor } })
+      setCocktails(cocktails)
     } catch (err) {
+      console.error('Error fetching cocktails:', err)
       setError(err instanceof Error ? err.message : 'An error occurred')
       setCocktails([])
     } finally {
