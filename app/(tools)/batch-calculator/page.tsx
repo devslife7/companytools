@@ -571,11 +571,11 @@ export default function BatchCalculatorPage() {
               <p className="text-sm text-gray-600 mt-1">Choose what you want to print</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Shopping List Button */}
               <button
                 onClick={handleGenerateShoppingList}
-                className="flex flex-col items-center justify-center p-6 bg-white border-2 border-gray-300 rounded-xl hover:border-orange-500 hover:shadow-lg transition-all duration-200 group"
+                className="flex flex-col items-center justify-center p-6 bg-white border border-gray-300 rounded-xl hover:border-orange-300 transition-all duration-200 group"
               >
                 <ShoppingCart className="w-8 h-8 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="font-bold text-gray-900 mb-1">Shopping List</span>
@@ -586,9 +586,9 @@ export default function BatchCalculatorPage() {
               <button
                 onClick={handleGenerateBatchCalculations}
                 disabled={!canExport}
-                className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl transition-all duration-200 group ${
+                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${
                   canExport
-                    ? "bg-white border-gray-300 hover:border-orange-500 hover:shadow-lg"
+                    ? "bg-white border-gray-300 hover:border-orange-300"
                     : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
                 }`}
               >
@@ -605,9 +605,9 @@ export default function BatchCalculatorPage() {
               <button
                 onClick={handleGeneratePdfReport}
                 disabled={!canExport}
-                className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl transition-all duration-200 group ${
+                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${
                   canExport
-                    ? "bg-white border-gray-300 hover:border-orange-500 hover:shadow-lg"
+                    ? "bg-white border-gray-300 hover:border-orange-300"
                     : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
                 }`}
               >
