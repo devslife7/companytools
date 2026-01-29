@@ -316,8 +316,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       <option value="quarts">Quarts</option>
                       <option value="gallons">Gallons</option>
                       <option value="each">Each</option>
-                      <option value="12oz cans">12oz Cans</option>
-                      <option value="4oz bottles">4oz Bottles</option>
+                      <option value="12oz can">12oz Can</option>
+                      <option value="4oz bottle">4oz Bottle</option>
                     </select>
                   </div>
                   <button

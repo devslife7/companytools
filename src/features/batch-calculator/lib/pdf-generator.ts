@@ -21,8 +21,13 @@ const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitVal
   
   const unit = preferredUnit.toLowerCase().trim()
   
+  // For "each", show as whole number
+  if (unit === "each") {
+    return `${Math.ceil(preferredUnitValue).toFixed(0)} ${preferredUnit}`
+  }
+  
   // For cans and bottles, round up and show as whole number with * separator
-  if (unit === "12oz cans" || unit === "4oz bottle") {
+  if (unit === "12oz can" || unit === "12oz cans" || unit === "4oz bottle" || unit === "4oz bottles") {
     return `${Math.ceil(preferredUnitValue).toFixed(0)} (${preferredUnit})`
   }
   
@@ -39,36 +44,30 @@ const generateHtmlHeader = (title: string) => {
         <title>${title}</title>
         <style>
             /* Compact B&W Styles for Print - Optimized for more content per page */
-            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10pt; max-width: 216mm; margin: 0 auto; }
-            h1 { font-size: 18pt; color: #000; margin: 0 0 5px 0; page-break-after: avoid; }
-            h2 { font-size: 14pt; color: #000; margin: 12px 0 4px 0; page-break-after: avoid; }
-            h3 { font-size: 12pt; color: #000; margin: 8px 0 3px 0; page-break-after: avoid; }
-            h4 { font-size: 11pt; color: #000; margin: 6px 0 2px 0; page-break-after: avoid; }
-            p { margin: 3px 0; font-size: 9pt; line-height: 1.2; }
+            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10.5pt; max-width: 216mm; margin: 0 auto; }
+            h1 { font-size: 19pt; color: #000; margin: 0 0 5px 0; page-break-after: avoid; }
+            h2 { font-size: 14.5pt; color: #000; margin: 12px 0 4px 0; page-break-after: avoid; }
+            h3 { font-size: 12.5pt; color: #000; margin: 8px 0 3px 0; page-break-after: avoid; }
+            h4 { font-size: 11.5pt; color: #000; margin: 6px 0 2px 0; page-break-after: avoid; }
+            p { margin: 3px 0; font-size: 9.5pt; line-height: 1.2; }
             .header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 5px; }
             .batch-section { margin-bottom: 15px; border: 1px solid #000; padding: 8px; page-break-inside: avoid; }
             .table-container { margin-top: 6px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9pt; }
-            th, td { border: 1px solid #000; padding: 3px 4px; text-align: right; font-size: 9pt; }
+            table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9.5pt; }
+            th, td { border: 1px solid #000; padding: 3px 4px; text-align: right; font-size: 9.5pt; }
             th { text-align: left; background-color: #f0f0f0; font-weight: bold; }
             .total-row td { font-weight: bold; background-color: #e0e0e0; }
             .summary-title { margin-top: 15px; border-bottom: 1px solid #000; padding-bottom: 3px; }
             .text-left { text-align: left; }
             .batch-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
             .batch-title { flex: 1; }
-            .batch-method { text-align: right; font-size: 9pt; margin-top: 2px; }
+            .batch-method { text-align: right; font-size: 9.5pt; margin-top: 2px; }
         </style>
     </head>
     <body>
         <div class="header">
             <h1>${title}</h1>
-            <p>Generated on: ${new Date().toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}</p>
+           
         </div>
   `
 }
@@ -101,7 +100,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
             <tbody>
                 ${grandTotals.liquor.length > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 9pt;">
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: right;">
                         LIQUOR ITEMS
                     </td>
                 </tr>
@@ -127,7 +126,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                 ` : ""}
                 ${grandTotals.soda.length > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${grandTotals.liquor.length > 0 ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9pt;">
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${grandTotals.liquor.length > 0 ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: right;">
                         SODA ITEMS
                     </td>
                 </tr>
@@ -153,7 +152,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                 ` : ""}
                 ${grandTotals.other.length > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9pt;">
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: right;">
                         OTHER ITEMS
                     </td>
                 </tr>
@@ -250,19 +249,18 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                     <h3 class="batch-title">${recipe.name}${recipe.id ? ` #${recipe.id}` : ""}</h3>
                     <div class="batch-method"><strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
                 </div>
-                <p style="margin: 2px 0;"><strong>1-Serving:</strong> ${formatNumber(singleServingVolumeML)} ML | <strong>Garnish:</strong> ${recipe.garnish || "N/A"}</p>
-                ${recipe.instructions ? `<p style="margin: 4px 0;"><strong>Instructions:</strong> ${recipe.instructions}</p>` : ''}
-                <h4 style="margin-top: 4px;">Ingredient Amounts</h4>
+                ${recipe.instructions ? `<p style="margin: 4px 0 2px 0;"><strong>Instructions:</strong></p><p style="margin: 0 0 4px 0; white-space: pre-line;">${recipe.instructions}</p>` : ''}
+
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th class="text-left">INGREDIENT</th>
-                                <th>1 Serving</th>
-                                ${servingsNum > 0 ? `<th>${servingsNum} Servings (ML)</th>` : ""}
+                                <th style="text-align: center;">INGREDIENT</th>
+                                <th style="text-align: center;">1 Serving</th>
+                                ${servingsNum > 0 ? `<th style="text-align: center;">${servingsNum} Servings (ML)</th>` : ""}
                                 ${
                                   totalServingsLiquidML > twentyLiterML && singleServingVolumeML > 0
-                                    ? `<th>${fixedTargetLiters}L Batch (ML)</th>`
+                                    ? `<th style="text-align: center;">${fixedTargetLiters}L Batch (ML)</th>`
                                     : ""
                                 }
                             </tr>
@@ -277,14 +275,12 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                                 const servingsData = servingsCalc
                                   ? type === "liquid"
                                     ? `${formatMLValue(servingsCalc.ml)} ml`
-                                    : type === "count"
-                                    ? `${formatNumber(servingsCalc.ml, 0)} ${servingsCalc.originalUnit}`
-                                    : servingsCalc.originalUnit
+                                    : "N/A"
                                   : "N/A"
 
                                 const targetData = targetCalc
                                   ? type === "liquid"
-                                    ? formatMLValue(targetCalc.ml)
+                                    ? `${formatMLValue(targetCalc.ml)} ml`
                                     : "N/A"
                                   : "N/A"
 

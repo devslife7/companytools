@@ -172,10 +172,12 @@ export const convertMLToPreferredUnit = (ml: number, preferredUnit: string | nul
       return ml / QUART_TO_ML
     case "gallons":
       return ml / GALLON_TO_ML
+    case "12oz can":
     case "12oz cans":
       // Use existing cans12oz if available (already rounded up), otherwise calculate
       return existingCans12oz !== undefined ? existingCans12oz : Math.ceil(ml / CAN_SIZE_12OZ_ML)
     case "4oz bottle":
+    case "4oz bottles":
       // Use existing bottles4oz if available (already rounded up), otherwise calculate
       return existingBottles4oz !== undefined ? existingBottles4oz : Math.ceil(ml / BOTTLE_SIZE_4OZ_ML)
     case "each":
