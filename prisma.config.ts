@@ -39,6 +39,7 @@ function ensurePgbouncerParam(connectionString: string): string {
 // The direct connection (port 5432) is not reachable from Vercel's build environment
 const isVercel = process.env.VERCEL === "1" || !!process.env.VERCEL_ENV;
 let migrationUrl: string | undefined;
+let directUrl: string | undefined;
 
 if (isVercel) {
   // In Vercel, always use DATABASE_URL (should be pooler connection)
@@ -47,6 +48,9 @@ if (isVercel) {
     throw new Error("DATABASE_URL must be set in Vercel environment variables");
   }
   migrationUrl = ensurePgbouncerParam(migrationUrl);
+  
+  // Use DIRECT_URL if available, otherwise use DATABASE_URL for directUrl
+  directUrl = process.env["DIRECT_URL"] || migrationUrl;
 } else {
   // In local dev, prefer DIRECT_URL for faster migrations, fallback to DATABASE_URL
   migrationUrl = process.env["DIRECT_URL"] || process.env["DATABASE_URL"];
@@ -54,6 +58,9 @@ if (isVercel) {
     throw new Error("Either DIRECT_URL or DATABASE_URL must be set for Prisma migrations");
   }
   migrationUrl = ensurePgbouncerParam(migrationUrl);
+  
+  // For local dev, use DIRECT_URL if available, otherwise DATABASE_URL
+  directUrl = process.env["DIRECT_URL"] || process.env["DATABASE_URL"];
 }
 
 export default defineConfig({
@@ -63,5 +70,6 @@ export default defineConfig({
   },
   datasource: {
     url: migrationUrl,
+    directUrl: directUrl,
   },
 });
