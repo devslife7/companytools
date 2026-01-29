@@ -75,6 +75,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate method is either "Shake" or "Build"
+    if (method !== 'Shake' && method !== 'Build') {
+      return NextResponse.json(
+        { error: 'Method must be either "Shake" or "Build"' },
+        { status: 400 }
+      )
+    }
+
     // Validate ingredients
     if (ingredients.length === 0) {
       return NextResponse.json(

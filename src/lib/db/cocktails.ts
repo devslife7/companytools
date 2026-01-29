@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import type { CocktailRecipe } from '@/features/batch-calculator/types'
+import type { CocktailRecipe, CocktailMethod } from '@/features/batch-calculator/types'
 
 /**
  * Transform Prisma cocktail model to CocktailRecipe type
@@ -8,7 +8,7 @@ function transformCocktailToRecipe(cocktail: {
   id: number
   name: string
   garnish: string
-  method: string
+  method: CocktailMethod | string
   instructions?: string | null
   featured: boolean
   ingredients: Array<{
@@ -18,11 +18,17 @@ function transformCocktailToRecipe(cocktail: {
     preferredUnit?: string | null
   }>
 }): CocktailRecipe {
+  // Ensure method is a valid CocktailMethod (fallback to Build if invalid)
+  const validMethod: CocktailMethod = 
+    cocktail.method === 'Shake' || cocktail.method === 'Build' 
+      ? cocktail.method as CocktailMethod 
+      : 'Build'
+
   return {
     id: cocktail.id,  // Include database ID
     name: cocktail.name,
     garnish: cocktail.garnish,
-    method: cocktail.method,
+    method: validMethod,
     ...(cocktail.instructions && { instructions: cocktail.instructions }),
     featured: cocktail.featured,
     ingredients: cocktail.ingredients
