@@ -36,7 +36,14 @@ const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitVal
 }
 
 // Helper function to generate HTML header
-const generateHtmlHeader = (title: string) => {
+const generateHtmlHeader = (title: string, showHeader: boolean = true) => {
+  const headerHtml = showHeader ? `
+        <div class="header">
+            <h1>${title}</h1>
+           
+        </div>
+  ` : ''
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -65,10 +72,7 @@ const generateHtmlHeader = (title: string) => {
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>${title}</h1>
-           
-        </div>
+        ${headerHtml}
   `
 }
 
@@ -331,6 +335,6 @@ export const generateBatchCalculationsPdf = (batches: BatchState[]) => {
 // Generate full report (both shopping list and batch calculations)
 export const generatePdfReport = (batches: BatchState[]) => {
   // Generate both shopping list and batch calculations
-  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet") + generateShoppingListHtml(batches) + generateBatchCalculationsHtml(batches) + `</body></html>`
+  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false) + generateShoppingListHtml(batches) + generateBatchCalculationsHtml(batches) + `</body></html>`
   openPdfWindow(htmlContent)
 }
