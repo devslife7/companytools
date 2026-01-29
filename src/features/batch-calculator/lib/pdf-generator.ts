@@ -275,7 +275,7 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
 
                                 const servingsData = servingsCalc
                                   ? type === "liquid"
-                                    ? formatMLValue(servingsCalc.ml)
+                                    ? `${formatMLValue(servingsCalc.ml)} ml`
                                     : type === "count"
                                     ? `${formatNumber(servingsCalc.ml, 0)} ${servingsCalc.originalUnit}`
                                     : servingsCalc.originalUnit
