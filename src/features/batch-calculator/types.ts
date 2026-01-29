@@ -11,6 +11,7 @@ export interface CocktailRecipe {
   name: string
   garnish: string
   method: string
+  instructions?: string
   ingredients: Ingredient[]
   featured?: boolean
 }

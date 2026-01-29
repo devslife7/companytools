@@ -251,6 +251,7 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                     <div class="batch-method"><strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
                 </div>
                 <p style="margin: 2px 0;"><strong>1-Serving:</strong> ${formatNumber(singleServingVolumeML)} ML | <strong>Garnish:</strong> ${recipe.garnish || "N/A"}</p>
+                ${recipe.instructions ? `<p style="margin: 4px 0;"><strong>Instructions:</strong> ${recipe.instructions}</p>` : ''}
                 <h4 style="margin-top: 4px;">Ingredient Amounts</h4>
                 <div class="table-container">
                     <table>

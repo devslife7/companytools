@@ -66,6 +66,10 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     setEditedRecipe({ ...editedRecipe, method: value })
   }
 
+  const handleInstructionsChange = (value: string) => {
+    setEditedRecipe({ ...editedRecipe, instructions: value })
+  }
+
   const handleIngredientChange = (index: number, field: keyof Ingredient, value: string) => {
     const newIngredients = [...editedRecipe.ingredients]
     newIngredients[index] = { ...newIngredients[index], [field]: value }
@@ -127,6 +131,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         name: editedRecipe.name.trim(),
         garnish: editedRecipe.garnish.trim(),
         method: editedRecipe.method.trim(),
+        instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
       })
 
@@ -144,6 +149,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         name: editedRecipe.name.trim(),
         garnish: editedRecipe.garnish.trim(),
         method: editedRecipe.method.trim(),
+        instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
       })
       onClose()
@@ -257,6 +263,18 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 resize-none"
               placeholder="Enter preparation method"
+            />
+          </div>
+
+          {/* Instructions */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
+            <textarea
+              value={editedRecipe.instructions || ''}
+              onChange={e => handleInstructionsChange(e.target.value)}
+              rows={6}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 resize-none"
+              placeholder="Enter step-by-step instructions for making the drink"
             />
           </div>
 

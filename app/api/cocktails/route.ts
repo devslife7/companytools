@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, garnish, method, ingredients, category, tags, createdBy, featured } = body
+    const { name, garnish, method, instructions, ingredients, category, tags, createdBy, featured } = body
 
     // Validate required fields
     if (!name || !garnish || !method || !ingredients || !Array.isArray(ingredients)) {
@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
       name,
       garnish,
       method,
+      ...(instructions !== undefined && { instructions }),
       ingredients: ingredients.map((ing: any) => ({
         name: ing.name,
         amount: ing.amount,

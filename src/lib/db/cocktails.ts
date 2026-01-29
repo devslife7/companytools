@@ -9,6 +9,7 @@ function transformCocktailToRecipe(cocktail: {
   name: string
   garnish: string
   method: string
+  instructions?: string | null
   featured: boolean
   ingredients: Array<{
     name: string
@@ -22,6 +23,7 @@ function transformCocktailToRecipe(cocktail: {
     name: cocktail.name,
     garnish: cocktail.garnish,
     method: cocktail.method,
+    ...(cocktail.instructions && { instructions: cocktail.instructions }),
     featured: cocktail.featured,
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
@@ -158,6 +160,7 @@ export async function createCocktail(
       name: data.name,
       garnish: data.garnish,
       method: data.method,
+      instructions: data.instructions || null,
       category: data.category,
       tags: data.tags || [],
       createdBy: data.createdBy,
@@ -213,16 +216,25 @@ export async function updateCocktail(
   }
 
   const updateData: any = {}
-  if (data.name) updateData.name = data.name
-  if (data.garnish) updateData.garnish = data.garnish
-  if (data.method) updateData.method = data.method
+  if (data.name !== undefined) updateData.name = data.name
+  if (data.garnish !== undefined) updateData.garnish = data.garnish
+  if (data.method !== undefined) updateData.method = data.method
+  if (data.instructions !== undefined) updateData.instructions = data.instructions || null
   if (data.category !== undefined) updateData.category = data.category
-  if (data.tags) updateData.tags = data.tags
+  if (data.tags !== undefined) updateData.tags = data.tags
   if (data.featured !== undefined) updateData.featured = data.featured
 
-  const cocktail = await prisma.cocktail.update({
+  // Only update cocktail if there are fields to update (ingredients are handled separately above)
+  if (Object.keys(updateData).length > 0) {
+    await prisma.cocktail.update({
+      where: { id },
+      data: updateData,
+    })
+  }
+
+  // Fetch the updated cocktail
+  const cocktail = await prisma.cocktail.findUnique({
     where: { id },
-    data: updateData,
     include: {
       ingredients: {
         orderBy: {
@@ -231,6 +243,10 @@ export async function updateCocktail(
       },
     },
   })
+
+  if (!cocktail) {
+    throw new Error('Cocktail not found after update')
+  }
 
   return transformCocktailToRecipe(cocktail)
 }

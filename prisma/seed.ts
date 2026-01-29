@@ -19,6 +19,7 @@ async function main() {
         name: cocktail.name,
         garnish: cocktail.garnish,
         method: cocktail.method,
+        instructions: cocktail.instructions || null,
         isActive: true,
         ingredients: {
           create: cocktail.ingredients.map((ingredient, index) => ({
