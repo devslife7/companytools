@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from "react"
 import { FlaskConical, Calculator, Trash2, Edit2 } from "lucide-react"
-import type { BatchState, Ingredient, CocktailRecipe } from "../types"
+import type { BatchState, Ingredient, CocktailRecipe, CocktailMethod } from "../types"
 import { ServingsInput } from "@/components/ui"
 import { SingleBatchDisplay } from "./SingleBatchDisplay"
 import { EditRecipeModal } from "./EditRecipeModal"
@@ -12,7 +12,7 @@ interface BatchItemProps {
   onIngredientChange: (id: number, newIngredients: Ingredient[]) => void
   onNameChange: (id: number, newName: string) => void
   onGarnishChange: (id: number, newGarnish: string) => void
-  onMethodChange: (id: number, newMethod: string) => void
+  onMethodChange: (id: number, newMethod: CocktailMethod) => void
   onRemove: (id: number) => void
   onEditRecipe?: (cocktail: CocktailRecipe, cocktailId?: number) => void  // Optional callback for database edit
   isOnlyItem: boolean

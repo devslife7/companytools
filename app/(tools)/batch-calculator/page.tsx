@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"
 
 // Import types
-import type { Ingredient, CocktailRecipe, BatchState } from "@/features/batch-calculator/types"
+import type { Ingredient, CocktailRecipe, BatchState, CocktailMethod } from "@/features/batch-calculator/types"
 
 // Import utilities
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
@@ -221,7 +221,7 @@ export default function BatchCalculatorPage() {
     )
   }, [])
 
-  const handleMethodChange = useCallback((id: number, newMethod: string) => {
+  const handleMethodChange = useCallback((id: number, newMethod: CocktailMethod) => {
     setBatches(prev =>
       prev.map(batch => {
         if (batch.id === id) {
