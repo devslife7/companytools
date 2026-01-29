@@ -4,8 +4,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Autumn Bloom Mocktail",
     garnish: "Mint sprig and Lavender sprig",
-    method:
-      "Add all ingredients (except cider) to a shaker with ice. Shake briefly to chill. Strain into a glass with fresh ice. Top with sparkling cider and stir gently.",
+    method: "Shake",
+    instructions: "Add all ingredients (except cider) to a shaker with ice. Shake briefly to chill. Strain into a glass with fresh ice. Top with sparkling cider and stir gently.",
     ingredients: [
       { name: "Sparkling Apple Cider", amount: "3 oz" },
       { name: "Pear Nectar/Juice", amount: "1 oz" },
@@ -30,8 +30,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Blackberry Collins",
     garnish: "Blackberry Wrapped in Mint Leaf on a Skewer",
-    method:
-      "1. Combine vodkka, lemon juice, simple syrup, and blackberry puree into a cocktail shaker filled with ice. 2. Shake until ingredients are properly chilled and strain into a collins glass filled with ice. 3. Top off with ginger beer. 4. Add edible gold dust.",
+    method: "Shake",
+    instructions: "1. Combine vodkka, lemon juice, simple syrup, and blackberry puree into a cocktail shaker filled with ice. 2. Shake until ingredients are properly chilled and strain into a collins glass filled with ice. 3. Top off with ginger beer. 4. Add edible gold dust.",
     ingredients: [
       { name: "Vodka", amount: "1.5 oz" },
       { name: "Lemon Juice", amount: "0.75 oz" },
@@ -43,7 +43,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Blue and Yellow Mimosa",
     garnish: "Mint sprig and Lavender sprig",
-    method: "Pour blue coracao last",
+    method: "Build",
+    instructions: "Pour blue coracao last",
     ingredients: [
       { name: "Prosecco", amount: "2 oz" },
       { name: "Orange Juice", amount: "2 oz" },
@@ -53,8 +54,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Classic Pisco Sour",
     garnish: "Angostura Bitters (3-5 drops)",
-    method:
-      "1. Add Pisco, Lime Juice, Simple Syrup, and Egg White to a shaker and dry-shake (without ice) vigorously. 2. Add ice and shake again until well-chilled. 3. Strain into a chilled glass (Timeless Cocktail). 4. Garnish with Angostura bitters drops.",
+    method: "Shake",
+    instructions: "1. Add Pisco, Lime Juice, Simple Syrup, and Egg White to a shaker and dry-shake (without ice) vigorously. 2. Add ice and shake again until well-chilled. 3. Strain into a chilled glass (Timeless Cocktail). 4. Garnish with Angostura bitters drops.",
     ingredients: [
       { name: "Pisco", amount: "2 oz" },
       { name: "Lime Juice", amount: "1 oz" },
@@ -76,8 +77,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Old Fashioned",
     garnish: "Lemon Twist",
-    method:
-      "1. Combine all ingredients in a tin filled with ice. 2. Stir until well-chilled. 3. Strain into a rocks glass filled with fresh ice.",
+    method: "Build",
+    instructions: "1. Combine all ingredients in a tin filled with ice. 2. Stir until well-chilled. 3. Strain into a rocks glass filled with fresh ice.",
     ingredients: [
       { name: "Bourbon or Rye", amount: "2 oz" },
       { name: "Simple Syrup", amount: "0.5 oz" },
@@ -87,8 +88,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Pear & Ginger Moscow Mule",
     garnish: "Pear Slice",
-    method:
-      "1. Combine vodka, pear puree, lime juice, and cardamom with ice. 2. Shake well. 3. Strain into a glass with ice. 4. Top with ginger beer and stir gently.",
+    method: "Shake",
+    instructions: "1. Combine vodka, pear puree, lime juice, and cardamom with ice. 2. Shake well. 3. Strain into a glass with ice. 4. Top with ginger beer and stir gently.",
     ingredients: [
       { name: "Vodka", amount: "2 oz" },
       { name: "Pear Puree", amount: "2 oz" },
@@ -100,8 +101,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Peruvian Garden Spritz",
     garnish: "Cucumber Ribbon & Mint Sprig",
-    method:
-      "1. Muddle Cucumber Slices and Mint Leaves. 2. Add Pisco and Lime Juice to Infuse. 3. Fill Glass with Ice and Strain Mixture. 4. Top with Sparkling Wine and Soda Water. 5. Stir gently.",
+    method: "Build",
+    instructions: "1. Muddle Cucumber Slices and Mint Leaves. 2. Add Pisco and Lime Juice to Infuse. 3. Fill Glass with Ice and Strain Mixture. 4. Top with Sparkling Wine and Soda Water. 5. Stir gently.",
     ingredients: [
       { name: "Pisco", amount: "1.5 oz" },
       { name: "Lime Juice", amount: "0.5 oz" },
@@ -114,8 +115,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Rhubarb Sour",
     garnish: "Mint sprig and Lavender sprig",
-    method:
-      "1. Dry Shake: Combine all ingredients (except ice) in a shaker and shake vigorously for 30 seconds. 2. Wet Shake: Add ice and shake again until chilled. Double-strain into a coupe or rocks glass.",
+    method: "Shake",
+    instructions: "1. Dry Shake: Combine all ingredients (except ice) in a shaker and shake vigorously for 30 seconds. 2. Wet Shake: Add ice and shake again until chilled. Double-strain into a coupe or rocks glass.",
     ingredients: [
       { name: "Base Spirit (Whiskey or Gin)", amount: "2 oz" },
       { name: "Fresh Lemon Juice", amount: "1 oz" },
@@ -125,8 +126,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
   {
     name: "Rose Garden",
-    garnish: "Edible Gold Dust (Added)",
-    method: "Baby Pansy",
+    garnish: "Baby Pansy",
+    method: "Build",
     ingredients: [
       { name: "Vodka", amount: "1.5 oz" },
       { name: "Lemon Juice", amount: "0.5 oz" },
@@ -138,8 +139,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Ruby Red Anniversary Daiquiri",
     garnish: "Mint sprig and Lavender sprig",
-    method:
-      "Combine all ingredients in a shaker with ice. Shake vigorously until chilled. Double-strain into a coupe glass.",
+    method: "Shake",
+    instructions: "Combine all ingredients in a shaker with ice. Shake vigorously until chilled. Double-strain into a coupe glass.",
     ingredients: [
       { name: "White Rum", amount: "2 oz" },
       { name: "Fresh Ruby Red Grapefruit Juice", amount: "1 oz" },
@@ -151,7 +152,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Sage and Ginger Paloma",
     garnish: "Sage Leaf",
-    method: "This cocktail is available on the bar all night.",
+    method: "Build",
+    instructions: "This cocktail is available on the bar all night.",
     ingredients: [
       { name: "Tequila (Reposado)", amount: "2 oz" },
       { name: "Sage Infused Honey", amount: "1 oz" },
@@ -163,7 +165,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Sparkling Pear French 75",
     garnish: "Mint sprig and Lavender sprig",
-    method: "Pour blue coracao last",
+    method: "Build",
+    instructions: "Pour blue coracao last",
     ingredients: [
       { name: "Gin", amount: "1 oz" },
       { name: "Lemon Juice", amount: "0.5 oz" },
@@ -173,8 +176,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
   {
     name: "Whiskey Honey Lemonade",
-    garnish: "Mint sprig and Lavender sprig",
-    method: "Baby Pansy",
+    garnish: "Baby Pansy",
+    method: "Build",
     ingredients: [
       { name: "Bourbon", amount: "2 oz" },
       { name: "Lemonade (Freshly Squeezed)", amount: "4 oz" },
@@ -196,7 +199,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Pear and Cranberry Bellini",
     garnish: "Pink sugar rim dont batch with sparkling wine",
-    method: "build",
+    method: "Build",
     ingredients: [
       { name: "Sparkling wine", amount: "4 oz" },
       { name: "White Cramberry", amount: "1 oz" },
