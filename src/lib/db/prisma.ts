@@ -79,7 +79,28 @@ function createPrismaClient() {
   })
 }
 
-export const prisma =
-  globalForPrisma.prisma ?? createPrismaClient()
+// Create Prisma client singleton
+// In serverless environments, this ensures we reuse the same client instance
+// across function invocations to avoid connection exhaustion
+let prismaInstance: PrismaClient
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+try {
+  prismaInstance = globalForPrisma.prisma ?? createPrismaClient()
+  
+  if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = prismaInstance
+  }
+  
+  // Verify Prisma client is properly initialized
+  if (!prismaInstance) {
+    throw new Error('Failed to initialize Prisma client - instance is null')
+  }
+} catch (error) {
+  console.error('Failed to create Prisma client:', error)
+  if (error instanceof Error) {
+    throw new Error(`Prisma client initialization failed: ${error.message}`)
+  }
+  throw error
+}
+
+export const prisma = prismaInstance

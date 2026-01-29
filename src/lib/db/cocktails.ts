@@ -103,6 +103,21 @@ export async function getAllCocktails(filters?: {
     return cocktails.map(transformCocktailToRecipe)
   } catch (error) {
     console.error('Database error in getAllCocktails:', error)
+    
+    // Log more details for debugging
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack?.split('\n').slice(0, 5).join('\n'), // First 5 lines of stack
+      })
+      
+      // Check for specific Prisma errors
+      if ((error as any).code) {
+        console.error('Prisma error code:', (error as any).code)
+      }
+    }
+    
     // Re-throw with more context
     if (error instanceof Error) {
       throw new Error(`Database query failed: ${error.message}`)

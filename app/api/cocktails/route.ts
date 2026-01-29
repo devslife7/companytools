@@ -9,12 +9,30 @@ import type { CocktailRecipe } from '@/features/batch-calculator/types'
 // GET /api/cocktails - Get all cocktails
 export async function GET(request: NextRequest) {
   try {
+    // Verify DATABASE_URL is set
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL environment variable is not set')
+      return NextResponse.json(
+        { 
+          error: 'Database configuration error',
+          details: process.env.NODE_ENV === 'development' ? 'DATABASE_URL is not set' : undefined
+        },
+        { status: 500 }
+      )
+    }
+
     const searchParams = request.nextUrl.searchParams
     
     // Check if requesting unique liquors
     if (searchParams.get('liquors') === 'true') {
-      const liquors = await getUniqueLiquors()
-      return NextResponse.json({ liquors })
+      try {
+        const liquors = await getUniqueLiquors()
+        return NextResponse.json({ liquors })
+      } catch (error) {
+        console.error('Error fetching liquors:', error)
+        // Return empty array on error for liquors (non-critical)
+        return NextResponse.json({ liquors: [] })
+      }
     }
     
     const search = searchParams.get('search') || undefined
@@ -48,13 +66,22 @@ export async function GET(request: NextRequest) {
       if (error.message.includes('connect') || error.message.includes('timeout') || error.message.includes('ECONNREFUSED')) {
         console.error('Database connection error detected')
       }
+      
+      // Check for Prisma client errors
+      if (error.message.includes('PrismaClient') || error.message.includes('prisma')) {
+        console.error('Prisma client error detected')
+      }
     }
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    
+    // Return error details in production for better debugging (can be removed if security concern)
     return NextResponse.json(
       { 
         error: 'Failed to fetch cocktails',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        details: errorMessage,
+        // Include error type for debugging
+        errorType: error instanceof Error ? error.constructor.name : 'Unknown'
       },
       { status: 500 }
     )
