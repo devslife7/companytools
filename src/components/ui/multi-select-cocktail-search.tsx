@@ -108,8 +108,8 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
                     onClick={() => handleToggleCocktail(cocktail)}
                     className={`w-full text-left p-2 rounded-md transition duration-200 ease-in-out flex justify-between items-center ${
                       selected
-                        ? "bg-orange-100 border border-orange-500 text-gray-900 shadow-md"
-                        : "bg-white hover:bg-gray-100 border border-gray-200 text-gray-700"
+                        ? "bg-orange-100 text-gray-900 shadow-md"
+                        : "bg-white hover:bg-gray-100 text-gray-700"
                     }`}
                   >
                     <span className="font-semibold">{cocktail.name}</span>

@@ -14,11 +14,16 @@ async function main() {
   console.log(`📝 Seeding ${COCKTAIL_DATA.length} cocktails...`)
   
   for (const cocktail of COCKTAIL_DATA) {
+    // Convert method to enum: case-insensitive match for "Shake"/"Shaken", default to "Build"
+    const methodLower = cocktail.method?.toLowerCase().trim()
+    const methodValue = (methodLower === 'shaken' || methodLower === 'shake') ? 'Shake' : 'Build'
+    
     await prisma.cocktail.create({
       data: {
         name: cocktail.name,
         garnish: cocktail.garnish,
-        method: cocktail.method,
+        method: methodValue,
+        instructions: cocktail.instructions || null,
         isActive: true,
         ingredients: {
           create: cocktail.ingredients.map((ingredient, index) => ({

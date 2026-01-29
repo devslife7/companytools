@@ -18,7 +18,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     name: "Pear Bourbon Sour",
     garnish: "pear and dry cherry skewer",
     method:
-      "Shaken",
+      "Shake",
     ingredients: [
       { name: "Bourbon", amount: "2 oz" },
       { name: "Pear Liqueur", amount: "1 oz" },
@@ -65,7 +65,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Espresso Martini",
     garnish: "3 coffee beans",
-    method: "Shaken",
+    method: "Shake",
     ingredients: [
       { name: "Vodka", amount: "2 oz" },
       { name: "Espresso", amount: "1 oz" },
@@ -185,7 +185,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
     name: "Maple Bourbon Cider",
     garnish: "Green Apple slice, cinnamon stick",
-    method: "Shaken",
+    method: "Shake",
     ingredients: [
       { name: "Bourbon", amount: "2 oz" },
       { name: "Apple Cider", amount: "4 oz" },

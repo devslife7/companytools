@@ -9,18 +9,24 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CocktailMethod {
+  Shake
+  Build
+}
+
 model Cocktail {
-  id         Int         @id @default(autoincrement())
-  name       String      @unique @db.VarChar(255)
-  garnish    String      @db.Text
-  method     String      @db.Text
-  createdAt  DateTime    @default(now()) @map("created_at")
-  updatedAt  DateTime    @updatedAt @map("updated_at")
-  createdBy  String?     @map("created_by") @db.VarChar(255)
-  isActive   Boolean     @default(true) @map("is_active")
-  tags       String[]    @default([])
-  category   String?     @db.VarChar(100)
-  featured   Boolean     @default(false)
+  id           Int         @id @default(autoincrement())
+  name         String      @unique @db.VarChar(255)
+  garnish      String      @db.Text
+  method       CocktailMethod @default(Build)
+  instructions String?     @db.Text
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  createdBy    String?     @map("created_by") @db.VarChar(255)
+  isActive     Boolean     @default(true) @map("is_active")
+  tags         String[]    @default([])
+  category     String?     @db.VarChar(100)
+  featured     Boolean     @default(false)
   
   ingredients Ingredient[]
   

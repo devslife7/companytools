@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect } from "react"
 import { X, PlusCircle, Trash2, Save, Loader2, AlertCircle } from "lucide-react"
-import type { CocktailRecipe, Ingredient } from "../types"
+import type { CocktailRecipe, Ingredient, CocktailMethod } from "../types"
 import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
 
 interface EditRecipeModalProps {
@@ -45,7 +45,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       setEditedRecipe({
         name: '',
         garnish: '',
-        method: '',
+        method: 'Build',
         ingredients: [{ name: '', amount: '', preferredUnit: '' }],
       })
     }
@@ -62,8 +62,12 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     setEditedRecipe({ ...editedRecipe, garnish: value })
   }
 
-  const handleMethodChange = (value: string) => {
+  const handleMethodChange = (value: CocktailMethod) => {
     setEditedRecipe({ ...editedRecipe, method: value })
+  }
+
+  const handleInstructionsChange = (value: string) => {
+    setEditedRecipe({ ...editedRecipe, instructions: value })
   }
 
   const handleIngredientChange = (index: number, field: keyof Ingredient, value: string) => {
@@ -96,8 +100,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       return
     }
 
-    if (!editedRecipe.method.trim()) {
-      setValidationError("Method is required")
+    if (!editedRecipe.method || (editedRecipe.method !== 'Shake' && editedRecipe.method !== 'Build')) {
+      setValidationError("Method must be either Shake or Build")
       return
     }
 
@@ -126,7 +130,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       const updatedRecipe = await updateCocktail(cocktailId, {
         name: editedRecipe.name.trim(),
         garnish: editedRecipe.garnish.trim(),
-        method: editedRecipe.method.trim(),
+        method: editedRecipe.method,
+        instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
       })
 
@@ -143,7 +148,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         ...editedRecipe,
         name: editedRecipe.name.trim(),
         garnish: editedRecipe.garnish.trim(),
-        method: editedRecipe.method.trim(),
+        method: editedRecipe.method as CocktailMethod,
+        instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
       })
       onClose()
@@ -237,7 +243,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
           </div>
 
           {/* Garnish */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Garnish</label>
             <input
               type="text"
@@ -246,17 +252,54 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
               placeholder="Enter garnish description"
             />
-          </div>
+          </div> */}
 
-          {/* Method */}
+          {/* Instructions */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Method</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
+            
+            {/* Method */}
+            <div className="mb-4">
+              <div className="flex gap-2">
+                <label className={`flex items-center justify-center px-5 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all duration-200 ${
+                  editedRecipe.method === 'Build'
+                    ? 'bg-white text-orange-600 border-orange-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                }`}>
+                  <input
+                    type="radio"
+                    name="method"
+                    value="Build"
+                    checked={editedRecipe.method === 'Build'}
+                    onChange={e => handleMethodChange(e.target.value as CocktailMethod)}
+                    className="sr-only"
+                  />
+                  <span>Build</span>
+                </label>
+                <label className={`flex items-center justify-center px-5 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all duration-200 ${
+                  editedRecipe.method === 'Shake'
+                    ? 'bg-white text-orange-600 border-orange-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                }`}>
+                  <input
+                    type="radio"
+                    name="method"
+                    value="Shake"
+                    checked={editedRecipe.method === 'Shake'}
+                    onChange={e => handleMethodChange(e.target.value as CocktailMethod)}
+                    className="sr-only"
+                  />
+                  <span>Shake</span>
+                </label>
+              </div>
+            </div>
+            
             <textarea
-              value={editedRecipe.method}
-              onChange={e => handleMethodChange(e.target.value)}
-              rows={4}
+              value={editedRecipe.instructions || ''}
+              onChange={e => handleInstructionsChange(e.target.value)}
+              rows={6}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 resize-none"
-              placeholder="Enter preparation method"
+              placeholder="Enter step-by-step instructions for making the drink"
             />
           </div>
 
@@ -298,7 +341,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       <option value="quarts">Quarts</option>
                       <option value="gallons">Gallons</option>
                       <option value="each">Each</option>
-                      <option value="12oz cans">12oz Cans</option>
+                      <option value="12oz can">12oz Can</option>
                       <option value="4oz bottle">4oz Bottle</option>
                     </select>
                   </div>

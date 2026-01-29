@@ -6,11 +6,14 @@ export interface Ingredient {
   preferredUnit?: string
 }
 
+export type CocktailMethod = "Shake" | "Build"
+
 export interface CocktailRecipe {
   id?: number  // Database ID (optional for backward compatibility)
   name: string
   garnish: string
-  method: string
+  method: CocktailMethod
+  instructions?: string
   ingredients: Ingredient[]
   featured?: boolean
 }

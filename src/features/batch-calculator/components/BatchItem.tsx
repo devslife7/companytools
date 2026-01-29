@@ -27,7 +27,7 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
     const [showEditModal, setShowEditModal] = useState(false)
 
     return (
-      <div className="p-3 sm:p-4 bg-white border border-gray-300 rounded-xl shadow-xl mb-4 transition-all duration-500 hover:border-orange-500">
+      <div className="p-3 sm:p-4 bg-white border border-gray-300 rounded-xl mb-4 transition-all duration-500 hover:border-orange-300">
         <div className="flex justify-between items-center mb-4 border-b border-gray-300 pb-3">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 flex items-center">

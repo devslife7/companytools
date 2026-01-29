@@ -112,12 +112,12 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
             min="0"
             step="1"
             required
-            className={`w-full py-2 pl-9 pr-10 text-gray-900 border-2 rounded-lg focus:ring-2 transition duration-300 shadow-sm ${
+            className={`w-full py-2 pl-9 pr-10 text-gray-900 border rounded-lg focus:ring-2 transition duration-300 ${
               disabled
                 ? "opacity-60 cursor-not-allowed border-gray-300 bg-gray-50"
                 : hasError
                   ? "bg-red-50 border-red-500 focus:border-red-600 focus:ring-red-500"
-                  : "bg-gray-50 border-gray-300 focus:border-orange-500 focus:ring-orange-500"
+                  : "bg-gray-50 border-gray-300 focus:border-orange-300 focus:ring-orange-300"
             }`}
             disabled={disabled}
             placeholder="Enter servings (required)"
