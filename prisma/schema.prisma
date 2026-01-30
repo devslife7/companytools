@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,26 +6,20 @@ datasource db {
   provider = "postgresql"
 }
 
-enum CocktailMethod {
-  Shake
-  Build
-}
-
 model Cocktail {
-  id           Int         @id @default(autoincrement())
-  name         String      @unique @db.VarChar(255)
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(255)
   method       CocktailMethod @default(Build)
-  instructions String?     @db.Text
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
-  createdBy    String?     @map("created_by") @db.VarChar(255)
-  isActive     Boolean     @default(true) @map("is_active")
-  tags         String[]    @default([])
-  category     String?     @db.VarChar(100)
-  featured     Boolean     @default(false)
-  
-  ingredients Ingredient[]
-  
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  createdBy    String?        @map("created_by") @db.VarChar(255)
+  isActive     Boolean        @default(true) @map("is_active")
+  tags         String[]       @default([])
+  category     String?        @db.VarChar(100)
+  featured     Boolean        @default(false)
+  instructions String?
+  ingredients  Ingredient[]
+
   @@index([name])
   @@index([isActive])
   @@index([category])
@@ -43,10 +34,14 @@ model Ingredient {
   amount        String   @db.VarChar(100)
   orderIndex    Int      @map("order_index")
   preferredUnit String?  @map("preferred_unit") @db.VarChar(50)
-  
   cocktail      Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
-  
+
   @@index([cocktailId])
   @@index([name])
   @@map("ingredients")
+}
+
+enum CocktailMethod {
+  Shake
+  Build
 }
