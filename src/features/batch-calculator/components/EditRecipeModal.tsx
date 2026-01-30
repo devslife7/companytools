@@ -294,13 +294,21 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               </div>
             </div>
             
-            <textarea
-              value={editedRecipe.instructions || ''}
-              onChange={e => handleInstructionsChange(e.target.value)}
-              rows={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 resize-none"
-              placeholder="Enter step-by-step instructions for making the drink"
-            />
+            {/* Textarea with custom placeholder */}
+            <div className="relative">
+              <textarea
+                value={editedRecipe.instructions || ''}
+                onChange={e => handleInstructionsChange(e.target.value)}
+                rows={6}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 resize-none relative z-10"
+                placeholder=""
+              />
+              {!editedRecipe.instructions && (
+                <div className="absolute top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
+                  Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build{'\n'}3. Garnish
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Ingredients */}
