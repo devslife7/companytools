@@ -165,7 +165,7 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
 
         <div className="p-3 sm:p-4">
           <p className="text-sm text-gray-600 mb-3 border-b border-gray-200 pb-1">
-            **Garnish:** {recipe.garnish || "N/A"} | **Method:** {recipe.method || "N/A"}
+            **Method:** {recipe.method || "N/A"}
           </p>
 
           <h4 className="text-lg font-semibold text-orange-600 mb-2">Ingredients (1 Serving)</h4>

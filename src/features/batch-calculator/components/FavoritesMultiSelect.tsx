@@ -105,7 +105,6 @@ export const FavoritesMultiSelect: React.FC<FavoritesMultiSelectProps> = React.m
                               <Check className="w-4 h-4 text-orange-600" />
                             )}
                           </h3>
-                          <p className="text-sm text-gray-600">{cocktail.garnish}</p>
                         </div>
                         {selected && (
                           <div className="flex-shrink-0">

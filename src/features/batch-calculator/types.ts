@@ -11,7 +11,6 @@ export type CocktailMethod = "Shake" | "Build"
 export interface CocktailRecipe {
   id?: number  // Database ID (optional for backward compatibility)
   name: string
-  garnish: string
   method: CocktailMethod
   instructions?: string
   ingredients: Ingredient[]

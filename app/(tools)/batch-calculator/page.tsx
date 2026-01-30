@@ -242,22 +242,6 @@ export default function BatchCalculatorPage() {
     )
   }, [])
 
-  const handleGarnishChange = useCallback((id: number, newGarnish: string) => {
-    setBatches(prev =>
-      prev.map(batch => {
-        if (batch.id === id) {
-          if (batch.editableRecipe) {
-            return {
-              ...batch,
-              editableRecipe: { ...batch.editableRecipe, garnish: newGarnish },
-            }
-          }
-        }
-        return batch
-      })
-    )
-  }, [])
-
   const handleMethodChange = useCallback((id: number, newMethod: CocktailMethod) => {
     setBatches(prev =>
       prev.map(batch => {
@@ -350,7 +334,6 @@ export default function BatchCalculatorPage() {
   const handleCreateCocktail = useCallback(async (recipe: CocktailRecipe) => {
     const newRecipe = await createCocktail({
       name: recipe.name,
-      garnish: recipe.garnish,
       method: recipe.method,
       ingredients: recipe.ingredients,
     })
@@ -590,7 +573,6 @@ export default function BatchCalculatorPage() {
               onServingsChange={handleServingsChange}
               onIngredientChange={handleIngredientChange}
               onNameChange={handleNameChange}
-              onGarnishChange={handleGarnishChange}
               onMethodChange={handleMethodChange}
               onRemove={handleRemoveBatch}
               onEditRecipe={handleOpenEditModal}

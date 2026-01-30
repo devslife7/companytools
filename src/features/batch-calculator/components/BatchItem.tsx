@@ -11,7 +11,6 @@ interface BatchItemProps {
   onServingsChange: (id: number, value: string) => void
   onIngredientChange: (id: number, newIngredients: Ingredient[]) => void
   onNameChange: (id: number, newName: string) => void
-  onGarnishChange: (id: number, newGarnish: string) => void
   onMethodChange: (id: number, newMethod: CocktailMethod) => void
   onRemove: (id: number) => void
   onEditRecipe?: (cocktail: CocktailRecipe, cocktailId?: number) => void  // Optional callback for database edit
@@ -21,7 +20,7 @@ interface BatchItemProps {
 
 // New memoized component for each slot (Crucial for performance fix)
 export const BatchItem: React.FC<BatchItemProps> = React.memo(
-  ({ batch, onServingsChange, onIngredientChange, onNameChange, onGarnishChange, onMethodChange, onRemove, onEditRecipe, isOnlyItem, hasError = false }) => {
+  ({ batch, onServingsChange, onIngredientChange, onNameChange, onMethodChange, onRemove, onEditRecipe, isOnlyItem, hasError = false }) => {
     const { servings, editableRecipe, id, selectedCocktail } = batch
     const [isEditing, setIsEditing] = useState(false)
     const [showEditModal, setShowEditModal] = useState(false)
@@ -94,7 +93,6 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
             onSave={(updatedRecipe: CocktailRecipe) => {
               // Update all recipe fields
               onNameChange(id, updatedRecipe.name)
-              onGarnishChange(id, updatedRecipe.garnish)
               onMethodChange(id, updatedRecipe.method)
               onIngredientChange(id, updatedRecipe.ingredients)
               setShowEditModal(false)

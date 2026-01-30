@@ -44,7 +44,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       // Initialize empty recipe for create mode
       setEditedRecipe({
         name: '',
-        garnish: '',
         method: 'Build',
         ingredients: [{ name: '', amount: '', preferredUnit: '' }],
       })
@@ -56,10 +55,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
 
   const handleNameChange = (value: string) => {
     setEditedRecipe({ ...editedRecipe, name: value })
-  }
-
-  const handleGarnishChange = (value: string) => {
-    setEditedRecipe({ ...editedRecipe, garnish: value })
   }
 
   const handleMethodChange = (value: CocktailMethod) => {
@@ -95,11 +90,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       return
     }
 
-    if (!editedRecipe.garnish.trim()) {
-      setValidationError("Garnish is required")
-      return
-    }
-
     if (!editedRecipe.method || (editedRecipe.method !== 'Shake' && editedRecipe.method !== 'Build')) {
       setValidationError("Method must be either Shake or Build")
       return
@@ -129,7 +119,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     if (mode === 'edit' && cocktailId) {
       const updatedRecipe = await updateCocktail(cocktailId, {
         name: editedRecipe.name.trim(),
-        garnish: editedRecipe.garnish.trim(),
         method: editedRecipe.method,
         instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
@@ -147,7 +136,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       onSave({
         ...editedRecipe,
         name: editedRecipe.name.trim(),
-        garnish: editedRecipe.garnish.trim(),
         method: editedRecipe.method as CocktailMethod,
         instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
@@ -242,18 +230,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             />
           </div>
 
-          {/* Garnish */}
-          {/* <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Garnish</label>
-            <input
-              type="text"
-              value={editedRecipe.garnish}
-              onChange={e => handleGarnishChange(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
-              placeholder="Enter garnish description"
-            />
-          </div> */}
-
           {/* Instructions */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
@@ -305,7 +281,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               />
               {!editedRecipe.instructions && (
                 <div className="absolute top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
-                  Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build{'\n'}3. Garnish
+                  Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build
                 </div>
               )}
             </div>

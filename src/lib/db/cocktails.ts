@@ -7,7 +7,6 @@ import type { CocktailRecipe, CocktailMethod } from '@/features/batch-calculator
 function transformCocktailToRecipe(cocktail: {
   id: number
   name: string
-  garnish: string
   method: CocktailMethod | string
   instructions?: string | null
   featured: boolean
@@ -27,7 +26,6 @@ function transformCocktailToRecipe(cocktail: {
   return {
     id: cocktail.id,  // Include database ID
     name: cocktail.name,
-    garnish: cocktail.garnish,
     method: validMethod,
     ...(cocktail.instructions && { instructions: cocktail.instructions }),
     featured: cocktail.featured,
@@ -179,7 +177,6 @@ export async function createCocktail(
   const cocktail = await prisma.cocktail.create({
     data: {
       name: data.name,
-      garnish: data.garnish,
       method: data.method,
       instructions: data.instructions || null,
       category: data.category,
@@ -238,7 +235,6 @@ export async function updateCocktail(
 
   const updateData: any = {}
   if (data.name !== undefined) updateData.name = data.name
-  if (data.garnish !== undefined) updateData.garnish = data.garnish
   if (data.method !== undefined) updateData.method = data.method
   if (data.instructions !== undefined) updateData.instructions = data.instructions || null
   if (data.category !== undefined) updateData.category = data.category

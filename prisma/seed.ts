@@ -21,7 +21,6 @@ async function main() {
     await prisma.cocktail.create({
       data: {
         name: cocktail.name,
-        garnish: cocktail.garnish,
         method: methodValue,
         instructions: cocktail.instructions || null,
         isActive: true,
