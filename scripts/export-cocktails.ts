@@ -44,11 +44,16 @@ function formatCocktail(cocktail: CocktailRecipe, index: number, total: number):
   lines.push('    ingredients: [')
   cocktail.ingredients.forEach((ing, ingIndex) => {
     const isLast = ingIndex === cocktail.ingredients.length - 1
-    if (ing.preferredUnit) {
-      lines.push(`      { name: ${JSON.stringify(ing.name)}, amount: ${JSON.stringify(ing.amount)}, preferredUnit: ${JSON.stringify(ing.preferredUnit)} }${isLast ? '' : ','}`)
-    } else {
-      lines.push(`      { name: ${JSON.stringify(ing.name)}, amount: ${JSON.stringify(ing.amount)} }${isLast ? '' : ','}`)
+    const parts: string[] = [`name: ${JSON.stringify(ing.name)}`, `amount: ${JSON.stringify(ing.amount)}`]
+    
+    if (ing.unit) {
+      parts.push(`unit: ${JSON.stringify(ing.unit)}`)
     }
+    if (ing.preferredUnit) {
+      parts.push(`preferredUnit: ${JSON.stringify(ing.preferredUnit)}`)
+    }
+    
+    lines.push(`      { ${parts.join(', ')} }${isLast ? '' : ','}`)
   })
   lines.push('    ],')
   
@@ -95,8 +100,9 @@ function transformCocktailToRecipe(cocktail: {
   featured: boolean
   ingredients: Array<{
     name: string
-    amount: string
+    amount: any // Decimal type from Prisma
     orderIndex: number
+    unit?: string | null
     preferredUnit?: string | null
   }>
 }): CocktailRecipe {
@@ -114,13 +120,23 @@ function transformCocktailToRecipe(cocktail: {
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(ing => {
+        // Convert Decimal to string
+        const amountStr = typeof ing.amount === 'string' 
+          ? ing.amount 
+          : ing.amount?.toString() || '0'
+        
         const ingredient: any = {
           name: ing.name,
-          amount: ing.amount,
+          amount: amountStr,
+        }
+        
+        if (ing.unit) {
+          ingredient.unit = ing.unit
         }
         if (ing.preferredUnit) {
           ingredient.preferredUnit = ing.preferredUnit
         }
+        
         return ingredient
       }),
   }
