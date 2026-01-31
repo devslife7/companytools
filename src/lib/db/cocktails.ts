@@ -1,5 +1,38 @@
 import { prisma } from './prisma'
 import type { CocktailRecipe, CocktailMethod } from '@/features/batch-calculator/types'
+import { Prisma } from '@prisma/client'
+
+/**
+ * Convert Prisma Decimal to string for TypeScript interface compatibility
+ */
+function decimalToString(value: Prisma.Decimal | string | null | undefined): string {
+  if (value === null || value === undefined) {
+    return '0'
+  }
+  if (typeof value === 'string') {
+    return value
+  }
+  // Prisma Decimal type - convert to string
+  return value.toString()
+}
+
+/**
+ * Convert string to Prisma Decimal for database storage
+ */
+function stringToDecimal(value: string | number | null | undefined): Prisma.Decimal {
+  if (value === null || value === undefined || value === '') {
+    return new Prisma.Decimal(0)
+  }
+  if (typeof value === 'number') {
+    return new Prisma.Decimal(value)
+  }
+  // Parse string to number, then create Decimal
+  const num = parseFloat(value)
+  if (isNaN(num)) {
+    return new Prisma.Decimal(0)
+  }
+  return new Prisma.Decimal(num)
+}
 
 /**
  * Transform Prisma cocktail model to CocktailRecipe type
@@ -12,7 +45,7 @@ function transformCocktailToRecipe(cocktail: {
   featured: boolean
   ingredients: Array<{
     name: string
-    amount: string
+    amount: Prisma.Decimal | string
     orderIndex: number
     unit?: string | null
     preferredUnit?: string | null
@@ -34,7 +67,7 @@ function transformCocktailToRecipe(cocktail: {
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(ing => ({
         name: ing.name,
-        amount: ing.amount,
+        amount: decimalToString(ing.amount),
         ...(ing.unit != null && ing.unit !== '' && { unit: ing.unit }),
         ...(ing.preferredUnit != null && ing.preferredUnit !== '' && { preferredUnit: ing.preferredUnit }),
       })),
@@ -188,7 +221,7 @@ export async function createCocktail(
       ingredients: {
         create: data.ingredients.map((ing, index) => ({
           name: ing.name,
-          amount: ing.amount,
+          amount: stringToDecimal(ing.amount),
           orderIndex: index,
           unit: ing.unit || null,
           preferredUnit: ing.preferredUnit || null,
@@ -229,7 +262,7 @@ export async function updateCocktail(
       data: data.ingredients.map((ing, index) => ({
         cocktailId: id,
         name: ing.name,
-        amount: ing.amount,
+        amount: stringToDecimal(ing.amount),
         orderIndex: index,
         unit: ing.unit || null,
         preferredUnit: ing.preferredUnit || null,

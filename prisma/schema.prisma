@@ -31,7 +31,7 @@ model Ingredient {
   id            Int      @id @default(autoincrement())
   cocktailId    Int      @map("cocktail_id")
   name          String   @db.VarChar(255)
-  amount        String   @db.VarChar(100)
+  amount        Decimal  @db.Decimal(10, 3)
   orderIndex    Int      @map("order_index")
   unit          String?  @map("unit") @db.VarChar(50)
   preferredUnit String?  @map("preferred_unit") @db.VarChar(50)
