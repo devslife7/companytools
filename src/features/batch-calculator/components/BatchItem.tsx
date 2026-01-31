@@ -63,7 +63,7 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Servings Input (The primary user input) */}
-          <div className="md:col-span-3 md:max-w-xs">
+          <div className="md:col-span-3 md:max-w-40">
             <ServingsInput
               value={servings}
               onChange={value => onServingsChange(id, value)}

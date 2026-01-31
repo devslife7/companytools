@@ -60,7 +60,6 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
 
     const handlePresetClick = (preset: number) => {
       onChange(preset.toString())
-      inputRef.current?.focus()
     }
 
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -131,7 +130,7 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
                   : "bg-white border-gray-300 hover:border-gray-400 focus:border-orange-400 focus:ring-orange-100"
             }`}
             disabled={disabled}
-            placeholder="Enter Servings"
+            placeholder="Servings"
           />
           <button
             type="button"
@@ -154,7 +153,7 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
           {isDropdownOpen && !disabled && (
             <div 
               ref={dropdownRef}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
+              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-[500px] overflow-y-auto"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               <div className="py-1">

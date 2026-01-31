@@ -541,17 +541,17 @@ export default function BatchCalculatorPage() {
         {hasSelectedCocktails && (
           <div className="mb-8 px-0">
             <div className="mb-4 pb-2 border-b-2 border-gray-300">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                   <h2 className="text-xl font-bold text-gray-900">Step 2: Set Servings</h2>
                   <p className="text-sm text-gray-600 mt-1">Enter the number of servings for each cocktail</p>
                 </div>
                 {servingsProgress.total > 0 && (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-100 rounded-lg w-full sm:w-auto">
+                    <span className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">
                       {servingsProgress.completed} / {servingsProgress.total}
                     </span>
-                    <div className="w-24 h-2 bg-gray-300 rounded-full overflow-hidden">
+                    <div className="flex-1 sm:w-24 h-2 bg-gray-300 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-orange-600 transition-all duration-300"
                         style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}

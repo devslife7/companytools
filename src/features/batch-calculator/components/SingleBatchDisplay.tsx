@@ -256,10 +256,10 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
 
           {/* Batch Totals Toggle Button */}
           {(servingsNum > 0 || singleServingVolumeML > 0) && (
-            <div className="mt-6">
+            <div className="mt-4">
               <button
                 onClick={() => setShowBatchTotals(!showBatchTotals)}
-                className="w-full flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition duration-200 shadow-sm"
+                className="w-full flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition duration-200"
               >
                 <div className="flex items-center space-x-2">
                   <Ruler className="w-6 h-6 text-orange-600" />
