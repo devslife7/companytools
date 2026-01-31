@@ -14,7 +14,6 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:export": "tsx scripts/export-cocktails.ts",
-    "db:backfill-units": "tsx scripts/backfill-unit-column.ts",
     "db:studio": "prisma studio"
   },
   "prisma": {

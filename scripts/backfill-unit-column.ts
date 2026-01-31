@@ -105,7 +105,11 @@ async function main() {
     }
 
     for (const ingredient of ingredients) {
-      const normalizedUnit = extractUnitFromAmount(ingredient.amount)
+      // Handle both string (before schema change) and Decimal (after schema change)
+      const amountString = typeof ingredient.amount === 'string' 
+        ? ingredient.amount 
+        : ingredient.amount?.toString() || ''
+      const normalizedUnit = extractUnitFromAmount(amountString)
       
       if (normalizedUnit) {
         updates.push({
@@ -117,13 +121,13 @@ async function main() {
         stats[normalizedUnit as keyof typeof stats]++
         
         if (!dryRun) {
-          console.log(`  ✓ ${ingredient.name}: "${ingredient.amount}" → unit: "${normalizedUnit}"`)
+          console.log(`  ✓ ${ingredient.name}: "${amountString}" → unit: "${normalizedUnit}"`)
         } else {
-          console.log(`  [DRY RUN] ${ingredient.name}: "${ingredient.amount}" → unit: "${normalizedUnit}"`)
+          console.log(`  [DRY RUN] ${ingredient.name}: "${amountString}" → unit: "${normalizedUnit}"`)
         }
       } else {
         stats.errors++
-        console.warn(`  ⚠️  ${ingredient.name}: "${ingredient.amount}" → Could not determine unit`)
+        console.warn(`  ⚠️  ${ingredient.name}: "${amountString}" → Could not determine unit`)
       }
     }
 
