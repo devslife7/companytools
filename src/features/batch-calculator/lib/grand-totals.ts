@@ -1,5 +1,5 @@
 import type { BatchState, BatchResultWithCans, UnitType } from "../types"
-import { calculateBatch, convertMLToPreferredUnit, parseAmount, combineAmountAndUnit } from "./calculations"
+import { calculateBatch, convertMLToPreferredUnit, parseAmount, combineAmountAndUnit, calculateSingleServingLiquidVolumeML, CONVERSION_FACTORS, LITER_TO_ML, QUART_TO_ML, BOTTLE_SIZE_ML } from "./calculations"
 import { isLiquorItem, isSodaItem, isAngosturaBitters } from "./ingredient-helpers"
 
 // Constants for can calculations
@@ -15,10 +15,13 @@ export const calculateGrandTotals = (batches: BatchState[]): {
   const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType; preferredUnit?: string; eachCount?: number }> = {}
 
   batches.forEach(batch => {
+    if (!batch.editableRecipe) return
+
     const servingsNum =
       typeof batch.servings === "number" ? batch.servings : batch.servings === "" ? 0 : parseInt(batch.servings, 10) || 0
 
-    if (batch.editableRecipe && servingsNum > 0) {
+    // Process batches with servings > 0
+    if (servingsNum > 0) {
       batch.editableRecipe.ingredients.forEach(item => {
         const result = calculateBatch(servingsNum, item.amount, item.unit)
         const key = item.name.trim()
@@ -54,6 +57,56 @@ export const calculateGrandTotals = (batches: BatchState[]): {
           }
         }
       })
+    }
+    // Process batches with targetLiters > 0 but no servings
+    else if (batch.targetLiters > 0) {
+      const singleServingVolumeML = calculateSingleServingLiquidVolumeML(batch.editableRecipe)
+      
+      if (singleServingVolumeML > 0) {
+        const targetLitersML = batch.targetLiters * LITER_TO_ML
+        
+        batch.editableRecipe.ingredients.forEach(item => {
+          const amountString = combineAmountAndUnit(item.amount, item.unit)
+          const { baseAmount, unit, type } = parseAmount(amountString)
+          const key = item.name.trim()
+          
+          // Check if this item has "each" as preferred unit
+          const hasEachPreferredUnit = item.preferredUnit?.toLowerCase().trim() === "each"
+          
+          // Include liquid ingredients OR items with "each" as preferred unit
+          if (type === "liquid" || hasEachPreferredUnit) {
+            if (!grandTotals[key]) {
+              grandTotals[key] = { ml: 0, bottles: 0, quart: 0, unitType: type }
+            }
+            
+            if (type === "liquid") {
+              const ingredientML = baseAmount * (CONVERSION_FACTORS[unit] || 0)
+              const proportion = ingredientML / singleServingVolumeML
+              const finalML = targetLitersML * proportion
+              
+              grandTotals[key].ml += finalML
+              grandTotals[key].bottles += finalML / BOTTLE_SIZE_ML
+              grandTotals[key].quart += finalML / QUART_TO_ML
+            }
+            
+            // For "each" items, calculate based on number of servings in target liters
+            if (hasEachPreferredUnit) {
+              // Calculate how many servings fit in target liters
+              const approximateServings = targetLitersML / singleServingVolumeML
+              if (!grandTotals[key].eachCount) {
+                grandTotals[key].eachCount = 0
+              }
+              // baseAmount is the count per serving, multiply by number of servings
+              grandTotals[key].eachCount = (grandTotals[key].eachCount || 0) + (baseAmount * approximateServings)
+            }
+            
+            // Store preferred unit if not already set (use first one found)
+            if (item.preferredUnit && !grandTotals[key].preferredUnit) {
+              grandTotals[key].preferredUnit = item.preferredUnit
+            }
+          }
+        })
+      }
     }
   })
 
