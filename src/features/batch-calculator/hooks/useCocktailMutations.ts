@@ -14,7 +14,7 @@ interface UseUpdateCocktailResult {
 }
 
 interface UseDeleteCocktailResult {
-  deleteCocktail: (id: number) => Promise<boolean>
+  deleteCocktail: (id: number, password: string) => Promise<boolean>
   loading: boolean
   error: string | null
 }
@@ -104,13 +104,17 @@ export function useDeleteCocktail(): UseDeleteCocktailResult {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const deleteCocktail = useCallback(async (id: number): Promise<boolean> => {
+  const deleteCocktail = useCallback(async (id: number, password: string): Promise<boolean> => {
     try {
       setLoading(true)
       setError(null)
 
       const response = await fetch(`/api/cocktails/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
       })
 
       if (!response.ok) {

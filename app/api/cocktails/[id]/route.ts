@@ -144,6 +144,27 @@ export async function DELETE(
       )
     }
 
+    // Get password from request body
+    const body = await request.json().catch(() => ({}))
+    const { password } = body
+
+    // Validate password
+    const requiredPassword = process.env.DELETE_RECIPE_PASSWORD
+    if (!requiredPassword) {
+      console.error('DELETE_RECIPE_PASSWORD environment variable is not set')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
+    if (!password || password !== requiredPassword) {
+      return NextResponse.json(
+        { error: 'Incorrect password' },
+        { status: 401 }
+      )
+    }
+
     // Check if cocktail exists
     const existing = await getCocktailById(cocktailId)
     if (!existing) {

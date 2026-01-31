@@ -32,8 +32,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const [deletePassword, setDeletePassword] = useState("")
   const [deletePasswordError, setDeletePasswordError] = useState<string | null>(null)
   
-  const DELETE_PASSWORD = "designcuisine"  // Password required to delete recipes
-  
   const { updateCocktail, loading: updateLoading, error: updateError } = useUpdateCocktail()
   const { deleteCocktail, loading: deleteLoading, error: deleteError } = useDeleteCocktail()
 
@@ -112,6 +110,21 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     }
     setValidationError(null)
   }, [recipe, isOpen, mode])
+
+  // Watch for deleteError changes and update deletePasswordError if it's a password error
+  useEffect(() => {
+    if (deleteError) {
+      // Check if it's a password-related error
+      if (deleteError.toLowerCase().includes('password') || deleteError.toLowerCase().includes('incorrect')) {
+        setDeletePasswordError(deleteError)
+      } else {
+        // For other errors, clear password error state
+        setDeletePasswordError(null)
+      }
+    } else {
+      setDeletePasswordError(null)
+    }
+  }, [deleteError])
 
   if (!isOpen || !editedRecipe) return null
 
@@ -210,18 +223,19 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const handleDelete = async () => {
     if (!cocktailId) return
 
-    // Validate password
-    if (deletePassword.trim() !== DELETE_PASSWORD) {
-      setDeletePasswordError("Incorrect password. Please try again.")
+    // Validate password is provided
+    if (!deletePassword.trim()) {
+      setDeletePasswordError("Password is required.")
       return
     }
 
     setDeletePasswordError(null)
-    const success = await deleteCocktail(cocktailId)
+    const success = await deleteCocktail(cocktailId, deletePassword.trim())
     if (success) {
       onDelete?.()
       onClose()
     }
+    // Error handling is done via useEffect watching deleteError
   }
 
   const handleOpenDeleteConfirm = () => {
@@ -491,7 +505,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                     setDeletePasswordError(null)
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && deletePassword.trim() === DELETE_PASSWORD) {
+                    if (e.key === 'Enter' && deletePassword.trim()) {
                       handleDelete()
                     }
                   }}
@@ -504,7 +518,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 )}
               </div>
 
-              {deleteError && (
+              {deleteError && !deletePasswordError && (
                 <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
                   {deleteError}
                 </div>
@@ -524,7 +538,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </button>
                 <button
                   onClick={handleDelete}
-                  disabled={deleteLoading || deletePassword.trim() !== DELETE_PASSWORD}
+                  disabled={deleteLoading || !deletePassword.trim()}
                   className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {deleteLoading ? (
