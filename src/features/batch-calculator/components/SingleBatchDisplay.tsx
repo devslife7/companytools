@@ -160,8 +160,9 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
               type="text"
               value={recipe.name}
               onChange={e => onNameChange(id, e.target.value)}
-              className="text-xl font-extrabold text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 w-full max-w-md focus:ring-2 focus:ring-orange-500"
+              className="text-xl font-extrabold text-gray-900 bg-white border border-gray-300 rounded px-4 md:px-2 py-3 md:py-1 w-full max-w-md focus:ring-2 focus:ring-orange-500 text-base md:text-xl min-h-[44px] md:min-h-0"
               placeholder="Cocktail Name"
+              inputMode="text"
             />
           </div>
         )}
@@ -179,26 +180,28 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
                 className="flex justify-between items-center border-b border-gray-200 pb-1 last:border-b-0"
               >
                 {isEditing ? (
-                  <div className="flex items-center w-full space-x-2">
+                  <div className="flex flex-col md:flex-row items-stretch md:items-center w-full gap-2 md:gap-2">
                     <input
                       type="text"
                       value={item.name}
                       onChange={e => handleIngredientUpdate(index, "name", e.target.value)}
-                      className="flex-grow py-1 px-2 bg-white text-gray-700 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                      className="flex-1 py-3 md:py-1 px-3 md:px-2 bg-white text-gray-700 rounded border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base md:text-sm min-h-[44px] md:min-h-0"
                       placeholder="Ingredient Name"
+                      inputMode="text"
                     />
-                    <div className="flex gap-1">
+                    <div className="flex gap-2 md:gap-1">
                       <input
                         type="text"
                         value={item.amount}
                         onChange={e => handleIngredientUpdate(index, "amount", e.target.value)}
-                        className="w-16 py-1 px-2 text-right bg-white text-orange-600 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                        className="w-24 md:w-16 py-3 md:py-1 px-3 md:px-2 text-right bg-white text-orange-600 rounded border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base md:text-sm min-h-[44px] md:min-h-0"
                         placeholder="Amount"
+                        inputMode="decimal"
                       />
                       <select
                         value={item.unit || "oz"}
                         onChange={e => handleIngredientUpdate(index, "unit", e.target.value)}
-                        className="w-16 py-1 px-1 text-sm bg-white text-orange-600 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-28 md:w-16 py-3 md:py-1 px-2 md:px-1 text-base md:text-sm bg-white text-orange-600 rounded border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[44px] md:min-h-0"
                       >
                         <option value="oz">oz</option>
                         <option value="dash">dash</option>
@@ -208,9 +211,11 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
                     </div>
                     <button
                       onClick={() => handleRemoveIngredient(index)}
-                      className="p-1 text-red-500 hover:bg-red-100 rounded"
+                      className="px-4 md:p-1 py-3 md:py-1 text-red-500 hover:bg-red-100 rounded flex items-center justify-center gap-2 md:gap-0 min-h-[44px] md:min-h-0"
+                      aria-label="Remove ingredient"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5 md:w-4 md:h-4" />
+                      <span className="md:hidden text-sm font-medium">Remove</span>
                     </button>
                   </div>
                 ) : (
@@ -226,9 +231,9 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
             {isEditing && (
               <button
                 onClick={handleAddIngredient}
-                className="w-full mt-2 py-2 flex items-center justify-center text-sm font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded border border-dashed border-orange-300 transition-colors"
+                className="w-full mt-2 py-3 md:py-2 flex items-center justify-center text-base md:text-sm font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded border border-dashed border-orange-300 transition-colors min-h-[44px] md:min-h-0"
               >
-                <PlusCircle className="w-4 h-4 mr-1" /> Add Ingredient
+                <PlusCircle className="w-5 h-5 md:w-4 md:h-4 mr-1" /> Add Ingredient
               </button>
             )}
           </div>

@@ -262,7 +262,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
 
       {/* Modal content */}
       <div
-        className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-200/80 pointer-events-auto animate-modal-enter relative z-10 flex flex-col backdrop-blur-sm"
+        className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[95vh] md:max-h-[90vh] overflow-hidden border border-gray-200/80 pointer-events-auto animate-modal-enter relative z-10 flex flex-col backdrop-blur-sm"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -283,7 +283,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white/50">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 bg-white/50">
           {/* Error Messages */}
           {(validationError || updateError || deleteError) && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -302,8 +302,9 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               type="text"
               value={editedRecipe.name}
               onChange={e => handleNameChange(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900"
+              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base"
               placeholder="Enter cocktail name"
+              inputMode="text"
             />
           </div>
 
@@ -314,7 +315,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             {/* Method */}
             <div className="mb-4">
               <div className="flex gap-2">
-                <label className={`flex items-center justify-center px-5 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all duration-200 ${
+                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${
                   editedRecipe.method === 'Build'
                     ? 'bg-white text-orange-600 border-orange-600'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
@@ -329,7 +330,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                   />
                   <span>Build</span>
                 </label>
-                <label className={`flex items-center justify-center px-5 py-2 rounded-lg border text-sm font-medium cursor-pointer transition-all duration-200 ${
+                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${
                   editedRecipe.method === 'Shake'
                     ? 'bg-white text-orange-600 border-orange-600'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
@@ -353,11 +354,11 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 value={editedRecipe.instructions || ''}
                 onChange={e => handleInstructionsChange(e.target.value)}
                 rows={6}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 resize-none relative z-10"
+                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base resize-none relative z-10"
                 placeholder=""
               />
               {!editedRecipe.instructions && (
-                <div className="absolute top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
+                <div className="absolute top-3 md:top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
                   Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build
                 </div>
               )}
@@ -371,43 +372,56 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               {editedRecipe.ingredients.map((ingredient, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                  className="flex flex-col md:flex-row md:items-center gap-3 p-3 md:p-3 bg-gray-50 border border-gray-200 rounded-lg"
                 >
-                  <div className="flex-1">
+                  {/* Ingredient Name - Full width on mobile, flex-1 on desktop */}
+                  <div className="flex-1 w-full md:w-auto">
+                    <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Ingredient Name</label>
                     <input
                       type="text"
                       value={ingredient.name}
                       onChange={e => handleIngredientChange(index, "name", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm"
+                      className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm"
                       placeholder="Ingredient name"
+                      inputMode="text"
                     />
                   </div>
-                  <div className="w-24">
-                    <input
-                      type="text"
-                      value={ingredient.amount}
-                      onChange={e => handleIngredientChange(index, "amount", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm text-right"
-                      placeholder="Amount"
-                    />
+                  
+                  {/* Amount and Unit - Side by side on mobile, separate on desktop */}
+                  <div className="flex gap-2 md:gap-3 md:items-center">
+                    <div className="flex-1 md:w-24">
+                      <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Amount</label>
+                      <input
+                        type="text"
+                        value={ingredient.amount}
+                        onChange={e => handleIngredientChange(index, "amount", e.target.value)}
+                        className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm text-right md:text-right"
+                        placeholder="Amount"
+                        inputMode="decimal"
+                      />
+                    </div>
+                    <div className="flex-1 md:w-28">
+                      <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Unit</label>
+                      <select
+                        value={ingredient.unit || "oz"}
+                        onChange={e => handleIngredientChange(index, "unit", e.target.value)}
+                        className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm bg-white"
+                      >
+                        <option value="oz">oz</option>
+                        <option value="dash">dash</option>
+                        <option value="tsp">tsp</option>
+                        <option value="each">each</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="w-28">
-                    <select
-                      value={ingredient.unit || "oz"}
-                      onChange={e => handleIngredientChange(index, "unit", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm bg-white"
-                    >
-                      <option value="oz">oz</option>
-                      <option value="dash">dash</option>
-                      <option value="tsp">tsp</option>
-                      <option value="each">each</option>
-                    </select>
-                  </div>
-                  <div className="w-36">
+                  
+                  {/* Preferred Unit - Full width on mobile, fixed width on desktop */}
+                  <div className="w-full md:w-36">
+                    <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Preferred Unit</label>
                     <select
                       value={ingredient.preferredUnit || ""}
                       onChange={e => handleIngredientChange(index, "preferredUnit", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm bg-white"
+                      className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm bg-white"
                     >
                       <option value="">Preferred Unit</option>
                       <option value="liters">Liters</option>
@@ -418,18 +432,22 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       <option value="4oz bottle">4oz Bottle</option>
                     </select>
                   </div>
+                  
+                  {/* Delete Button - Full width on mobile, auto on desktop */}
                   <button
                     onClick={() => handleRemoveIngredient(index)}
-                    className="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors"
+                    className="w-full md:w-auto px-4 py-3 md:p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors flex items-center justify-center gap-2 md:gap-0 min-h-[44px] md:min-h-0"
                     title="Remove ingredient"
+                    aria-label="Remove ingredient"
                   >
                     <Trash2 className="w-5 h-5" />
+                    <span className="md:hidden text-sm font-medium">Remove</span>
                   </button>
                 </div>
               ))}
               <button
                 onClick={handleAddIngredient}
-                className="w-full py-3 flex items-center justify-center gap-2 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg border border-dashed border-orange-300 transition-colors"
+                className="w-full py-4 md:py-3 flex items-center justify-center gap-2 text-base md:text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg border border-dashed border-orange-300 transition-colors min-h-[44px] md:min-h-0"
               >
                 <PlusCircle className="w-5 h-5" />
                 Add Ingredient
@@ -439,34 +457,20 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-4 border-t border-gray-200/60 bg-gradient-to-r from-gray-50/80 via-white to-gray-50/80 rounded-b-xl backdrop-blur-sm">
-          {/* Delete Button (only in edit mode with DB ID) */}
-          <div>
-            {mode === 'edit' && cocktailId && (
-              <button
-                onClick={handleOpenDeleteConfirm}
-                disabled={updateLoading || deleteLoading}
-                className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </button>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 p-4 border-t border-gray-200/60 bg-gradient-to-r from-gray-50/80 via-white to-gray-50/80 rounded-b-xl backdrop-blur-sm">
+          {/* Action Buttons - Top on mobile, right on desktop */}
+          <div className="flex gap-3 order-1 md:order-2">
             <button
               onClick={handleCancel}
               disabled={updateLoading || deleteLoading}
-              className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 md:flex-none px-6 py-3 md:py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-0"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={updateLoading || deleteLoading}
-              className="px-6 py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-200 shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 md:flex-none px-6 py-3 md:py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-200 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-0"
             >
               {updateLoading ? (
                 <>
@@ -480,6 +484,20 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </>
               )}
             </button>
+          </div>
+
+          {/* Delete Button (only in edit mode with DB ID) - Below on mobile, left on desktop */}
+          <div className="w-full md:w-auto order-2 md:order-1">
+            {mode === 'edit' && cocktailId && (
+              <button
+                onClick={handleOpenDeleteConfirm}
+                disabled={updateLoading || deleteLoading}
+                className="w-full md:w-auto px-4 py-3 md:py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-0"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            )}
           </div>
         </div>
 
@@ -510,8 +528,9 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                     }
                   }}
                   placeholder="Enter password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 text-base md:text-base min-h-[44px] md:min-h-0"
                   autoFocus
+                  inputMode="text"
                 />
                 {deletePasswordError && (
                   <p className="mt-2 text-sm text-red-600">{deletePasswordError}</p>
@@ -524,7 +543,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </div>
               )}
               
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowDeleteConfirm(false)
@@ -532,14 +551,14 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                     setDeletePasswordError(null)
                   }}
                   disabled={deleteLoading}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200 disabled:opacity-50"
+                  className="w-full sm:w-auto px-4 py-3 md:py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200 disabled:opacity-50 min-h-[44px] md:min-h-0"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
                   disabled={deleteLoading || !deletePassword.trim()}
-                  className="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto px-4 py-3 md:py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-0"
                 >
                   {deleteLoading ? (
                     <>
