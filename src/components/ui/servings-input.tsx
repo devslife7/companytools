@@ -95,8 +95,8 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
     }
 
     return (
-      <div className="flex flex-col space-y-1">
-        <label htmlFor={id} className="text-sm font-medium text-gray-600">
+      <div className="flex flex-col">
+        <label htmlFor={id} className="text-sm font-semibold text-gray-700 mb-2">
           {label}
         </label>
         <div className="relative" ref={containerRef}>
