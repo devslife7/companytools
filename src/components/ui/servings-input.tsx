@@ -12,12 +12,18 @@ interface ServingsInputProps {
   hasError?: boolean
 }
 
-// Generate options from 20 to 800 in intervals of 20
-const SERVINGS_OPTIONS = Array.from({ length: 40 }, (_, i) => 20 + i * 20)
+// Quick select presets (most common values)
+const QUICK_PRESETS = [50, 100, 150, 200, 250]
+
+// Full dropdown options from 20 to 800 in intervals of 20, plus 50, 150, and 250
+const DROPDOWN_OPTIONS = [
+  ...Array.from({ length: 40 }, (_, i) => 20 + i * 20),
+  50, 150, 250
+].sort((a, b) => a - b).filter((v, i, arr) => arr.indexOf(v) === i)
 
 export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
   ({ value, onChange, disabled, label, id, icon: Icon, hasError = false }) => {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     const dropdownRef = useRef<HTMLDivElement>(null)
@@ -28,7 +34,7 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent | TouchEvent) => {
         if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-          setIsOpen(false)
+          setIsDropdownOpen(false)
         }
       }
 
@@ -42,18 +48,22 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       onChange(e.target.value)
-      setIsOpen(true)
+      // Don't open dropdown when typing - keep them separate
     }
 
     const handleSelectOption = (option: number) => {
       if (!isScrolling.current) {
         onChange(option.toString())
-        setIsOpen(false)
-        inputRef.current?.blur()
+        setIsDropdownOpen(false)
       }
     }
 
-    const handleTouchStart = (e: React.TouchEvent, option: number) => {
+    const handlePresetClick = (preset: number) => {
+      onChange(preset.toString())
+      inputRef.current?.focus()
+    }
+
+    const handleTouchStart = (e: React.TouchEvent) => {
       touchStartY.current = e.touches[0].clientY
       isScrolling.current = false
     }
@@ -74,14 +84,17 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
       isScrolling.current = false
     }
 
-    const handleInputFocus = () => {
-      setIsOpen(true)
-    }
-
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
-        setIsOpen(false)
         inputRef.current?.blur()
+      }
+      // Arrow down opens the dropdown
+      if (e.key === "ArrowDown" && !isDropdownOpen) {
+        e.preventDefault()
+        setIsDropdownOpen(true)
+      }
+      if (e.key === "Escape") {
+        setIsDropdownOpen(false)
       }
     }
 
@@ -89,63 +102,63 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
       e.preventDefault()
       e.stopPropagation()
       if (!disabled) {
-        setIsOpen(!isOpen)
-        inputRef.current?.focus()
+        setIsDropdownOpen(!isDropdownOpen)
       }
     }
 
+    const isCustomValue = value !== "" && !DROPDOWN_OPTIONS.includes(Number(value))
+
     return (
-      <div className="flex flex-col">
-        <label htmlFor={id} className="text-sm font-semibold text-gray-700 mb-2">
-          {label}
-        </label>
-        <div className="relative" ref={containerRef}>
-          <Icon className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-orange-600 z-10" />
+      <div className="flex flex-col w-full" ref={containerRef}>
+        {/* Main input with dropdown toggle */}
+        <div className="relative">
+          <Icon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-orange-600 z-10" />
           <input
             ref={inputRef}
             id={id}
             type="number"
             value={value}
             onChange={handleInputChange}
-            onFocus={handleInputFocus}
             onKeyDown={handleInputKeyDown}
             min="0"
             step="1"
             required
-            className={`w-full py-2 pl-9 pr-10 text-gray-900 border rounded-lg focus:ring-2 transition duration-300 ${
+            className={`w-full py-2.5 pl-10 pr-12 text-gray-900 border rounded-lg focus:ring-2 focus:outline-none transition duration-200 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
               disabled
-                ? "opacity-60 cursor-not-allowed border-gray-300 bg-gray-50"
+                ? "opacity-60 cursor-not-allowed border-gray-300 bg-gray-100"
                 : hasError
-                  ? "bg-red-50 border-red-500 focus:border-red-600 focus:ring-red-500"
-                  : "bg-gray-50 border-gray-300 focus:border-orange-300 focus:ring-orange-300"
+                  ? "bg-red-50 border-red-400 focus:border-red-500 focus:ring-red-200"
+                  : "bg-white border-gray-300 hover:border-gray-400 focus:border-orange-400 focus:ring-orange-100"
             }`}
             disabled={disabled}
-            placeholder="Enter servings (required)"
+            placeholder="Enter Servings"
           />
           <button
             type="button"
             onClick={handleToggleDropdown}
-            onTouchStart={handleToggleDropdown}
             disabled={disabled}
-            className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors ${
+            className={`absolute right-1 top-1/2 transform -translate-y-1/2 p-2 rounded-md transition-all duration-200 ${
               disabled
                 ? "text-gray-400 cursor-not-allowed"
-                : "text-gray-600 hover:text-orange-600 active:text-orange-700"
+                : isDropdownOpen
+                  ? "text-orange-600 bg-orange-50"
+                  : "text-gray-500 hover:text-orange-600 hover:bg-orange-50"
             }`}
-            aria-label="Toggle dropdown"
+            aria-label="Show all options"
+            aria-expanded={isDropdownOpen}
           >
-            <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
           </button>
 
-          {/* Dropdown */}
-          {isOpen && !disabled && (
+          {/* Dropdown menu */}
+          {isDropdownOpen && !disabled && (
             <div 
               ref={dropdownRef}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-y-auto"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               <div className="py-1">
-                {SERVINGS_OPTIONS.map(option => (
+                {DROPDOWN_OPTIONS.map(option => (
                   <button
                     key={option}
                     type="button"
@@ -153,13 +166,13 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
                       e.preventDefault()
                       handleSelectOption(option)
                     }}
-                    onTouchStart={(e) => handleTouchStart(e, option)}
+                    onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={(e) => handleTouchEnd(e, option)}
-                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
                       value === option
                         ? "bg-orange-100 text-orange-900 font-semibold"
-                        : "text-gray-700 hover:bg-gray-100 active:bg-gray-200"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     {option}
@@ -169,6 +182,34 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
             </div>
           )}
         </div>
+
+        {/* Quick preset buttons - separate from the input */}
+        {!disabled && (
+          <div className="mt-2 w-full">
+            <div className="flex items-center gap-1.5 flex-nowrap w-full">
+              <span className="text-xs text-gray-500 mr-1">Quick:</span>
+              {QUICK_PRESETS.map(preset => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => handlePresetClick(preset)}
+                  className={`px-3 py-1 text-xs font-medium rounded-full border transition-all duration-200 ${
+                    value === preset
+                      ? "bg-orange-500 text-white border-orange-500 shadow-sm"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-orange-400 hover:text-orange-600"
+                  }`}
+                >
+                  {preset}
+                </button>
+              ))}
+              {isCustomValue && (
+                <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200 whitespace-nowrap">
+                  Custom: {value}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     )
   }

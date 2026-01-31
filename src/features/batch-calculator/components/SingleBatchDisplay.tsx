@@ -167,7 +167,7 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
           </div>
         )}
 
-        <div className="pt-2 px-3 sm:px-4 pb-3 sm:pb-4">
+        <div className="pt-2 px-0 pb-3 sm:pb-4">
           {recipe.instructions && (
             <div className="mb-3">
               <div className="flex items-center gap-2 mb-1.5">
