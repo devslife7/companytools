@@ -13,6 +13,7 @@ import {
   combineAmountAndUnit,
 } from "./calculations"
 import { calculateGrandTotals } from "./grand-totals"
+import { isLiquorItem, isAngosturaBitters } from "./ingredient-helpers"
 
 // Helper function to format preferred unit display
 const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitValue: number | null | undefined): string => {
@@ -87,7 +88,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
   const hasPreferredUnits = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
     item => (item as any).preferredUnit
   )
-  const totalColumns = hasPreferredUnits ? 4 : 3
+  const totalColumns = hasPreferredUnits ? 3 : 2
   const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
   
   return `
@@ -98,7 +99,6 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                 <tr>
                     <th class="text-left">INGREDIENT</th>
                     ${preferredUnitHeader}
-                    <th>Approx. @750ml</th>
                     <th>Total ML</th>
                 </tr>
             </thead>
@@ -115,7 +115,6 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatNumber(ing.bottles)} bottles</td>
                         <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
@@ -141,7 +140,6 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>-</td>
                         <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
@@ -167,7 +165,6 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>-</td>
                         <td>${formatMLValue(ing.ml)} ml</td>
                     </tr>
                 `
@@ -278,16 +275,22 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                                 const targetCalc = targetBatchIngredients[index]
                                 const amountString = combineAmountAndUnit(item.amount, item.unit)
                                 const { type } = parseAmount(amountString)
+                                const isLiquor = isLiquorItem(item.name)
+                                const isAngostura = isAngosturaBitters(item.name)
 
                                 const servingsData = servingsCalc
                                   ? type === "liquid"
-                                    ? `${formatMLValue(servingsCalc.ml)} ml`
+                                    ? isLiquor && !isAngostura && servingsCalc.bottles > 0
+                                      ? `(${formatNumber(servingsCalc.bottles)} @750ml) ${formatMLValue(servingsCalc.ml)} ml`
+                                      : `${formatMLValue(servingsCalc.ml)} ml`
                                     : "N/A"
                                   : "N/A"
 
                                 const targetData = targetCalc
                                   ? type === "liquid"
-                                    ? `${formatMLValue(targetCalc.ml)} ml`
+                                    ? isLiquor && !isAngostura && targetCalc.bottles > 0
+                                      ? `(${formatNumber(targetCalc.bottles)} @750ml) ${formatMLValue(targetCalc.ml)} ml`
+                                      : `${formatMLValue(targetCalc.ml)} ml`
                                     : "N/A"
                                   : "N/A"
 
