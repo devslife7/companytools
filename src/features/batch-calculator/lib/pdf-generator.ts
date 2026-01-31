@@ -10,6 +10,7 @@ import {
   calculateSingleServingLiquidVolumeML,
   formatNumber,
   formatMLValue,
+  combineAmountAndUnit,
 } from "./calculations"
 import { calculateGrandTotals } from "./grand-totals"
 
@@ -206,7 +207,7 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
     const servingsBatchIngredients =
       servingsNum > 0
         ? recipe.ingredients.map(item => {
-            const batchResult = calculateBatch(servingsNum, item.amount)
+            const batchResult = calculateBatch(servingsNum, item.amount, item.unit)
             return { name: item.name, singleAmount: item.amount, ...batchResult }
           })
         : []
@@ -216,7 +217,8 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
     const targetBatchIngredients =
       singleServingVolumeML > 0
         ? recipe.ingredients.map(item => {
-            const { baseAmount, unit, type } = parseAmount(item.amount)
+            const amountString = combineAmountAndUnit(item.amount, item.unit)
+            const { baseAmount, unit, type } = parseAmount(amountString)
 
             if (type !== "liquid") {
               return {
@@ -274,7 +276,8 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                               .map((item, index) => {
                                 const servingsCalc = servingsBatchIngredients[index]
                                 const targetCalc = targetBatchIngredients[index]
-                                const { type } = parseAmount(item.amount)
+                                const amountString = combineAmountAndUnit(item.amount, item.unit)
+                                const { type } = parseAmount(amountString)
 
                                 const servingsData = servingsCalc
                                   ? type === "liquid"
@@ -288,9 +291,10 @@ const generateBatchCalculationsHtml = (batches: BatchState[]) => {
                                     : "N/A"
                                   : "N/A"
 
+                                const displayAmount = combineAmountAndUnit(item.amount, item.unit)
                                 return `<tr>
                                     <td class="text-left">${item.name}</td>
-                                    <td>${item.amount}</td>
+                                    <td>${displayAmount}</td>
                                     ${servingsNum > 0 ? `<td>${servingsData}</td>` : ""}
                                     ${
                                       totalServingsLiquidML > twentyLiterML && singleServingVolumeML > 0

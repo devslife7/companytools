@@ -125,7 +125,8 @@ export async function POST(request: NextRequest) {
       ingredients: ingredients.map((ing: any) => ({
         name: ing.name,
         amount: ing.amount,
-        preferredUnit: ing.preferredUnit || null,
+        unit: ing.unit || undefined,
+        preferredUnit: ing.preferredUnit || undefined,
       })),
     }
 

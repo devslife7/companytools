@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import { X, PlusCircle, Trash2, Save, Loader2, AlertCircle } from "lucide-react"
 import type { CocktailRecipe, Ingredient, CocktailMethod } from "../types"
 import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
+import { parseAmount } from "../lib/calculations"
 
 interface EditRecipeModalProps {
   isOpen: boolean
@@ -36,16 +37,77 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const { updateCocktail, loading: updateLoading, error: updateError } = useUpdateCocktail()
   const { deleteCocktail, loading: deleteLoading, error: deleteError } = useDeleteCocktail()
 
+  // Helper function to parse existing amount strings for backward compatibility
+  const parseIngredientAmount = (ingredient: Ingredient): { amount: string; unit: string } => {
+    // If unit already exists, use it directly
+    if (ingredient.unit) {
+      return { amount: ingredient.amount, unit: ingredient.unit }
+    }
+    
+    // Otherwise, parse the amount string to extract unit
+    if (!ingredient.amount) {
+      return { amount: '', unit: 'oz' } // Default to oz
+    }
+    
+    const parsed = parseAmount(ingredient.amount)
+    
+    // Extract numeric value from amount string
+    const lowerAmount = ingredient.amount.toLowerCase().trim()
+    
+    // Handle special cases
+    if (lowerAmount.includes("top") || lowerAmount.includes("n/a")) {
+      return { amount: '0', unit: 'oz' }
+    }
+    
+    // Try to match number pattern (including fractions, decimals, ranges)
+    const match = lowerAmount.match(/([\d\.\/\,\-\s]+)/)
+    
+    if (match) {
+      const numberStr = match[1].trim()
+      // Extract unit from parsed result, or default to 'oz'
+      let extractedUnit = 'oz'
+      if (parsed.unit && parsed.unit !== 'N/A' && parsed.unit !== 'count' && parsed.unit !== 'Top') {
+        // Normalize unit names
+        if (parsed.unit.toLowerCase().startsWith('oz')) {
+          extractedUnit = 'oz'
+        } else if (parsed.unit.toLowerCase().startsWith('dash')) {
+          extractedUnit = 'dash'
+        } else if (parsed.unit.toLowerCase().startsWith('tsp')) {
+          extractedUnit = 'tsp'
+        } else if (parsed.unit.toLowerCase().includes('each')) {
+          extractedUnit = 'each'
+        } else {
+          // For count items, use 'each'
+          extractedUnit = parsed.type === 'count' ? 'each' : 'oz'
+        }
+      }
+      return { amount: numberStr, unit: extractedUnit }
+    }
+    
+    // Fallback: if no number found, treat as count item with unit 'each'
+    return { amount: ingredient.amount, unit: 'each' }
+  }
+
   // Initialize edited recipe when modal opens or recipe changes
   useEffect(() => {
     if (recipe) {
-      setEditedRecipe(JSON.parse(JSON.stringify(recipe))) // Deep copy
+      // Deep copy and parse amounts for backward compatibility
+      const parsedRecipe = JSON.parse(JSON.stringify(recipe)) as CocktailRecipe
+      parsedRecipe.ingredients = parsedRecipe.ingredients.map(ing => {
+        const parsed = parseIngredientAmount(ing)
+        return {
+          ...ing,
+          amount: parsed.amount,
+          unit: parsed.unit,
+        }
+      })
+      setEditedRecipe(parsedRecipe)
     } else if (mode === 'create') {
       // Initialize empty recipe for create mode
       setEditedRecipe({
         name: '',
         method: 'Build',
-        ingredients: [{ name: '', amount: '', preferredUnit: '' }],
+        ingredients: [{ name: '', amount: '', unit: 'oz', preferredUnit: '' }],
       })
     }
     setValidationError(null)
@@ -74,7 +136,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const handleAddIngredient = () => {
     setEditedRecipe({
       ...editedRecipe,
-      ingredients: [...editedRecipe.ingredients, { name: "", amount: "", preferredUnit: "" }],
+      ingredients: [...editedRecipe.ingredients, { name: "", amount: "", unit: "oz", preferredUnit: "" }],
     })
   }
 
@@ -100,6 +162,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       .map(ing => ({
         name: ing.name.trim(),
         amount: ing.amount.trim(),
+        ...(ing.unit?.trim() && { unit: ing.unit.trim() }),
         ...(ing.preferredUnit?.trim() && { preferredUnit: ing.preferredUnit.trim() }),
       }))
     if (validIngredients.length === 0) {
@@ -305,7 +368,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       placeholder="Ingredient name"
                     />
                   </div>
-                  <div className="w-32">
+                  <div className="w-24">
                     <input
                       type="text"
                       value={ingredient.amount}
@@ -313,6 +376,18 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm text-right"
                       placeholder="Amount"
                     />
+                  </div>
+                  <div className="w-28">
+                    <select
+                      value={ingredient.unit || "oz"}
+                      onChange={e => handleIngredientChange(index, "unit", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-sm bg-white"
+                    >
+                      <option value="oz">oz</option>
+                      <option value="dash">dash</option>
+                      <option value="tsp">tsp</option>
+                      <option value="each">each</option>
+                    </select>
                   </div>
                   <div className="w-36">
                     <select

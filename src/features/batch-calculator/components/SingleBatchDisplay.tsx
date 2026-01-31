@@ -13,6 +13,7 @@ import {
   calculateSingleServingLiquidVolumeML,
   formatNumber,
   formatMLValue,
+  combineAmountAndUnit,
 } from "../lib/calculations"
 
 interface SingleBatchDisplayProps {
@@ -48,7 +49,7 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
       if (!recipe || servingsNum <= 0) return []
 
       return recipe.ingredients.map(item => {
-        const batchResult = calculateBatch(servingsNum, item.amount)
+        const batchResult = calculateBatch(servingsNum, item.amount, item.unit)
         return { ...batchResult, singleAmount: item.amount, name: item.name }
       })
     }, [recipe, servingsNum])
@@ -66,7 +67,8 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
       const targetML = twentyLiterML
 
       return recipe.ingredients.map(item => {
-        const { baseAmount, unit, type } = parseAmount(item.amount)
+        const amountString = combineAmountAndUnit(item.amount, item.unit)
+        const { baseAmount, unit, type } = parseAmount(amountString)
 
         if (type !== "liquid") {
           // Count and special items do not scale with liquid volume target.
@@ -104,7 +106,8 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
       if (!recipe) return []
 
       return recipe.ingredients.map((item, index) => {
-        const parsed = parseAmount(item.amount)
+        const amountString = combineAmountAndUnit(item.amount, item.unit)
+        const parsed = parseAmount(amountString)
         const servingsCalc = servingsBatchIngredients[index] || ({} as BatchResult)
         const targetCalc = targetBatchIngredients[index] || ({} as BatchResult)
 
@@ -130,7 +133,7 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
 
     const handleAddIngredient = () => {
       if (!recipe) return
-      const newIngredients: Ingredient[] = [...recipe.ingredients, { name: "", amount: "" }]
+      const newIngredients: Ingredient[] = [...recipe.ingredients, { name: "", amount: "", unit: "oz" }]
       onIngredientChange(id, newIngredients)
     }
 
@@ -184,13 +187,25 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
                       className="flex-grow py-1 px-2 bg-white text-gray-700 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500 text-sm"
                       placeholder="Ingredient Name"
                     />
-                    <input
-                      type="text"
-                      value={item.amount}
-                      onChange={e => handleIngredientUpdate(index, "amount", e.target.value)}
-                      className="w-24 py-1 px-2 text-right bg-white text-orange-600 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                      placeholder="Amount"
-                    />
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={item.amount}
+                        onChange={e => handleIngredientUpdate(index, "amount", e.target.value)}
+                        className="w-16 py-1 px-2 text-right bg-white text-orange-600 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                        placeholder="Amount"
+                      />
+                      <select
+                        value={item.unit || "oz"}
+                        onChange={e => handleIngredientUpdate(index, "unit", e.target.value)}
+                        className="w-16 py-1 px-1 text-sm bg-white text-orange-600 rounded border border-gray-300 focus:ring-orange-500 focus:border-orange-500"
+                      >
+                        <option value="oz">oz</option>
+                        <option value="dash">dash</option>
+                        <option value="tsp">tsp</option>
+                        <option value="each">each</option>
+                      </select>
+                    </div>
                     <button
                       onClick={() => handleRemoveIngredient(index)}
                       className="p-1 text-red-500 hover:bg-red-100 rounded"
@@ -201,7 +216,9 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
                 ) : (
                   <>
                     <span className="text-gray-700">{item.name}</span>
-                    <span className="font-mono text-orange-600">{item.amount}</span>
+                    <span className="font-mono text-orange-600">
+                      {item.amount}{item.unit ? ` ${item.unit}` : ''}
+                    </span>
                   </>
                 )}
               </div>

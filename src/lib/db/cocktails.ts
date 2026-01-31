@@ -14,6 +14,7 @@ function transformCocktailToRecipe(cocktail: {
     name: string
     amount: string
     orderIndex: number
+    unit?: string | null
     preferredUnit?: string | null
   }>
 }): CocktailRecipe {
@@ -34,7 +35,8 @@ function transformCocktailToRecipe(cocktail: {
       .map(ing => ({
         name: ing.name,
         amount: ing.amount,
-        ...(ing.preferredUnit && { preferredUnit: ing.preferredUnit }),
+        ...(ing.unit != null && ing.unit !== '' && { unit: ing.unit }),
+        ...(ing.preferredUnit != null && ing.preferredUnit !== '' && { preferredUnit: ing.preferredUnit }),
       })),
   }
 }
@@ -188,6 +190,7 @@ export async function createCocktail(
           name: ing.name,
           amount: ing.amount,
           orderIndex: index,
+          unit: ing.unit || null,
           preferredUnit: ing.preferredUnit || null,
         })),
       },
@@ -228,6 +231,7 @@ export async function updateCocktail(
         name: ing.name,
         amount: ing.amount,
         orderIndex: index,
+        unit: ing.unit || null,
         preferredUnit: ing.preferredUnit || null,
       })),
     })

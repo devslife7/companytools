@@ -103,24 +103,26 @@ export const parseAmount = (amountString: string): ParsedAmount => {
   return { baseAmount: 1, unit: lowerAmount || "count", type: "count" }
 }
 
-export const calculateBatch = (multiplier: number | string, amountString: string): BatchResult => {
+export const calculateBatch = (multiplier: number | string, amountString: string, unit?: string | null): BatchResult => {
   const mult = typeof multiplier === "number" ? multiplier : parseFloat(multiplier || "0")
   if (isNaN(mult) || mult <= 0) {
     return { ml: 0, quart: 0, bottles: 0, unitType: "special", originalUnit: "N/A" }
   }
 
-  const { baseAmount, unit, type } = parseAmount(amountString)
+  // Combine amount and unit if unit is provided separately
+  const combinedAmount = unit ? combineAmountAndUnit(amountString, unit) : amountString
+  const { baseAmount, unit: parsedUnit, type } = parseAmount(combinedAmount)
 
   if (type === "special" || baseAmount === 0) {
-    return { ml: 0, quart: 0, bottles: 0, unitType: "special", originalUnit: unit }
+    return { ml: 0, quart: 0, bottles: 0, unitType: "special", originalUnit: parsedUnit }
   }
 
   if (type === "count") {
     // For count items, we don't convert to liquid volume, result.ml stores the count
-    return { ml: baseAmount * mult, quart: 0, bottles: 0, unitType: "count", originalUnit: unit }
+    return { ml: baseAmount * mult, quart: 0, bottles: 0, unitType: "count", originalUnit: parsedUnit }
   }
 
-  const mlPerUnit = CONVERSION_FACTORS[unit] || 0
+  const mlPerUnit = CONVERSION_FACTORS[parsedUnit] || 0
   const totalML = baseAmount * mlPerUnit * mult
 
   return {
@@ -128,7 +130,7 @@ export const calculateBatch = (multiplier: number | string, amountString: string
     quart: totalML / QUART_TO_ML,
     bottles: totalML / BOTTLE_SIZE_ML,
     unitType: "liquid",
-    originalUnit: unit,
+    originalUnit: parsedUnit,
   }
 }
 
@@ -136,7 +138,9 @@ export const calculateBatch = (multiplier: number | string, amountString: string
 export const calculateSingleServingLiquidVolumeML = (recipe: CocktailRecipe | null): number => {
   if (!recipe) return 0
   return recipe.ingredients.reduce((totalML, item) => {
-    const { baseAmount, unit, type } = parseAmount(item.amount)
+    // Use combined amount string if unit exists separately, otherwise use amount as-is
+    const amountString = item.unit ? combineAmountAndUnit(item.amount, item.unit) : item.amount
+    const { baseAmount, unit, type } = parseAmount(amountString)
     if (type === "liquid") {
       const mlPerUnit = CONVERSION_FACTORS[unit] || 0
       return totalML + baseAmount * mlPerUnit
@@ -146,6 +150,14 @@ export const calculateSingleServingLiquidVolumeML = (recipe: CocktailRecipe | nu
 }
 
 // --- FORMATTING UTILITIES ---
+
+// Helper function to combine amount and unit for backward compatibility with parseAmount
+// This is used when we have separate amount and unit fields but need a combined string
+export const combineAmountAndUnit = (amount: string, unit?: string | null): string => {
+  if (!amount) return ""
+  if (!unit) return amount
+  return `${amount} ${unit}`
+}
 
 export const formatNumber = (num: number, decimals: number = 2): string => {
   if (typeof num !== "number" || isNaN(num) || !isFinite(num)) return "N/A"

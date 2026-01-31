@@ -1,5 +1,5 @@
 import type { BatchState, BatchResultWithCans, UnitType } from "../types"
-import { calculateBatch, convertMLToPreferredUnit, parseAmount } from "./calculations"
+import { calculateBatch, convertMLToPreferredUnit, parseAmount, combineAmountAndUnit } from "./calculations"
 import { isLiquorItem, isSodaItem, isAngosturaBitters } from "./ingredient-helpers"
 
 // Constants for can calculations
@@ -20,7 +20,7 @@ export const calculateGrandTotals = (batches: BatchState[]): {
 
     if (batch.editableRecipe && servingsNum > 0) {
       batch.editableRecipe.ingredients.forEach(item => {
-        const result = calculateBatch(servingsNum, item.amount)
+        const result = calculateBatch(servingsNum, item.amount, item.unit)
         const key = item.name.trim()
         
         // Check if this item has "each" as preferred unit
@@ -40,7 +40,8 @@ export const calculateGrandTotals = (batches: BatchState[]): {
           
           // For "each" items, calculate total count (multiply amount per serving by servings)
           if (hasEachPreferredUnit) {
-            const { baseAmount } = parseAmount(item.amount)
+            const amountString = combineAmountAndUnit(item.amount, item.unit)
+            const { baseAmount } = parseAmount(amountString)
             if (!grandTotals[key].eachCount) {
               grandTotals[key].eachCount = 0
             }
