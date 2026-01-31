@@ -179,17 +179,17 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
       {/* Blurred backdrop */}
       <div
-        className="fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 pointer-events-auto animate-fade-in"
+        className="fixed inset-0 backdrop-blur-md bg-gradient-to-br from-gray-900/50 via-gray-800/40 to-gray-900/50 pointer-events-auto animate-fade-in"
         onClick={handleCancel}
       />
 
       {/* Modal content */}
       <div
-        className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-300 pointer-events-auto animate-modal-enter relative z-10 flex flex-col"
+        className="bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-200/80 pointer-events-auto animate-modal-enter relative z-10 flex flex-col backdrop-blur-sm"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-gradient-to-r from-orange-50 to-white rounded-t-xl">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200/60 bg-gradient-to-r from-gray-50/80 via-white to-gray-50/80 rounded-t-xl backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <h3 className="text-2xl font-extrabold text-gray-900">
               {mode === 'create' ? 'Create New Recipe' : 'Edit Recipe'}
@@ -206,7 +206,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white/50">
           {/* Error Messages */}
           {(validationError || updateError || deleteError) && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -350,7 +350,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center p-4 border-t border-gray-300 bg-gray-50 rounded-b-xl">
+        <div className="flex justify-between items-center p-4 border-t border-gray-200/60 bg-gradient-to-r from-gray-50/80 via-white to-gray-50/80 rounded-b-xl backdrop-blur-sm">
           {/* Delete Button (only in edit mode with DB ID) */}
           <div>
             {mode === 'edit' && cocktailId && (
@@ -396,8 +396,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
 
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-white via-gray-50/90 to-white rounded-lg p-6 max-w-md w-full shadow-2xl border border-gray-200/80">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Recipe?</h3>
               <p className="text-gray-600 mb-4">
                 Are you sure you want to delete "{editedRecipe.name}"? This action cannot be undone.
