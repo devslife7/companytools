@@ -152,7 +152,7 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
       )
 
     return (
-      <div className="mt-4">
+      <div className="mt-2">
         {/* Name editing input when in edit mode */}
         {isEditing && (
           <div className="mb-4 pb-4 border-b border-gray-300">
@@ -167,10 +167,26 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
           </div>
         )}
 
-        <div className="p-3 sm:p-4">
-          <p className="text-sm text-gray-600 mb-3 border-b border-gray-200 pb-1">
-            **Method:** {recipe.method || "N/A"}
-          </p>
+        <div className="pt-2 px-3 sm:px-4 pb-3 sm:pb-4">
+          {recipe.instructions && (
+            <div className="mb-3">
+              <div className="flex items-center gap-2 mb-1.5">
+                <h4 className="text-sm font-semibold text-gray-900">Instructions:</h4>
+                <span className="text-sm text-gray-600">
+                  {recipe.method || "N/A"}
+                </span>
+              </div>
+              <div className="text-sm text-gray-700 whitespace-pre-line">
+                {recipe.instructions}
+              </div>
+            </div>
+          )}
+
+          {!recipe.instructions && (
+            <p className="text-sm text-gray-600 mb-3">
+              {recipe.method || "N/A"}
+            </p>
+          )}
 
           <h4 className="text-lg font-semibold text-orange-600 mb-2">Ingredients (1 Serving)</h4>
           <div className="space-y-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
