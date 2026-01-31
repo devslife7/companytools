@@ -38,13 +38,16 @@ const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitVal
 }
 
 // Helper function to generate HTML header
-const generateHtmlHeader = (title: string, showHeader: boolean = true) => {
+const generateHtmlHeader = (title: string, showHeader: boolean = true, compactPadding: boolean = false) => {
   const headerHtml = showHeader ? `
         <div class="header">
             <h1>${title}</h1>
            
         </div>
   ` : ''
+  
+  const bodyPadding = compactPadding ? '3mm' : '10mm'
+  const summaryTitleMarginTop = compactPadding ? '4px' : '15px'
   
   return `
     <!DOCTYPE html>
@@ -53,7 +56,7 @@ const generateHtmlHeader = (title: string, showHeader: boolean = true) => {
         <title>${title}</title>
         <style>
             /* Compact B&W Styles for Print - Optimized for more content per page */
-            body { font-family: sans-serif; margin: 0; padding: 10mm; color: #000; background: #fff; font-size: 10.5pt; max-width: 216mm; margin: 0 auto; }
+            body { font-family: sans-serif; margin: 0; padding: ${bodyPadding}; color: #000; background: #fff; font-size: 10.5pt; max-width: 216mm; margin: 0 auto; }
             h1 { font-size: 19pt; color: #000; margin: 0 0 5px 0; page-break-after: avoid; }
             h2 { font-size: 14.5pt; color: #000; margin: 12px 0 4px 0; page-break-after: avoid; }
             h3 { font-size: 12.5pt; color: #000; margin: 8px 0 3px 0; page-break-after: avoid; }
@@ -66,11 +69,12 @@ const generateHtmlHeader = (title: string, showHeader: boolean = true) => {
             th, td { border: 1px solid #000; padding: 3px 4px; text-align: right; font-size: 9.5pt; }
             th { text-align: left; background-color: #f0f0f0; font-weight: bold; }
             .total-row td { font-weight: bold; background-color: #e0e0e0; }
-            .summary-title { margin-top: 15px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+            .summary-title { margin-top: ${summaryTitleMarginTop}; border-bottom: 1px solid #000; padding-bottom: 3px; }
+            .summary-title-no-border { margin-top: ${summaryTitleMarginTop}; padding-bottom: 3px; }
             .text-left { text-align: left; }
             .batch-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-            .batch-title { flex: 1; }
-            .batch-method { text-align: right; font-size: 9.5pt; margin-top: 2px; }
+            .batch-title { flex: 1; margin-top: 0; }
+            .batch-method { text-align: right; font-size: 9.5pt; margin-top: 0; }
         </style>
     </head>
     <body>
@@ -92,7 +96,7 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
   const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
   
   return `
-    <h2 class="summary-title">Inventory Shopping List (Grand Totals based on Servings)</h2>
+    <h2 class="summary-title-no-border">Inventory Shopping List (Grand Totals based on Servings)</h2>
     <div class="table-container">
         <table>
             <thead>
@@ -178,13 +182,14 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
 }
 
 // Helper function to generate batch calculations HTML
-const generateBatchCalculationsHtml = (batches: BatchState[]) => {
+const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: boolean = false) => {
   const reportData = batches.filter(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
   const fixedTargetLiters = FIXED_BATCH_LITERS
 
-  let htmlContent = `<h2 class="summary-title">Individual Batch Sheets</h2>`
+  const extraMarginStyle = extraTopMargin ? ' style="margin-top: 20px;"' : ''
+  let htmlContent = `<h2 class="summary-title-no-border"${extraMarginStyle}>Individual Batch Sheets</h2>`
 
   reportData.forEach(batch => {
     if (!batch.editableRecipe) return
@@ -329,19 +334,19 @@ const openPdfWindow = (htmlContent: string) => {
 
 // Generate shopping list PDF only
 export const generateShoppingListPdf = (batches: BatchState[]) => {
-  const htmlContent = generateHtmlHeader("Cocktail Shopping List") + generateShoppingListHtml(batches) + `</body></html>`
+  const htmlContent = generateHtmlHeader("Cocktail Shopping List", false, true) + generateShoppingListHtml(batches) + `</body></html>`
   openPdfWindow(htmlContent)
 }
 
 // Generate batch calculations PDF only
 export const generateBatchCalculationsPdf = (batches: BatchState[]) => {
-  const htmlContent = generateHtmlHeader("Cocktail Batching Calculations") + generateBatchCalculationsHtml(batches) + `</body></html>`
+  const htmlContent = generateHtmlHeader("Cocktail Batching Calculations", false, true) + generateBatchCalculationsHtml(batches) + `</body></html>`
   openPdfWindow(htmlContent)
 }
 
 // Generate full report (both shopping list and batch calculations)
 export const generatePdfReport = (batches: BatchState[]) => {
   // Generate both shopping list and batch calculations
-  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false) + generateShoppingListHtml(batches) + generateBatchCalculationsHtml(batches) + `</body></html>`
+  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false, true) + generateShoppingListHtml(batches) + generateBatchCalculationsHtml(batches, true) + `</body></html>`
   openPdfWindow(htmlContent)
 }
