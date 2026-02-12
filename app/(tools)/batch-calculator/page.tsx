@@ -544,15 +544,7 @@ export default function BatchCalculatorPage() {
                                 Featured
                               </span>
                             )}
-                            {cocktail.featured && cocktail.image && (
-                              <div className="mb-2 relative h-32 w-full overflow-hidden rounded-md">
-                                <img
-                                  src={cocktail.image}
-                                  alt={cocktail.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              </div>
-                            )}
+
                             <p className="text-xs text-gray-500 line-clamp-2">
                               {cocktail.ingredients.map(ing => ing.name).join(', ')}
                             </p>
