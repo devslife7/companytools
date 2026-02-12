@@ -403,7 +403,7 @@ export default function BatchCalculatorPage() {
 
   return (
     <div className="min-h-screen text-gray-900 font-sans py-6 sm:py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full">
         {/* Toast Notifications */}
         <ToastContainer toasts={toasts} onRemove={removeToast} />
 
@@ -421,255 +421,266 @@ export default function BatchCalculatorPage() {
           </button>
         </div>
 
-        {/* Section 1: Select Cocktails */}
-        <div className="mb-8 px-0">
-          <div className="mb-2">
-            <h2 className="text-xl font-bold text-gray-900">Step 1: Select Cocktails</h2>
-          </div>
+        {/* Main Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-          {/* Database Status
-          {cocktailsLoading ? (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
-              Loading cocktails from database...
-            </div>
-          ) : cocktailsError ? (
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-600 text-sm mb-4">
-              ⚠️ Database unavailable, using static data fallback. Error: {cocktailsError}
-            </div>
-          ) : apiCocktails.length > 0 ? (
-            <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-4">
-              ✓ Loaded {apiCocktails.length} cocktails from database
-            </div>
-          ) : null} */}
-
-          {/* Search Bar + Filter Dropdowns (same row) */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <div className="flex-1 min-w-0 relative">
-                <MultiSelectCocktailSearch
-                  cocktails={availableCocktails}
-                  selectedCocktails={selectedCocktails}
-                  onSelectionChange={handleCocktailSelectionChange}
-                  label="Search and Add More Cocktails"
-                />
+          {/* LEFT COLUMN: Cocktail Selection */}
+          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 sticky top-8">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-900">Select Cocktails</h2>
+                <p className="text-sm text-gray-500">Search or filter to add to your batch.</p>
               </div>
 
-              {/* Featured/All Filter Dropdown */}
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
-                className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
-              >
-                <option value="featured">Featured</option>
-                <option value="all">All Cocktails</option>
-              </select>
-
-              {/* Liquor Filter Dropdown */}
-              <select
-                value={selectedLiquor}
-                onChange={(e) => setSelectedLiquor(e.target.value)}
-                className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
-              >
-                <option value="">All Liquors</option>
-                {availableLiquors.map((liquor) => (
-                  <option key={liquor} value={liquor}>
-                    {liquor}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Selected Cocktails Chips */}
-            {selectedCocktails.length > 0 && (
-              <div className="flex flex-wrap gap-2 p-2 mt-2 bg-gray-50 border border-gray-200 rounded-lg">
-                {selectedCocktails.map(cocktail => (
-                  <div
-                    key={cocktail.name}
-                    className="flex items-center gap-1 px-3 py-1 bg-orange-100 border border-orange-300 rounded-full text-sm font-semibold text-gray-900"
-                  >
-                    <span>{cocktail.name}</span>
-                    <button
-                      onClick={() => handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))}
-                      className="ml-1 hover:bg-orange-200 rounded-full p-0.5 transition-colors"
-                      title="Remove cocktail"
-                    >
-                      <X className="w-3 h-3 text-orange-700" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Cocktails List */}
-          <div className="mb-6">
-            {filteredLoading ? (
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
-                Loading cocktails...
-              </div>
-            ) : filteredCocktails.length === 0 ? (
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
-                {filter === 'featured' ? 'No featured cocktails found.' : 'No cocktails found.'}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {filteredCocktails.map(cocktail => {
-                  const isSelected = selectedCocktails.some(c => c.name === cocktail.name)
-                  return (
-                    <button
-                      key={cocktail.id || cocktail.name}
-                      onClick={() => {
-                        if (isSelected) {
-                          handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))
-                        } else {
-                          handleCocktailSelectionChange([...selectedCocktails, cocktail])
-                        }
-                      }}
-                      className={`p-6 rounded-xl border text-left transition-all duration-200 ${isSelected
-                        ? 'bg-orange-50 border-orange-300'
-                        : 'bg-white border-gray-200 hover:border-gray-300'
-                        }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2 text-lg">{cocktail.name}</h3>
-                          {cocktail.featured && (
-                            <span className="inline-block px-2 py-0.5 bg-orange-200 text-orange-800 text-xs font-semibold rounded mb-2">
-                              Featured
-                            </span>
-                          )}
-                          <p className="text-sm text-gray-600 mt-2">
-                            {cocktail.ingredients.map(ing => ing.name).join(', ')}
-                          </p>
-                        </div>
-                        {isSelected && (
-                          <div className="ml-2 text-orange-600">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Section 2: Configure Servings */}
-        {hasSelectedCocktails && (
-          <div className="mb-8 px-0">
-            <div className="mb-4 pb-2 border-b-2 border-gray-300">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Step 2: Set Servings</h2>
-                  <p className="text-sm text-gray-600 mt-1">Enter the number of servings for each cocktail</p>
+              {/* Database Status
+              {cocktailsLoading ? (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
+                  Loading cocktails from database...
                 </div>
-                {servingsProgress.total > 0 && (
-                  <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-100 rounded-lg w-full sm:w-auto">
-                    <span className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">
-                      {servingsProgress.completed} / {servingsProgress.total}
-                    </span>
-                    <div className="flex-1 sm:w-24 h-2 bg-gray-300 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-orange-600 transition-all duration-300"
-                        style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
+              ) : cocktailsError ? (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-600 text-sm mb-4">
+                  ⚠️ Database unavailable, using static data fallback. Error: {cocktailsError}
+                </div>
+              ) : apiCocktails.length > 0 ? (
+                <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-4">
+                  ✓ Loaded {apiCocktails.length} cocktails from database
+                </div>
+              ) : null} */}
+
+              {/* Search Bar + Filter Dropdowns */}
+              <div className="mb-4 flex flex-col gap-3">
+                <div className="w-full relative">
+                  <MultiSelectCocktailSearch
+                    cocktails={availableCocktails}
+                    selectedCocktails={selectedCocktails}
+                    onSelectionChange={handleCocktailSelectionChange}
+                    label="Search by name..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Featured/All Filter Dropdown */}
+                  <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
+                    className="w-full px-3 py-2 rounded-lg font-medium bg-gray-50 text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-orange-500 focus:outline-none transition-all text-sm"
+                  >
+                    <option value="featured">Featured</option>
+                    <option value="all">All</option>
+                  </select>
+
+                  {/* Liquor Filter Dropdown */}
+                  <select
+                    value={selectedLiquor}
+                    onChange={(e) => setSelectedLiquor(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg font-medium bg-gray-50 text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-orange-500 focus:outline-none transition-all text-sm"
+                  >
+                    <option value="">All Liquors</option>
+                    {availableLiquors.map((liquor) => (
+                      <option key={liquor} value={liquor}>
+                        {liquor}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
+              {/* Selected Cocktails Chips */}
+              {selectedCocktails.length > 0 && (
+                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-gray-50 border border-gray-200 rounded-lg">
+                  {selectedCocktails.map(cocktail => (
+                    <div
+                      key={cocktail.name}
+                      className="flex items-center gap-1 px-3 py-1 bg-orange-100 border border-orange-300 rounded-full text-sm font-semibold text-gray-900"
+                    >
+                      <span>{cocktail.name}</span>
+                      <button
+                        onClick={() => handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))}
+                        className="ml-1 hover:bg-orange-200 rounded-full p-0.5 transition-colors"
+                        title="Remove cocktail"
+                      >
+                        <X className="w-3 h-3 text-orange-700" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Cocktails List */}
+            <div className="mb-2 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
+              {filteredLoading ? (
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
+                  Loading cocktails...
+                </div>
+              ) : filteredCocktails.length === 0 ? (
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
+                  {filter === 'featured' ? 'No featured cocktails found.' : 'No cocktails found.'}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3">
+                  {filteredCocktails.map(cocktail => {
+                    const isSelected = selectedCocktails.some(c => c.name === cocktail.name)
+                    return (
+                      <button
+                        key={cocktail.id || cocktail.name}
+                        onClick={() => {
+                          if (isSelected) {
+                            handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))
+                          } else {
+                            handleCocktailSelectionChange([...selectedCocktails, cocktail])
+                          }
+                        }}
+                        className={`p-4 rounded-lg border text-left transition-all duration-200 ${isSelected
+                          ? 'bg-orange-50 border-orange-300'
+                          : 'bg-white border-gray-200 hover:border-orange-200 hover:shadow-sm'
+                          }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 mb-1 text-base">{cocktail.name}</h3>
+                            {cocktail.featured && (
+                              <span className="inline-block px-1.5 py-0.5 bg-orange-100 text-orange-800 text-[10px] uppercase font-bold tracking-wider rounded mb-1">
+                                Featured
+                              </span>
+                            )}
+                            {cocktail.featured && cocktail.image && (
+                              <div className="mb-2 relative h-32 w-full overflow-hidden rounded-md">
+                                <img
+                                  src={cocktail.image}
+                                  alt={cocktail.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                            )}
+                            <p className="text-xs text-gray-500 line-clamp-2">
+                              {cocktail.ingredients.map(ing => ing.name).join(', ')}
+                            </p>
+                          </div>
+                          {isSelected && (
+                            <div className="ml-2 text-orange-600">
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
-        )}
 
-        <div className="space-y-6 sm:space-y-8 mb-4">
-          {/* Render all independent cocktail batch slots */}
-          {batches.map(batch => (
-            <BatchItem
-              key={batch.id}
-              batch={batch}
-              onServingsChange={handleServingsChange}
-              onIngredientChange={handleIngredientChange}
-              onNameChange={handleNameChange}
-              onMethodChange={handleMethodChange}
-              onRemove={handleRemoveBatch}
-              onEditRecipe={handleOpenEditModal}
-              isOnlyItem={batches.length === 1}
-              hasError={batchesWithMissingServings.has(batch.id)}
-            />
-          ))}
-        </div>
 
-        {/* Section 3: Print Options */}
-        {hasSelectedCocktails && (
-          <div className="mt-8 px-0">
-            <div className="mb-4 pb-2 border-b-2 border-gray-300">
-              <h2 className="text-xl font-bold text-gray-900">Step 3: Print</h2>
-              <p className="text-sm text-gray-600 mt-1">Choose what you want to print</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Shopping List Button */}
-              <button
-                onClick={handleGenerateShoppingList}
-                className="flex flex-col items-center justify-center p-6 bg-white border border-gray-300 rounded-xl hover:border-orange-300 transition-all duration-200 group"
-              >
-                <ShoppingCart className="w-8 h-8 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
-                <span className="font-bold text-gray-900 mb-1">Shopping List</span>
-                <span className="text-xs text-gray-600 text-center">Grand totals of all ingredients</span>
-              </button>
-
-              {/* Batch Calculations Button */}
-              <button
-                onClick={handleGenerateBatchCalculations}
-                disabled={!canExport}
-                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${canExport
-                  ? "bg-white border-gray-300 hover:border-orange-300"
-                  : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
-                  }`}
-              >
-                <Calculator className={`w-8 h-8 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
-                <span className={`font-bold mb-1 ${canExport ? "text-gray-900" : "text-gray-500"}`}>
-                  Batch Calculations
-                </span>
-                <span className={`text-xs text-center ${canExport ? "text-gray-600" : "text-gray-400"}`}>
-                  Individual batch sheets
-                </span>
-              </button>
-
-              {/* Full Report Button */}
-              <button
-                onClick={handleGeneratePdfReport}
-                disabled={!canExport}
-                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${canExport
-                  ? "bg-white border-gray-300 hover:border-orange-300"
-                  : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
-                  }`}
-              >
-                <FileText className={`w-8 h-8 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
-                <span className={`font-bold mb-1 ${canExport ? "text-gray-900" : "text-gray-500"}`}>
-                  Full Report
-                </span>
-                <span className={`text-xs text-center ${canExport ? "text-gray-600" : "text-gray-400"}`}>
-                  Shopping list + batch sheets
-                </span>
-              </button>
-            </div>
-
-            {/* Progress indicator message */}
-            {servingsProgress.total > 0 && servingsProgress.completed < servingsProgress.total && (
-              <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>Note:</strong> Enter servings for all cocktails to enable batch calculations and full report printing.
-                  ({servingsProgress.completed} of {servingsProgress.total} completed)
+          {/* RIGHT COLUMN: Batch Calculator Workspace */}
+          <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+            {!hasSelectedCocktails ? (
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl text-center">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
+                  <Calculator className="w-8 h-8 text-gray-300" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Cocktails Selected</h3>
+                <p className="text-gray-500 max-w-sm">
+                  Select cocktails from the list on the left to start calculating your batches.
                 </p>
               </div>
+            ) : (
+              <>
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="mb-6 pb-4 border-b border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">Batch Worksheet</h2>
+                        <p className="text-sm text-gray-500 mt-1">Set servings and adjust recipes.</p>
+                      </div>
+                      {servingsProgress.total > 0 && (
+                        <div className="flex items-center gap-3 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                          <span className="text-sm font-medium text-gray-600">
+                            Progress: {servingsProgress.completed}/{servingsProgress.total}
+                          </span>
+                          <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-orange-500 transition-all duration-300"
+                              style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Render all independent cocktail batch slots */}
+                    {batches.map(batch => (
+                      <BatchItem
+                        key={batch.id}
+                        batch={batch}
+                        onServingsChange={handleServingsChange}
+                        onIngredientChange={handleIngredientChange}
+                        onNameChange={handleNameChange}
+                        onMethodChange={handleMethodChange}
+                        onRemove={handleRemoveBatch}
+                        onEditRecipe={handleOpenEditModal}
+                        isOnlyItem={batches.length === 1}
+                        hasError={batchesWithMissingServings.has(batch.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Print/Export Options moved here inside the right column */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Shopping List Button */}
+                  <button
+                    onClick={handleGenerateShoppingList}
+                    className="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <ShoppingCart className="w-6 h-6 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-gray-900">Shopping List</span>
+                    <span className="text-xs text-gray-500 mt-1">Total ingredients</span>
+                  </button>
+
+                  {/* Batch Calculations Button */}
+                  <button
+                    onClick={handleGenerateBatchCalculations}
+                    disabled={!canExport}
+                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-200 group ${canExport
+                      ? "bg-white border-gray-200 hover:border-orange-300 hover:shadow-md"
+                      : "bg-gray-50 border-gray-100 cursor-not-allowed opacity-50"
+                      }`}
+                  >
+                    <Calculator className={`w-6 h-6 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
+                    <span className={`font-semibold ${canExport ? "text-gray-900" : "text-gray-400"}`}>
+                      Batch Sheets
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">Individual guides</span>
+                  </button>
+
+                  {/* Full Report Button */}
+                  <button
+                    onClick={handleGeneratePdfReport}
+                    disabled={!canExport}
+                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-200 group ${canExport
+                      ? "bg-white border-gray-200 hover:border-orange-300 hover:shadow-md"
+                      : "bg-gray-50 border-gray-100 cursor-not-allowed opacity-50"
+                      }`}
+                  >
+                    <FileText className={`w-6 h-6 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
+                    <span className={`font-semibold ${canExport ? "text-gray-900" : "text-gray-400"}`}>
+                      Full Report
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">Everything combined</span>
+                  </button>
+                </div>
+              </>
             )}
           </div>
-        )}
+        </div>
+
+
+
 
         {/* Servings Required Modal */}
         <Modal

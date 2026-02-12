@@ -10,17 +10,17 @@ export default function ToolsLayout({
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
       {/* Navigation Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <Link href="/" className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition">
                 <Home className="w-5 h-5" />
                 <span className="font-semibold text-lg">Company Tools</span>
               </Link>
-              
+
               <nav className="hidden md:flex space-x-6">
-                <Link 
-                  href="/batch-calculator" 
+                <Link
+                  href="/batch-calculator"
                   className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition"
                 >
                   <Calculator className="w-4 h-4" />
@@ -33,7 +33,7 @@ export default function ToolsLayout({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
 

@@ -43,6 +43,7 @@ function transformCocktailToRecipe(cocktail: {
   method: CocktailMethod | string
   instructions?: string | null
   featured: boolean
+  image?: string | null
   ingredients: Array<{
     name: string
     amount: Prisma.Decimal | string
@@ -52,9 +53,9 @@ function transformCocktailToRecipe(cocktail: {
   }>
 }): CocktailRecipe {
   // Ensure method is a valid CocktailMethod (fallback to Build if invalid)
-  const validMethod: CocktailMethod = 
-    cocktail.method === 'Shake' || cocktail.method === 'Build' 
-      ? cocktail.method as CocktailMethod 
+  const validMethod: CocktailMethod =
+    cocktail.method === 'Shake' || cocktail.method === 'Build'
+      ? cocktail.method as CocktailMethod
       : 'Build'
 
   return {
@@ -136,7 +137,7 @@ export async function getAllCocktails(filters?: {
     return cocktails.map(transformCocktailToRecipe)
   } catch (error) {
     console.error('Database error in getAllCocktails:', error)
-    
+
     // Log more details for debugging
     if (error instanceof Error) {
       console.error('Error details:', {
@@ -144,13 +145,13 @@ export async function getAllCocktails(filters?: {
         message: error.message,
         stack: error.stack?.split('\n').slice(0, 5).join('\n'), // First 5 lines of stack
       })
-      
+
       // Check for specific Prisma errors
       if ((error as any).code) {
         console.error('Prisma error code:', (error as any).code)
       }
     }
-    
+
     // Re-throw with more context
     if (error instanceof Error) {
       throw new Error(`Database query failed: ${error.message}`)
@@ -382,15 +383,15 @@ export async function getUniqueLiquors(): Promise<string[]> {
     ]
 
     const foundLiquors = new Set<string>()
-    
+
     cocktails.forEach(cocktail => {
       cocktail.ingredients.forEach(ingredient => {
         const ingredientNameLower = ingredient.name.toLowerCase()
         // Check if ingredient name contains any liquor keyword
-        const hasLiquorKeyword = liquorKeywords.some(keyword => 
+        const hasLiquorKeyword = liquorKeywords.some(keyword =>
           ingredientNameLower.includes(keyword)
         )
-        
+
         if (hasLiquorKeyword) {
           // Add the ingredient name as-is (preserving original capitalization)
           foundLiquors.add(ingredient.name)
