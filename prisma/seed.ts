@@ -31,6 +31,8 @@ async function main() {
             name: ingredient.name,
             amount: ingredient.amount,
             orderIndex: index,
+            unit: ingredient.unit || null,
+            preferredUnit: ingredient.preferredUnit || null,
           })),
         },
       },
