@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from "react"
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react"
 import { Search, Check } from "lucide-react"
 import type { CocktailRecipe } from "@/features/batch-calculator/types"
 
@@ -13,7 +13,9 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
   ({ cocktails, selectedCocktails, onSelectionChange }) => {
     const [searchTerm, setSearchTerm] = useState("")
     const [isOpen, setIsOpen] = useState(false)
+    const [highlightedIndex, setHighlightedIndex] = useState(-1)
     const searchRef = useRef<HTMLDivElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -46,7 +48,52 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
       }
       setSearchTerm("")
       setIsOpen(false)
+      setHighlightedIndex(-1)
     }
+
+    // Reset highlighted index when search results change
+    useEffect(() => {
+      setHighlightedIndex(-1)
+    }, [searchTerm])
+
+    // Auto-scroll highlighted item into view
+    useEffect(() => {
+      if (highlightedIndex >= 0 && listRef.current) {
+        const items = listRef.current.querySelectorAll('[data-result-item]')
+        items[highlightedIndex]?.scrollIntoView({ block: 'nearest' })
+      }
+    }, [highlightedIndex])
+
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+      if (!isOpen || !searchTerm || filteredCocktails.length === 0) return
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault()
+          setHighlightedIndex(prev =>
+            prev < filteredCocktails.length - 1 ? prev + 1 : 0
+          )
+          break
+        case 'ArrowUp':
+          e.preventDefault()
+          setHighlightedIndex(prev =>
+            prev > 0 ? prev - 1 : filteredCocktails.length - 1
+          )
+          break
+        case 'Enter':
+          e.preventDefault()
+          if (highlightedIndex >= 0 && highlightedIndex < filteredCocktails.length) {
+            handleToggleCocktail(filteredCocktails[highlightedIndex])
+          }
+          break
+        case 'Escape':
+          setIsOpen(false)
+          setHighlightedIndex(-1)
+          break
+      }
+    }, [isOpen, searchTerm, filteredCocktails, highlightedIndex, handleToggleCocktail])
+
+    const dropdownOpen = isOpen && searchTerm && filteredCocktails.length > 0
 
     return (
       <div ref={searchRef} className="relative">
@@ -61,26 +108,42 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
             setIsOpen(true)
           }}
           onFocus={() => setIsOpen(true)}
-          className="w-full py-2 pl-10 pr-4 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal"
+          onKeyDown={handleKeyDown}
+          className={`w-full py-2 pl-10 pr-4 font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal ${dropdownOpen ? "rounded-t-xl border-b-0" : "rounded-xl"
+            }`}
         />
 
-        {/* Dropdown Results — absolutely positioned, overlays content */}
-        {isOpen && searchTerm && filteredCocktails.length > 0 && (
-          <div className="absolute left-0 right-0 top-full mt-1 max-h-64 overflow-y-auto border border-gray-300 rounded-lg bg-white shadow-lg z-50">
-            <div className="space-y-1 p-1">
-              {filteredCocktails.map(cocktail => {
+        {/* Dropdown Results — flush against input, no gap */}
+        {dropdownOpen && (
+          <div
+            ref={listRef}
+            className="absolute left-0 right-0 top-full max-h-64 overflow-y-auto border border-gray-200 border-t border-t-gray-100 rounded-b-xl bg-white shadow-lg z-50"
+          >
+            <div className="py-1">
+              {filteredCocktails.map((cocktail, index) => {
                 const selected = isSelected(cocktail)
+                const highlighted = index === highlightedIndex
                 return (
                   <button
                     key={cocktail.name}
+                    data-result-item
                     onClick={() => handleToggleCocktail(cocktail)}
-                    className={`w-full text-left p-2 rounded-md transition duration-200 ease-in-out flex justify-between items-center ${selected
-                      ? "bg-orange-100 text-gray-900 shadow-md"
-                      : "bg-white hover:bg-gray-100 text-gray-700"
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`w-full text-left px-3 py-2.5 flex justify-between items-center transition-colors duration-100 ${selected
+                        ? highlighted
+                          ? "bg-orange-100 border-l-[3px] border-l-orange-500 text-gray-900 font-semibold"
+                          : "bg-orange-50 border-l-[3px] border-l-orange-400 text-gray-900 font-semibold"
+                        : highlighted
+                          ? "bg-gray-100 border-l-[3px] border-l-gray-300 text-gray-900"
+                          : "bg-white border-l-[3px] border-l-transparent text-gray-600 hover:bg-gray-50"
                       }`}
                   >
-                    <span className="font-semibold">{cocktail.name}</span>
-                    {selected && <Check className="w-5 h-5 text-orange-600" />}
+                    <span>{cocktail.name}</span>
+                    {selected && (
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-orange-500">
+                        <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -89,7 +152,7 @@ export const MultiSelectCocktailSearch: React.FC<MultiSelectCocktailSearchProps>
         )}
 
         {isOpen && searchTerm && filteredCocktails.length === 0 && (
-          <div className="absolute left-0 right-0 top-full mt-1 p-3 bg-red-50 border border-red-300 rounded-lg text-red-600 text-sm z-50">
+          <div className="absolute left-0 right-0 top-full border border-gray-200 border-t border-t-gray-100 rounded-b-xl bg-white shadow-lg z-50 p-3 text-gray-400 text-sm">
             No cocktails found matching &quot;{searchTerm}&quot;.
           </div>
         )}
