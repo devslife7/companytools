@@ -17,7 +17,7 @@ import { useToast, ToastContainer } from "@/components/ui"
 import { BatchItem } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
-import { Plus, ShoppingCart, Calculator, FileText } from "lucide-react"
+import { Plus, ShoppingCart, Calculator, FileText, X } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -89,12 +89,12 @@ export default function BatchCalculatorPage() {
     // Helper function to apply filters to static data
     const applyFiltersToStatic = (data: typeof COCKTAIL_DATA) => {
       let filtered = data
-      
+
       // Apply featured filter
       if (filter === 'featured') {
         filtered = filtered.filter(c => c.featured === true)
       }
-      
+
       // Apply liquor filter
       if (selectedLiquor) {
         filtered = filtered.filter(c =>
@@ -103,7 +103,7 @@ export default function BatchCalculatorPage() {
           )
         )
       }
-      
+
       return filtered
     }
 
@@ -111,12 +111,12 @@ export default function BatchCalculatorPage() {
     if (!filteredLoading && filteredCocktailsFromDb.length > 0) {
       return filteredCocktailsFromDb
     }
-    
+
     // If database error or empty, fallback to filtered static data
     if (filteredError || (!filteredLoading && filteredCocktailsFromDb.length === 0)) {
       return applyFiltersToStatic(COCKTAIL_DATA)
     }
-    
+
     // While loading, show filtered static data so UI doesn't break
     return applyFiltersToStatic(COCKTAIL_DATA)
   }, [filteredCocktailsFromDb, filteredLoading, filteredError, filter, selectedLiquor])
@@ -285,10 +285,10 @@ export default function BatchCalculatorPage() {
       const cocktailNames = batchesWithoutServings
         .map(b => b.selectedCocktail?.name || `Batch #${b.id}`)
         .join(", ")
-      
+
       const missingIds = new Set(batchesWithoutServings.map(b => b.id))
       setBatchesWithMissingServings(missingIds)
-      
+
       setMissingServingsMessage(
         `Please enter servings for all cocktails before generating batch calculations.\n\nMissing servings for: ${cocktailNames}\n\nServings are required to generate accurate batch calculations.`
       )
@@ -310,11 +310,11 @@ export default function BatchCalculatorPage() {
       const cocktailNames = batchesWithoutServings
         .map(b => b.selectedCocktail?.name || `Batch #${b.id}`)
         .join(", ")
-      
+
       // Highlight batches with missing servings
       const missingIds = new Set(batchesWithoutServings.map(b => b.id))
       setBatchesWithMissingServings(missingIds)
-      
+
       setMissingServingsMessage(
         `Please enter servings for all cocktails before downloading.\n\nMissing servings for: ${cocktailNames}\n\nServings are required to generate accurate batch calculations.`
       )
@@ -442,41 +442,63 @@ export default function BatchCalculatorPage() {
             </div>
           ) : null} */}
 
-          {/* Multi-Select Cocktail Search */}
+          {/* Search Bar + Filter Dropdowns (same row) */}
           <div className="mb-4">
-            <MultiSelectCocktailSearch
-              cocktails={availableCocktails}
-              selectedCocktails={selectedCocktails}
-              onSelectionChange={handleCocktailSelectionChange}
-              label="Search and Add More Cocktails"
-            />
-          </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 min-w-0 relative">
+                <MultiSelectCocktailSearch
+                  cocktails={availableCocktails}
+                  selectedCocktails={selectedCocktails}
+                  onSelectionChange={handleCocktailSelectionChange}
+                  label="Search and Add More Cocktails"
+                />
+              </div>
 
-          {/* Filter Dropdowns */}
-          <div className="mb-4 flex overflow-x-auto scrollbar-hide gap-2 items-center">
-            {/* Featured/All Filter Dropdown */}
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
-              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
-            >
-              <option value="featured">Featured</option>
-              <option value="all">All Cocktails</option>
-            </select>
-            
-            {/* Liquor Filter Dropdown */}
-            <select
-              value={selectedLiquor}
-              onChange={(e) => setSelectedLiquor(e.target.value)}
-              className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
-            >
-              <option value="">All Liquors</option>
-              {availableLiquors.map((liquor) => (
-                <option key={liquor} value={liquor}>
-                  {liquor}
-                </option>
-              ))}
-            </select>
+              {/* Featured/All Filter Dropdown */}
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
+                className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
+              >
+                <option value="featured">Featured</option>
+                <option value="all">All Cocktails</option>
+              </select>
+
+              {/* Liquor Filter Dropdown */}
+              <select
+                value={selectedLiquor}
+                onChange={(e) => setSelectedLiquor(e.target.value)}
+                className="px-4 py-2 rounded-xl font-semibold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-gray-300 focus:outline-none transition-all duration-200 cursor-pointer flex-none"
+              >
+                <option value="">All Liquors</option>
+                {availableLiquors.map((liquor) => (
+                  <option key={liquor} value={liquor}>
+                    {liquor}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Selected Cocktails Chips */}
+            {selectedCocktails.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-2 mt-2 bg-gray-50 border border-gray-200 rounded-lg">
+                {selectedCocktails.map(cocktail => (
+                  <div
+                    key={cocktail.name}
+                    className="flex items-center gap-1 px-3 py-1 bg-orange-100 border border-orange-300 rounded-full text-sm font-semibold text-gray-900"
+                  >
+                    <span>{cocktail.name}</span>
+                    <button
+                      onClick={() => handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))}
+                      className="ml-1 hover:bg-orange-200 rounded-full p-0.5 transition-colors"
+                      title="Remove cocktail"
+                    >
+                      <X className="w-3 h-3 text-orange-700" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Cocktails List */}
@@ -503,11 +525,10 @@ export default function BatchCalculatorPage() {
                           handleCocktailSelectionChange([...selectedCocktails, cocktail])
                         }
                       }}
-                      className={`p-6 rounded-xl border text-left transition-all duration-200 ${
-                        isSelected
-                          ? 'bg-orange-50 border-orange-300'
-                          : 'bg-white border-gray-200 hover:border-gray-300'
-                      }`}
+                      className={`p-6 rounded-xl border text-left transition-all duration-200 ${isSelected
+                        ? 'bg-orange-50 border-orange-300'
+                        : 'bg-white border-gray-200 hover:border-gray-300'
+                        }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -605,11 +626,10 @@ export default function BatchCalculatorPage() {
               <button
                 onClick={handleGenerateBatchCalculations}
                 disabled={!canExport}
-                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${
-                  canExport
-                    ? "bg-white border-gray-300 hover:border-orange-300"
-                    : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
-                }`}
+                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${canExport
+                  ? "bg-white border-gray-300 hover:border-orange-300"
+                  : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
+                  }`}
               >
                 <Calculator className={`w-8 h-8 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
                 <span className={`font-bold mb-1 ${canExport ? "text-gray-900" : "text-gray-500"}`}>
@@ -624,11 +644,10 @@ export default function BatchCalculatorPage() {
               <button
                 onClick={handleGeneratePdfReport}
                 disabled={!canExport}
-                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${
-                  canExport
-                    ? "bg-white border-gray-300 hover:border-orange-300"
-                    : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
-                }`}
+                className={`flex flex-col items-center justify-center p-6 border rounded-xl transition-all duration-200 group ${canExport
+                  ? "bg-white border-gray-300 hover:border-orange-300"
+                  : "bg-gray-50 border-gray-200 cursor-not-allowed opacity-60"
+                  }`}
               >
                 <FileText className={`w-8 h-8 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
                 <span className={`font-bold mb-1 ${canExport ? "text-gray-900" : "text-gray-500"}`}>
