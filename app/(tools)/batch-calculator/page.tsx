@@ -425,7 +425,7 @@ export default function BatchCalculatorPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* LEFT COLUMN: Cocktail Selection */}
-          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 sticky top-8">
+          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 lg:sticky lg:top-8">
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <div className="mb-4">
                 <h2 className="text-xl font-bold text-gray-900">Select Cocktails</h2>
