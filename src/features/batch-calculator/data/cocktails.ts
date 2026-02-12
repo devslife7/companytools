@@ -63,6 +63,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     method: "Shake",
     instructions: "1. Combine bourbon, lemon, syrup, bitters and foam into a cocktail shaker filled with ice.\n2. Shake until ingredients are properly chilled.\n3. Strain in ice filled rocks glass.\n4. Garnish with 3 cranberry skewer",
     featured: true,
+    image: "/cocktails/cranberry-cinnamon-whiskey-sour.png",
     ingredients: [
       { name: "Bourbon", amount: "1.5", unit: "oz", preferredUnit: "liters" },
       { name: "Lemon Juice", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
@@ -79,6 +80,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     method: "Shake",
     instructions: "1. Combine vodka, espresso, and coffee liqueur into a shaker with lots of ice.\n2. Shake hard for 15 seconds (this creates the foam).\n3. Pour into a chilled glass.\n4. Garnish with 3 coffee beans.",
     featured: true,
+    image: "/cocktails/espresso-martini.png",
     ingredients: [
       { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
       { name: "Espresso", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -94,6 +96,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     method: "Shake",
     instructions: "1. Combine bourbon, apple cider, maple syrup, and a splash of lemon juice into a Shaker with ice.\n2. Shake well to ensure the maple syrup integrates with the cold cider.\n3. Garnish with a cinnamon stick or an apple slice.",
     featured: true,
+    image: "/cocktails/maple-bourbon-cider.png",
     ingredients: [
       { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
       { name: "Apple Cider", amount: "4", unit: "oz", preferredUnit: "gallons" },
@@ -181,6 +184,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     method: "Build",
     instructions: "1. Combine vodka, lemon juice, cardamon simple syrup and rose hydrolat in cocktail glass.\n2. Add grapefruit seltzer and garnish.\n3. Garnish with single baby pansy in the middle.",
     featured: true,
+    image: "/cocktails/rose-garden.png",
     ingredients: [
       { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
       { name: "Lemon Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },

@@ -25,6 +25,7 @@ async function main() {
         instructions: cocktail.instructions || null,
         isActive: true,
         featured: cocktail.featured || false,
+        image: cocktail.image || null,
         ingredients: {
           create: cocktail.ingredients.map((ingredient, index) => ({
             name: ingredient.name,

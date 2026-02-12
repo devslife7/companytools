@@ -16,6 +16,7 @@ export interface CocktailRecipe {
   instructions?: string
   ingredients: Ingredient[]
   featured?: boolean
+  image?: string
 }
 
 export type UnitType = "liquid" | "count" | "special"

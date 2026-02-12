@@ -17,6 +17,7 @@ model Cocktail {
   tags         String[]       @default([])
   category     String?        @db.VarChar(100)
   featured     Boolean        @default(false)
+  image        String?        @db.VarChar(255)
   instructions String?
   ingredients  Ingredient[]
 

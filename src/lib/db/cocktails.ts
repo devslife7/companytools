@@ -64,6 +64,7 @@ function transformCocktailToRecipe(cocktail: {
     method: validMethod,
     ...(cocktail.instructions && { instructions: cocktail.instructions }),
     featured: cocktail.featured,
+    ...(cocktail.image && { image: cocktail.image }),
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(ing => ({
@@ -219,6 +220,7 @@ export async function createCocktail(
       tags: data.tags || [],
       createdBy: data.createdBy,
       featured: data.featured ?? false,
+      image: data.image || null,
       ingredients: {
         create: data.ingredients.map((ing, index) => ({
           name: ing.name,
@@ -278,6 +280,7 @@ export async function updateCocktail(
   if (data.category !== undefined) updateData.category = data.category
   if (data.tags !== undefined) updateData.tags = data.tags
   if (data.featured !== undefined) updateData.featured = data.featured
+  if (data.image !== undefined) updateData.image = data.image || null
 
   // Only update cocktail if there are fields to update (ingredients are handled separately above)
   if (Object.keys(updateData).length > 0) {
