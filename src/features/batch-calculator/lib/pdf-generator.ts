@@ -255,7 +255,7 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
             <div class="batch-section">
                 <div class="batch-header">
                     <h3 class="batch-title">${recipe.name}${recipe.id ? ` #${recipe.id}` : ""}</h3>
-                    <div class="batch-method"><strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
+                    <div class="batch-method">${servingsNum > 0 ? `<strong>${servingsNum}pp</strong> | ` : ""}<strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
                 </div>
                 ${recipe.instructions ? `<p style="margin: 4px 0 2px 0;"><strong>Instructions:</strong></p><p style="margin: 0 0 4px 0; white-space: pre-line;">${recipe.instructions}</p>` : ''}
 
