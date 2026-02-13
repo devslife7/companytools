@@ -7,13 +7,12 @@ import {
   BOTTLE_SIZE_ML,
   parseAmount,
   calculateBatch,
-  calculateSingleServingLiquidVolumeML,
   formatNumber,
   formatMLValue,
   combineAmountAndUnit,
 } from "./calculations"
 import { calculateGrandTotals } from "./grand-totals"
-import { isLiquorItem, isAngosturaBitters } from "./ingredient-helpers"
+import { isLiquorItem, isAngosturaBitters, isSodaItem } from "./ingredient-helpers"
 
 // Helper function to format preferred unit display
 const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitValue: number | null | undefined): string => {
@@ -202,7 +201,17 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
         ? 0
         : parseInt(batch.servings, 10) || 0
 
-    const singleServingVolumeML = calculateSingleServingLiquidVolumeML(recipe)
+    // Exclude soda items from batch volume calculations
+    const singleServingVolumeML = recipe.ingredients
+      .filter(item => !isSodaItem(item.name))
+      .reduce((totalML, item) => {
+        const amountString = item.unit ? combineAmountAndUnit(item.amount, item.unit) : item.amount
+        const { baseAmount, unit, type } = parseAmount(amountString)
+        if (type === "liquid") {
+          return totalML + baseAmount * (CONVERSION_FACTORS[unit] || 0)
+        }
+        return totalML
+      }, 0)
     const twentyLiterML = fixedTargetLiters * LITER_TO_ML
 
     // Calculate for Servings Batch (if valid)
@@ -213,7 +222,9 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
             return { name: item.name, singleAmount: item.amount, ...batchResult }
           })
         : []
-    const totalServingsLiquidML = servingsBatchIngredients.reduce((sum, ing) => sum + ing.ml, 0)
+    const totalServingsLiquidML = servingsBatchIngredients
+      .filter(ing => !isSodaItem(ing.name))
+      .reduce((sum, ing) => sum + ing.ml, 0)
 
     // Calculate for Fixed 20L Target Liter Batch (if valid)
     const targetBatchIngredients =
@@ -282,20 +293,25 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
                                 const { type } = parseAmount(amountString)
                                 const isLiquor = isLiquorItem(item.name)
                                 const isAngostura = isAngosturaBitters(item.name)
+                                const isSoda = isSodaItem(item.name)
 
                                 const servingsData = servingsCalc
                                   ? type === "liquid"
-                                    ? isLiquor && !isAngostura && servingsCalc.bottles > 0
-                                      ? `(${formatNumber(servingsCalc.bottles)} @750ml) ${formatMLValue(servingsCalc.ml)} ml`
-                                      : `${formatMLValue(servingsCalc.ml)} ml`
+                                    ? isSoda
+                                      ? "N/A"
+                                      : isLiquor && !isAngostura && servingsCalc.bottles > 0
+                                        ? `(${formatNumber(servingsCalc.bottles)} @750ml) ${formatMLValue(servingsCalc.ml)} ml`
+                                        : `${formatMLValue(servingsCalc.ml)} ml`
                                     : "N/A"
                                   : "N/A"
 
                                 const targetData = targetCalc
                                   ? type === "liquid"
-                                    ? isLiquor && !isAngostura && targetCalc.bottles > 0
-                                      ? `(${formatNumber(targetCalc.bottles)} @750ml) ${formatMLValue(targetCalc.ml)} ml`
-                                      : `${formatMLValue(targetCalc.ml)} ml`
+                                    ? isSoda
+                                      ? "N/A"
+                                      : isLiquor && !isAngostura && targetCalc.bottles > 0
+                                        ? `(${formatNumber(targetCalc.bottles)} @750ml) ${formatMLValue(targetCalc.ml)} ml`
+                                        : `${formatMLValue(targetCalc.ml)} ml`
                                     : "N/A"
                                   : "N/A"
 
