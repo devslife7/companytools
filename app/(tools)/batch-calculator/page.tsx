@@ -354,7 +354,7 @@ export default function BatchCalculatorPage() {
     // Update local batches if this recipe is in use
     setBatches(prev =>
       prev.map(batch => {
-        if (batch.selectedCocktail?.name === updatedRecipe.name || batch.editableRecipe?.name === updatedRecipe.name) {
+        if (batch.selectedCocktail?.id === updatedRecipe.id || batch.editableRecipe?.id === updatedRecipe.id) {
           return {
             ...batch,
             selectedCocktail: updatedRecipe,
@@ -367,7 +367,7 @@ export default function BatchCalculatorPage() {
 
     // Update selected cocktails list
     setSelectedCocktails(prev =>
-      prev.map(cocktail => (cocktail.name === updatedRecipe.name ? updatedRecipe : cocktail))
+      prev.map(cocktail => (cocktail.id === updatedRecipe.id ? updatedRecipe : cocktail))
     )
 
     // Refresh cocktails list from database
@@ -381,10 +381,10 @@ export default function BatchCalculatorPage() {
     if (!editingCocktail) return
 
     // Remove from selected cocktails if it's selected
-    setSelectedCocktails(prev => prev.filter(c => c.name !== editingCocktail.name))
+    setSelectedCocktails(prev => prev.filter(c => c.id !== editingCocktail.id))
 
     // Remove batches using this recipe
-    setBatches(prev => prev.filter(batch => batch.selectedCocktail?.name !== editingCocktail.name))
+    setBatches(prev => prev.filter(batch => batch.selectedCocktail?.id !== editingCocktail.id))
 
     // Refresh cocktails list
     await refetchCocktails()

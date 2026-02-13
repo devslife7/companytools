@@ -403,6 +403,8 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
       prevProps.batch.id === nextProps.batch.id &&
       prevProps.batch.servings === nextProps.batch.servings &&
       prevProps.batch.editableRecipe?.name === nextProps.batch.editableRecipe?.name &&
+      prevProps.batch.editableRecipe?.instructions === nextProps.batch.editableRecipe?.instructions &&
+      prevProps.batch.editableRecipe?.method === nextProps.batch.editableRecipe?.method &&
       JSON.stringify(prevProps.batch.editableRecipe?.ingredients) ===
         JSON.stringify(nextProps.batch.editableRecipe?.ingredients)
     )
