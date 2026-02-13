@@ -60,7 +60,8 @@ export default function BatchCalculatorPage() {
   }, [])
 
   // Fetch cocktails for display list with filter
-  const { cocktails: filteredCocktailsFromDb, loading: filteredLoading, error: filteredError } = useCocktails({
+
+  const { cocktails: filteredCocktailsFromDb, loading: filteredLoading, error: filteredError, refetch: refetchFilteredCocktails } = useCocktails({
     enabled: true,
     featured: filter === 'featured' ? true : undefined,
     active: true,
@@ -170,7 +171,7 @@ export default function BatchCalculatorPage() {
       const batchToRemove = batches.find(b => b.id === idToRemove)
       if (batchToRemove?.selectedCocktail) {
         // Remove from selected cocktails
-        setSelectedCocktails(prev => prev.filter(c => c.name !== batchToRemove.selectedCocktail!.name))
+        setSelectedCocktails(prev => prev.filter(c => c.id !== batchToRemove.selectedCocktail!.id))
       }
       setBatches(prev => prev.filter(batch => batch.id !== idToRemove))
     },
@@ -371,10 +372,10 @@ export default function BatchCalculatorPage() {
     )
 
     // Refresh cocktails list from database
-    await refetchCocktails()
+    await Promise.all([refetchCocktails(), refetchFilteredCocktails()])
     success(`Recipe "${updatedRecipe.name}" updated successfully!`)
     setShowEditModal(false)
-  }, [refetchCocktails, success])
+  }, [refetchCocktails, refetchFilteredCocktails, success])
 
   // Handle delete recipe
   const handleDeleteCocktail = useCallback(async () => {
@@ -387,10 +388,10 @@ export default function BatchCalculatorPage() {
     setBatches(prev => prev.filter(batch => batch.selectedCocktail?.id !== editingCocktail.id))
 
     // Refresh cocktails list
-    await refetchCocktails()
+    await Promise.all([refetchCocktails(), refetchFilteredCocktails()])
     success(`Recipe "${editingCocktail.name}" deleted successfully!`)
     setShowEditModal(false)
-  }, [editingCocktail, refetchCocktails, success])
+  }, [editingCocktail, refetchCocktails, refetchFilteredCocktails, success])
 
   // Open edit modal
   const handleOpenEditModal = useCallback((cocktail: CocktailRecipe, cocktailId?: number) => {
@@ -495,7 +496,7 @@ export default function BatchCalculatorPage() {
                     >
                       <span>{cocktail.name}</span>
                       <button
-                        onClick={() => handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))}
+                        onClick={() => handleCocktailSelectionChange(selectedCocktails.filter(c => c.id !== cocktail.id))}
                         className="ml-1 hover:bg-orange-200 rounded-full p-0.5 transition-colors"
                         title="Remove cocktail"
                       >
@@ -520,13 +521,13 @@ export default function BatchCalculatorPage() {
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {filteredCocktails.map(cocktail => {
-                    const isSelected = selectedCocktails.some(c => c.name === cocktail.name)
+                    const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
                     return (
                       <button
                         key={cocktail.id || cocktail.name}
                         onClick={() => {
                           if (isSelected) {
-                            handleCocktailSelectionChange(selectedCocktails.filter(c => c.name !== cocktail.name))
+                            handleCocktailSelectionChange(selectedCocktails.filter(c => c.id !== cocktail.id))
                           } else {
                             handleCocktailSelectionChange([...selectedCocktails, cocktail])
                           }
