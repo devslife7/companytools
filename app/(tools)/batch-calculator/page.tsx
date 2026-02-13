@@ -336,6 +336,7 @@ export default function BatchCalculatorPage() {
     const newRecipe = await createCocktail({
       name: recipe.name,
       method: recipe.method,
+      instructions: recipe.instructions,
       ingredients: recipe.ingredients,
     })
 
