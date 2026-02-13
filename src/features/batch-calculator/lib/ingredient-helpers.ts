@@ -1,5 +1,18 @@
+// Helper function to identify soda items
+export const isSodaItem = (name: string): boolean => {
+  const sodaKeywords = [
+    "ginger beer", "ginger ale", "soda water", "club soda", "tonic water", "tonic",
+    "seltzer", "sparkling water", "carbonated water", "cola", "sprite", "7up",
+    "fresca", "fanta", "root beer", "dr pepper", "mountain dew", "pepsi", "coca cola"
+  ]
+  const lowerName = name.toLowerCase()
+  return sodaKeywords.some(keyword => lowerName.includes(keyword))
+}
+
 // Helper function to identify liquor items
 export const isLiquorItem = (name: string): boolean => {
+  // Soda items are never liquor (e.g. "ginger beer" contains "gin" but is not liquor)
+  if (isSodaItem(name)) return false
   const liquorKeywords = [
     "vodka", "gin", "rum", "whiskey", "whisky", "bourbon", "tequila", "pisco",
     "brandy", "cognac", "liqueur", "liquor", "prosecco", "champagne", "wine",
@@ -10,17 +23,6 @@ export const isLiquorItem = (name: string): boolean => {
   ]
   const lowerName = name.toLowerCase()
   return liquorKeywords.some(keyword => lowerName.includes(keyword))
-}
-
-// Helper function to identify soda items
-export const isSodaItem = (name: string): boolean => {
-  const sodaKeywords = [
-    "ginger beer", "ginger ale", "soda water", "club soda", "tonic water", "tonic",
-    "seltzer", "sparkling water", "carbonated water", "cola", "sprite", "7up",
-    "fresca", "fanta", "root beer", "dr pepper", "mountain dew", "pepsi", "coca cola"
-  ]
-  const lowerName = name.toLowerCase()
-  return sodaKeywords.some(keyword => lowerName.includes(keyword))
 }
 
 // Helper function to check if item is ginger beer
