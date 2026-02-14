@@ -61,6 +61,7 @@ export default function BatchCalculatorPage() {
 
   // Fetch cocktails for display list with filter
 
+
   const { cocktails: filteredCocktailsFromDb, loading: filteredLoading, error: filteredError, refetch: refetchFilteredCocktails } = useCocktails({
     enabled: true,
     featured: filter === 'featured' ? true : undefined,
