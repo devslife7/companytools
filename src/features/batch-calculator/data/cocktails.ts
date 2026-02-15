@@ -2,7 +2,7 @@ import type { CocktailRecipe } from "../types"
 
 export const COCKTAIL_DATA: CocktailRecipe[] = [
   {
-    id: 1,
+    id: 46,
     name: "Autumn Bloom Mocktail",
     method: "Shake",
     instructions: "1. Add all ingredients (except cider) to a shaker with ice.\n2. Shake briefly to chill.\n3. Strain into a glass with fresh ice.\n4. Top with sparkling cider and stir gently.",
@@ -17,23 +17,24 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 3,
+    id: 47,
     name: "Blackberry Collins",
     method: "Shake",
-    instructions: "1. Combine vodka, lemon juice, simple syrup, and blackberry puree into a cocktail shaker filled with ice. 2. Shake until ingredients are properly chilled and strain into a collins glass filled with ice. 3. Top off with ginger beer. 4. Add edible gold dust.",
+    instructions: "1. Combine vodka, lemon juice, simple syrup, and blackberry puree into a cocktail shaker filled with ice.\n2. Shake until ingredients are properly chilled and strain into a collins glass filled with ice.\n3. Top off with ginger beer.\n4. Add edible gold dust.",
+    featured: true,
     ingredients: [
       { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
       { name: "Lemon Juice", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
       { name: "Simple Syrup", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
       { name: "Blackberry Puree", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Ginger Beer", amount: "3", unit: "oz", preferredUnit: "12oz cans" },
+      { name: "Ginger Beer", amount: "3", unit: "oz", preferredUnit: "12oz can" },
       { name: "Blackberry", amount: "1", unit: "each", preferredUnit: "each" },
       { name: "Mint Leaf", amount: "1", unit: "each", preferredUnit: "each" }
     ],
   },
 
   {
-    id: 4,
+    id: 48,
     name: "Blue and Yellow Mimosa",
     method: "Build",
     instructions: "1. Add orange juice and prosecco into a champagne glass.\n2. Add blue curacao slowly into the side of the glass.",
@@ -45,7 +46,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 5,
+    id: 49,
     name: "Classic Pisco Sour",
     method: "Shake",
     instructions: "1. Add Pisco, Lime Juice, Simple Syrup, and Egg White to a shaker and dry-shake (without ice) vigorously. 2. Add ice and shake again until well-chilled. 3. Strain into a chilled glass (Timeless Cocktail). 4. Garnish with Angostura bitters drops.",
@@ -58,12 +59,10 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 20,
+    id: 50,
     name: "Cranberry Cinnamon Whiskey Sour",
     method: "Shake",
     instructions: "1. Combine bourbon, lemon, syrup, bitters and foam into a cocktail shaker filled with ice.\n2. Shake until ingredients are properly chilled.\n3. Strain in ice filled rocks glass.\n4. Garnish with 3 cranberry skewer",
-    featured: true,
-    image: "/cocktails/cranberry-cinnamon-whiskey-sour.png",
     ingredients: [
       { name: "Bourbon", amount: "1.5", unit: "oz", preferredUnit: "liters" },
       { name: "Lemon Juice", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
@@ -75,12 +74,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 6,
+    id: 51,
     name: "Espresso Martini",
     method: "Shake",
     instructions: "1. Combine vodka, espresso, and coffee liqueur into a shaker with lots of ice.\n2. Shake hard for 15 seconds (this creates the foam).\n3. Pour into a chilled glass.\n4. Garnish with 3 coffee beans.",
     featured: true,
-    image: "/cocktails/espresso-martini.png",
     ingredients: [
       { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
       { name: "Espresso", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -91,12 +89,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 16,
+    id: 52,
     name: "Maple Bourbon Cider",
     method: "Shake",
     instructions: "1. Combine bourbon, apple cider, maple syrup, and a splash of lemon juice into a Shaker with ice.\n2. Shake well to ensure the maple syrup integrates with the cold cider.\n3. Garnish with a cinnamon stick or an apple slice.",
     featured: true,
-    image: "/cocktails/maple-bourbon-cider.png",
     ingredients: [
       { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
       { name: "Apple Cider", amount: "4", unit: "oz", preferredUnit: "gallons" },
@@ -108,7 +105,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 7,
+    id: 53,
     name: "Old Fashioned",
     method: "Build",
     instructions: "1. Combine all ingredients in a tin filled with ice.\n2. Stir until well-chilled.\n3. Strain into a rocks glass filled with fresh ice.",
@@ -121,7 +118,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 8,
+    id: 54,
     name: "Pear & Ginger Moscow Mule",
     method: "Shake",
     instructions: "1. Combine vodka, pear puree, lime juice, and cardamom with ice.\n2. Shake well.\n3. Strain into a glass with ice.\n4. Top with ginger beer and stir gently.\n5. Garnish with pear slice",
@@ -136,7 +133,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 17,
+    id: 55,
     name: "Pear and Cranberry Bellini",
     method: "Build",
     instructions: "1. Combine pear nectar and cranberry juice (unsweetened works best) into a chilled champagne flute.\n2. Top with cold Prosecco or your favorite sparkling wine, pouring slowly to manage the fizz.",
@@ -148,10 +145,10 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 2,
+    id: 56,
     name: "Pear Bourbon Sour",
     method: "Shake",
-    instructions: "1. Combine 2 oz bourbon with 2 oz pear nectar/juice, lemon juice, and simple syrup in a shaker.\n2. Add ice to the shaker and shake vigorously for 10-15 seconds until very cold.\n3. Strain into a rocks glass filled with fresh ice.\n4. Garnish with pear and dry cherry skewer.",
+    instructions: "1. Combine 2 oz bourbon with 2 oz pear nectar/juice, lemon juice, and simple syrup in a shaker.\n2. Add ice to the shaker and shake vigorously for 10-15 seconds until very cold.\n3. Strain into a rocks glass filled with fresh ice.\n4. Garnish with pear and dry cherry skewer.\n5. dont forget the pear slice",
     ingredients: [
       { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
       { name: "Pear Liqueur", amount: "1", unit: "oz", preferredUnit: "liters" },
@@ -164,7 +161,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 9,
+    id: 57,
     name: "Peruvian Garden Spritz",
     method: "Build",
     instructions: "1. Muddle Cucumber Slices and Mint Leaves.\n2. Add Pisco and Lime Juice to Infuse.\n3. Fill Glass with Ice and Strain Mixture.\n4. Top with Sparkling Wine and Soda Water.\n5. Stir gently.",
@@ -179,12 +176,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 11,
+    id: 58,
     name: "Rose Garden",
     method: "Build",
     instructions: "1. Combine vodka, lemon juice, cardamon simple syrup and rose hydrolat in cocktail glass.\n2. Add grapefruit seltzer and garnish.\n3. Garnish with single baby pansy in the middle.",
     featured: true,
-    image: "/cocktails/rose-garden.png",
     ingredients: [
       { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
       { name: "Lemon Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
@@ -196,7 +192,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 12,
+    id: 59,
     name: "Ruby Red Anniversary Daiquiri",
     method: "Shake",
     instructions: "1. Combine all ingredients in a shaker with ice.\n2. Shake vigorously until chilled.\n3. Double-strain into a coupe glass.",
@@ -210,7 +206,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 13,
+    id: 60,
     name: "Sage and Ginger Paloma",
     method: "Build",
     instructions: "1. Lightly crush 2–3 sage leaves in your shaker with a splash of lime juice.\n2. Add Tequila and Grapefruit juice with ice.\n3. Shake briefly to chill.\n4. Strain into a glass with fresh ice and top with Ginger Beer.\n5. Garnish with grapefruit slice and a sage leaf.",
@@ -225,7 +221,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 21,
+    id: 61,
     name: "Sangue Di Bergamotto Mocktail",
     method: "Shake",
     instructions: "1. Combine hibiscus tea, ginger syrup, and bergamot puree into a cocktail glass with ice.\n2. Shake well until chilled.",
@@ -237,7 +233,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 14,
+    id: 62,
     name: "Sparkling Pear French 75",
     method: "Build",
     instructions: "1. Combine gin, pear brandy (or Pear Nectar), and lemon juice into a shaker with ice.\n2. Shake for 10 seconds until cold.\n3. Pour into a chilled champagne flute.\n4. Top off with champagne or prosecco.\n5. Garnish with a thin pear slice or a lemon twist.",
@@ -251,7 +247,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
-    id: 15,
+    id: 63,
     name: "Whiskey Honey Lemonade",
     method: "Build",
     instructions: "1. Combine whiskey (Bourbon works best),  lemon juice, and honey syrup (equal parts honey/water) into cocktail glass with ice.\n2. Add a splash of Soda water if you want it bubbly (optional).\n3. Garnish with a lemon wheel or a sprig of mint.",
