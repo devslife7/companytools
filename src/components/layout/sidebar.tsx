@@ -30,7 +30,7 @@ export function Sidebar() {
                         <GlassWater className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="font-bold text-gray-900 leading-tight">Catering Co.</h1>
+                        <h1 className="font-bold text-gray-900 leading-tight">InternalToolsDC</h1>
                         <p className="text-xs text-gray-500 font-medium">DRINK LIBRARY</p>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ export function Sidebar() {
                         {/* <img src="/avatar-placeholder.jpg" alt="User" /> if available */}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">Marcus V.</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">Marcos V.</p>
                         <p className="text-xs text-gray-500 truncate">Head Mixologist</p>
                     </div>
                 </div>

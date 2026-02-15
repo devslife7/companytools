@@ -18,6 +18,7 @@ model Cocktail {
   category     String?        @db.VarChar(100)
   featured     Boolean        @default(false)
   image        String?        @db.VarChar(255)
+  abv          Float?         // Alcohol by Volume percentage (e.g. 15.5)
   instructions String?
   glass        String?        @db.VarChar(100)
   ingredients  Ingredient[]

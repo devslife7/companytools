@@ -18,7 +18,7 @@ import { useToast, ToastContainer } from "@/components/ui"
 import { BatchCalculatorModal } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { Modal } from "@/components/ui"
-import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2 } from "lucide-react"
+import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2, Star } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -40,7 +40,7 @@ export default function BatchCalculatorPage() {
   // Filters
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedSpirit, setSelectedSpirit] = useState<string>('All')
-  const [selectedStyle, setSelectedStyle] = useState<string>('All')
+  const [filterFeatured, setFilterFeatured] = useState<string>('All')
   const [selectedGlass, setSelectedGlass] = useState<string>('All')
 
   const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
@@ -97,11 +97,8 @@ export default function BatchCalculatorPage() {
         if (!hasSpirit) return false
       }
 
-      // 3. Style Filter (Method)
-      if (selectedStyle !== 'All') {
-        if (selectedStyle === 'Shaken' && cocktail.method !== 'Shake') return false
-        if (selectedStyle === 'Stirred/Built' && cocktail.method !== 'Build') return false
-      }
+      // 3. Featured Filter
+      if (filterFeatured === 'Featured' && !cocktail.featured) return false
 
       // 4. Glass Filter
       if (selectedGlass !== 'All') {
@@ -110,7 +107,7 @@ export default function BatchCalculatorPage() {
 
       return true
     })
-  }, [allCocktails, searchQuery, selectedSpirit, selectedStyle, selectedGlass])
+  }, [allCocktails, searchQuery, selectedSpirit, filterFeatured, selectedGlass])
 
   // Sync batches with selected cocktails
   useEffect(() => {
@@ -311,7 +308,7 @@ export default function BatchCalculatorPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center justify-center px-6 py-3.5 bg-brand-primary text-brand-primary-foreground font-bold rounded-xl hover:bg-brand-primary-hover transition-all shadow-sm gap-2 active:scale-[0.98]"
+          className="inline-flex items-center justify-center px-5 py-2.5 bg-brand-primary text-brand-primary-foreground font-bold rounded-xl hover:bg-brand-primary-hover transition-all shadow-sm gap-2 active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           New Recipe
@@ -352,19 +349,18 @@ export default function BatchCalculatorPage() {
             </div>
           </div>
 
-          {/* Style Filter */}
+          {/* Featured Filter */}
           <div className="relative group min-w-[140px]">
             <select
-              value={selectedStyle}
-              onChange={(e) => setSelectedStyle(e.target.value)}
+              value={filterFeatured}
+              onChange={(e) => setFilterFeatured(e.target.value)}
               className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
-              <option value="All">Style: All</option>
-              <option value="Shaken">Style: Shaken</option>
-              <option value="Stirred/Built">Style: Stirred</option>
+              <option value="All">Show: All</option>
+              <option value="Featured">Show: Featured</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <Wine className="w-4 h-4" />
+              <Star className="w-4 h-4" />
             </div>
           </div>
 
@@ -375,14 +371,14 @@ export default function BatchCalculatorPage() {
               onChange={(e) => setSelectedGlass(e.target.value)}
               className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
-              <option value="All">Glass: All</option>
-              <option value="Rocks Glass">Glass: Rocks Glass</option>
-              <option value="Coupe">Glass: Coupe</option>
-              <option value="Martini">Glass: Martini</option>
-              <option value="Highball">Glass: Highball</option>
-              <option value="Flute">Glass: Flute</option>
-              <option value="Wine Glass">Glass: Wine Glass</option>
-              <option value="Served Up">Glass: Served Up</option>
+              <option value="All">Show: All</option>
+              <option value="Rocks">Rocks</option>
+              <option value="Coupe">Coupe</option>
+              <option value="Martini">Martini</option>
+              <option value="Highball">Highball</option>
+              <option value="Flute">Flute</option>
+              <option value="Wine Glass">Wine Glass</option>
+              <option value="Served Up">Served Up</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
               <Citrus className="w-4 h-4" />
@@ -408,7 +404,7 @@ export default function BatchCalculatorPage() {
           <h3 className="text-2xl font-bold text-gray-900 mb-2">No recipes found</h3>
           <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your search terms or filters to find what you're looking for.</p>
           <button
-            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setSelectedStyle('All'); setSelectedGlass('All'); }}
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); }}
             className="mt-8 text-brand-primary font-bold hover:text-brand-primary-hover transition-colors inline-flex items-center gap-2"
           >
             Clear all filters
@@ -420,15 +416,30 @@ export default function BatchCalculatorPage() {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
             const mainSpirit = cocktail.ingredients.find(i => availableLiquors.includes(i.name) || i.name.includes("Vodka") || i.name.includes("Gin") || i.name.includes("Rum") || i.name.includes("Whiskey") || i.name.includes("Tequila") || i.name.includes("Bourbon"))?.name || "Spirit"
 
-            // Determine tags
-            const tags = []
-            if (cocktail.featured) tags.push({ label: "SIGNATURE", color: "bg-brand-primary" })
-            else if (cocktail.method === 'Build') tags.push({ label: "CLASSIC", color: "bg-slate-700" })
-            else tags.push({ label: "SEASONAL", color: "bg-amber-500" })
 
-            // Zero proof check (naive)
-            const isZeroProof = !cocktail.ingredients.some(i => ["Vodka", "Gin", "Rum", "Whiskey", "Tequila", "Bourbon", "Pisco", "Mezcal", "Liqueur"].some(spirit => i.name.includes(spirit)))
-            if (isZeroProof) tags.push({ label: "ZERO-PROOF", color: "bg-emerald-600" })
+
+            // ABV & Mocktail Logic
+            const spiritKeywords = ["Vodka", "Gin", "Rum", "Whiskey", "Tequila", "Bourbon", "Pisco", "Mezcal", "Liqueur", "Brandy", "Cognac", "Vermouth", "Aperol", "Campari", "Wine", "Prosecco", "Champagne", "Beer", "Cider", "Stout", "Ale", "Lager", "Sake", "Soju", "Absinthe", "Chartreuse", "Amaro", "Bitters", "Cointreau", "Triple Sec", "Curacao", "Schnapps", "Spirit", "Alcohol"];
+
+            const hasAlcohol = cocktail.ingredients.some(i => spiritKeywords.some(spirit => i.name.toLowerCase().includes(spirit.toLowerCase())));
+            const isExplicitMocktail = cocktail.name.toLowerCase().includes("mocktail") || cocktail.name.toLowerCase().includes("zero proof");
+            const isMocktail = (cocktail.abv === 0) || (!hasAlcohol && !cocktail.abv) || isExplicitMocktail;
+
+            let abvBadge = null;
+            if (isMocktail) {
+              abvBadge = (
+                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg shadow-sm border border-emerald-100 flex items-center gap-1.5 z-10 group-hover:scale-105 transition-transform">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                  <span className="text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase">Zero Proof</span>
+                </div>
+              )
+            } else if (cocktail.abv && cocktail.abv > 0) {
+              abvBadge = (
+                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg shadow-sm border border-amber-100 flex items-center gap-1.5 z-10 group-hover:scale-105 transition-transform">
+                  <span className="text-[10px] font-extrabold text-amber-700 tracking-wider uppercase">{cocktail.abv}% ABV</span>
+                </div>
+              )
+            }
 
             return (
               <div
@@ -457,14 +468,17 @@ export default function BatchCalculatorPage() {
                   {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
 
-                  {/* Tags */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2">
-                    {tags.map((tag, idx) => (
-                      <span key={idx} className={`${tag.color} text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm tracking-wider uppercase`}>
-                        {tag.label}
-                      </span>
-                    ))}
-                  </div>
+                  {/* Featured Badge */}
+                  {cocktail.featured && (
+                    <div className="absolute top-3 left-3 bg-brand-primary/95 px-3 py-1 rounded-lg shadow-sm border border-brand-primary/20 flex items-center z-10">
+                      <span className="text-[10px] font-extrabold text-brand-primary-foreground tracking-wider uppercase">Featured</span>
+                    </div>
+                  )}
+
+                  {/* ABV / Mocktail Badge */}
+                  {abvBadge}
+
+
 
                   {/* Selection Checkmark Overlay */}
                   {isSelected && (
@@ -481,27 +495,13 @@ export default function BatchCalculatorPage() {
                   <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
                     {cocktail.name}
                   </h3>
-                  <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide mt-2">
-                    <span className="text-brand-primary">{mainSpirit.toUpperCase()}</span>
-                    <span>•</span>
-                    <span>{cocktail.glassType?.toUpperCase() ?? "GLASSWARE"}</span>
-                  </div>
+
+                  <p className="text-sm text-gray-400 font-medium mt-1 truncate">
+                    {cocktail.ingredients.slice(0, 3).map(i => i.name).join(' • ')}
+                  </p>
 
                   {/* Actions (Hover) */}
-                  <div className="mt-4 flex gap-2">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); toggleSelection(cocktail); }}
-                      className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-all ${isSelected ? 'bg-brand-primary text-brand-primary-foreground border-brand-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-brand-primary hover:text-brand-primary'}`}
-                    >
-                      {isSelected ? 'Selected' : 'Select'}
-                    </button>
-                    <button
-                      onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}
-                      className="px-3 py-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      Edit
-                    </button>
-                  </div>
+
                 </div>
               </div>
             )
@@ -530,7 +530,7 @@ export default function BatchCalculatorPage() {
             </button>
             <button
               onClick={() => setShowBatchModal(true)}
-              className="px-6 py-3 bg-brand-accent text-brand-secondary font-bold rounded-lg shadow-lg hover:bg-brand-accent/90 hover:shadow-xl transition-all flex items-center gap-2"
+              className="px-6 py-3 bg-brand-primary text-brand-primary-foreground font-bold rounded-lg shadow-lg hover:bg-brand-primary-hover hover:shadow-xl transition-all flex items-center gap-2"
             >
               <CheckCheck className="w-5 h-5" />
               Review Batch

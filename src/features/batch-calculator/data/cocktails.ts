@@ -14,6 +14,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
       { name: "Mint sprig", amount: "1", unit: "each", preferredUnit: "each" },
       { name: "Lavender spring", amount: "1", unit: "each", preferredUnit: "each" }
     ],
+    abv: 0,
   },
 
   {
@@ -31,6 +32,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
       { name: "Blackberry", amount: "1", unit: "each", preferredUnit: "each" },
       { name: "Mint Leaf", amount: "1", unit: "each", preferredUnit: "each" }
     ],
+    abv: 12.5,
   },
 
   {

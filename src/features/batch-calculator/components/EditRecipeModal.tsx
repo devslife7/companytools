@@ -31,7 +31,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null)
   const [deletePassword, setDeletePassword] = useState("")
   const [deletePasswordError, setDeletePasswordError] = useState<string | null>(null)
-  
+
   const { updateCocktail, loading: updateLoading, error: updateError } = useUpdateCocktail()
   const { deleteCocktail, loading: deleteLoading, error: deleteError } = useDeleteCocktail()
 
@@ -41,25 +41,25 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     if (ingredient.unit) {
       return { amount: ingredient.amount, unit: ingredient.unit }
     }
-    
+
     // Otherwise, parse the amount string to extract unit
     if (!ingredient.amount) {
       return { amount: '', unit: 'oz' } // Default to oz
     }
-    
+
     const parsed = parseAmount(ingredient.amount)
-    
+
     // Extract numeric value from amount string
     const lowerAmount = ingredient.amount.toLowerCase().trim()
-    
+
     // Handle special cases
     if (lowerAmount.includes("top") || lowerAmount.includes("n/a")) {
       return { amount: '0', unit: 'oz' }
     }
-    
+
     // Try to match number pattern (including fractions, decimals, ranges)
     const match = lowerAmount.match(/([\d\.\/\,\-\s]+)/)
-    
+
     if (match) {
       const numberStr = match[1].trim()
       // Extract unit from parsed result, or default to 'oz'
@@ -81,7 +81,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       }
       return { amount: numberStr, unit: extractedUnit }
     }
-    
+
     // Fallback: if no number found, treat as count item with unit 'each'
     return { amount: ingredient.amount, unit: 'each' }
   }
@@ -202,6 +202,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         method: editedRecipe.method,
         glassType: editedRecipe.glassType,
         instructions: editedRecipe.instructions?.trim() || undefined,
+        abv: editedRecipe.abv,
         ingredients: validIngredients,
       })
 
@@ -219,6 +220,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         name: editedRecipe.name.trim(),
         method: editedRecipe.method as CocktailMethod,
         instructions: editedRecipe.instructions?.trim() || undefined,
+        abv: editedRecipe.abv,
         ingredients: validIngredients,
       })
       onClose()
@@ -322,7 +324,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
             >
               <option value="">Select glass type...</option>
-              <option value="Rocks Glass">Rocks Glass</option>
+              <option value="Rocks">Rocks</option>
               <option value="Coupe">Coupe</option>
               <option value="Martini">Martini</option>
               <option value="Highball">Highball</option>
@@ -332,6 +334,27 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             </select>
           </div>
 
+          {/* ABV */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">ABV (%)</label>
+            <input
+              type="number"
+              value={editedRecipe.abv ?? ''}
+              onChange={e => {
+                const val = e.target.value;
+                setEditedRecipe({
+                  ...editedRecipe,
+                  abv: val === '' ? undefined : parseFloat(val)
+                })
+              }}
+              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base"
+              placeholder="e.g. 15.5 (Leave empty for auto-detection)"
+              step="0.1"
+              min="0"
+            />
+            <p className="mt-1 text-xs text-gray-500">Set to 0 for explicit Mocktail label, or leave empty to infer from ingredients.</p>
+          </div>
+
           {/* Instructions */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
@@ -339,11 +362,10 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             {/* Method */}
             <div className="mb-4">
               <div className="flex gap-2">
-                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${
-                  editedRecipe.method === 'Build'
-                    ? 'bg-white text-orange-600 border-orange-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                }`}>
+                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${editedRecipe.method === 'Build'
+                  ? 'bg-white text-orange-600 border-orange-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                  }`}>
                   <input
                     type="radio"
                     name="method"
@@ -354,11 +376,10 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                   />
                   <span>Build</span>
                 </label>
-                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${
-                  editedRecipe.method === 'Shake'
-                    ? 'bg-white text-orange-600 border-orange-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                }`}>
+                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${editedRecipe.method === 'Shake'
+                  ? 'bg-white text-orange-600 border-orange-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                  }`}>
                   <input
                     type="radio"
                     name="method"
@@ -371,7 +392,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </label>
               </div>
             </div>
-            
+
             {/* Textarea with custom placeholder */}
             <div className="relative">
               <textarea
@@ -410,7 +431,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       inputMode="text"
                     />
                   </div>
-                  
+
                   {/* Amount and Unit - Side by side on mobile, separate on desktop */}
                   <div className="flex gap-2 md:gap-3 md:items-center">
                     <div className="flex-1 md:w-24">
@@ -438,7 +459,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       </select>
                     </div>
                   </div>
-                  
+
                   {/* Preferred Unit - Full width on mobile, fixed width on desktop */}
                   <div className="w-full md:w-36">
                     <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Preferred Unit</label>
@@ -456,7 +477,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                       <option value="4oz bottle">4oz Bottle</option>
                     </select>
                   </div>
-                  
+
                   {/* Delete Button - Full width on mobile, auto on desktop */}
                   <button
                     onClick={() => handleRemoveIngredient(index)}
@@ -531,9 +552,9 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             <div className="bg-gradient-to-br from-white via-gray-50/90 to-white rounded-lg p-6 max-w-md w-full shadow-2xl border border-gray-200/80">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Recipe?</h3>
               <p className="text-gray-600 mb-4">
-                Are you sure you want to delete "{editedRecipe.name}"? This action cannot be undone.
+                Are you sure you want to delete &quot;{editedRecipe.name}&quot;? This action cannot be undone.
               </p>
-              
+
               {/* Password Input */}
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -566,7 +587,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                   {deleteError}
                 </div>
               )}
-              
+
               <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   onClick={() => {
