@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback, useMemo } from "react"
+import Image from "next/image"
 
 // Import types
 import type { Ingredient, CocktailRecipe, BatchState, CocktailMethod } from "@/features/batch-calculator/types"
@@ -14,10 +15,22 @@ import { useCocktails, useCreateCocktail } from "@/features/batch-calculator/hoo
 import { useToast, ToastContainer } from "@/components/ui"
 
 // Import components
-import { BatchItem } from "@/features/batch-calculator/components"
+import { BatchCalculatorModal } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
-import { MultiSelectCocktailSearch, Modal } from "@/components/ui"
-import { Plus, ShoppingCart, Calculator, FileText, X } from "lucide-react"
+import { Modal } from "@/components/ui"
+import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2 } from "lucide-react"
+
+// --- helper for extracting glass type ---
+const inferGlassType = (instructions: string = ""): string | null => {
+  const lower = instructions.toLowerCase()
+  if (lower.includes("coupe")) return "Coupe"
+  if (lower.includes("rocks") || lower.includes("old fashioned")) return "Rocks"
+  if (lower.includes("highball") || lower.includes("collins")) return "Highball"
+  if (lower.includes("flute") || lower.includes("champagne")) return "Flute"
+  if (lower.includes("martini")) return "Martini"
+  if (lower.includes("mug")) return "Mug"
+  return null
+}
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -27,20 +40,29 @@ export default function BatchCalculatorPage() {
   const [showServingsModal, setShowServingsModal] = useState(false)
   const [missingServingsMessage, setMissingServingsMessage] = useState("")
   const [batchesWithMissingServings, setBatchesWithMissingServings] = useState<Set<number>>(new Set())
+
+  // UI States
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showBatchModal, setShowBatchModal] = useState(false)
+
   const [editingCocktail, setEditingCocktail] = useState<CocktailRecipe | null>(null)
   const [editingCocktailId, setEditingCocktailId] = useState<number | undefined>()
-  const [filter, setFilter] = useState<'featured' | 'all'>('featured')
-  const [selectedLiquor, setSelectedLiquor] = useState<string>('')
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedSpirit, setSelectedSpirit] = useState<string>('All')
+  const [selectedStyle, setSelectedStyle] = useState<string>('All')
+  const [selectedGlass, setSelectedGlass] = useState<string>('All')
+
   const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
 
   // Toast notifications
   const { toasts, removeToast, success, error: showError } = useToast()
 
-  // Fetch cocktails from database (primary source) - for search/selection
+  // Fetch cocktails from database
   const { cocktails: apiCocktails, loading: cocktailsLoading, error: cocktailsError, refetch: refetchCocktails } = useCocktails({
-    enabled: true, // Always try to use database
+    enabled: true,
   })
 
   // Fetch unique liquors
@@ -59,74 +81,53 @@ export default function BatchCalculatorPage() {
     fetchLiquors()
   }, [])
 
-  // Fetch cocktails for display list with filter
+  const { createCocktail } = useCreateCocktail()
 
-
-  const { cocktails: filteredCocktailsFromDb, loading: filteredLoading, error: filteredError, refetch: refetchFilteredCocktails } = useCocktails({
-    enabled: true,
-    featured: filter === 'featured' ? true : undefined,
-    active: true,
-    liquor: selectedLiquor || undefined,
-  })
-
-  // Create cocktail mutation
-  const { createCocktail, loading: createLoading } = useCreateCocktail()
-
-  // Use database cocktails if available, fallback to static data only if database fails
-  const availableCocktails = useMemo(() => {
-    // If we have cocktails from database, use them
-    if (!cocktailsLoading && apiCocktails.length > 0) {
-      return apiCocktails
-    }
-    // If database failed or returned empty, fallback to static data
-    if (cocktailsError || (!cocktailsLoading && apiCocktails.length === 0)) {
-      return COCKTAIL_DATA
-    }
-    // While loading, show static data so UI doesn't break
+  // Use database cocktails if available, fallback to static data
+  const allCocktails = useMemo(() => {
+    if (!cocktailsLoading && apiCocktails.length > 0) return apiCocktails
+    if (cocktailsError || (!cocktailsLoading && apiCocktails.length === 0)) return COCKTAIL_DATA
     return COCKTAIL_DATA
   }, [apiCocktails, cocktailsLoading, cocktailsError])
 
-  // Apply filters to static data and merge with database cocktails
+  // Filter Logic
   const filteredCocktails = useMemo(() => {
-    // Helper function to apply filters to static data
-    const applyFiltersToStatic = (data: typeof COCKTAIL_DATA) => {
-      let filtered = data
-
-      // Apply featured filter
-      if (filter === 'featured') {
-        filtered = filtered.filter(c => c.featured === true)
+    return allCocktails.filter(cocktail => {
+      // 1. Search Query
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase()
+        const matchesName = cocktail.name.toLowerCase().includes(q)
+        const matchesIng = cocktail.ingredients.some(i => i.name.toLowerCase().includes(q))
+        if (!matchesName && !matchesIng) return false
       }
 
-      // Apply liquor filter
-      if (selectedLiquor) {
-        filtered = filtered.filter(c =>
-          c.ingredients.some(ing =>
-            ing.name.toLowerCase().includes(selectedLiquor.toLowerCase())
-          )
+      // 2. Spirit Filter
+      if (selectedSpirit !== 'All') {
+        const hasSpirit = cocktail.ingredients.some(ing =>
+          ing.name.toLowerCase().includes(selectedSpirit.toLowerCase())
         )
+        if (!hasSpirit) return false
       }
 
-      return filtered
-    }
+      // 3. Style Filter (Method)
+      if (selectedStyle !== 'All') {
+        if (selectedStyle === 'Shaken' && cocktail.method !== 'Shake') return false
+        if (selectedStyle === 'Stirred/Built' && cocktail.method !== 'Build') return false
+      }
 
-    // If database is loaded and has cocktails, use them
-    if (!filteredLoading && filteredCocktailsFromDb.length > 0) {
-      return filteredCocktailsFromDb
-    }
+      // 4. Glass Filter (Inferred)
+      if (selectedGlass !== 'All') {
+        const glass = inferGlassType(cocktail.instructions)
+        if (!glass || glass !== selectedGlass) return false
+      }
 
-    // If database error or empty, fallback to filtered static data
-    if (filteredError || (!filteredLoading && filteredCocktailsFromDb.length === 0)) {
-      return applyFiltersToStatic(COCKTAIL_DATA)
-    }
-
-    // While loading, show filtered static data so UI doesn't break
-    return applyFiltersToStatic(COCKTAIL_DATA)
-  }, [filteredCocktailsFromDb, filteredLoading, filteredError, filter, selectedLiquor])
+      return true
+    })
+  }, [allCocktails, searchQuery, selectedSpirit, selectedStyle, selectedGlass])
 
   // Sync batches with selected cocktails
   useEffect(() => {
     setBatches(prevBatches => {
-      // Create a map of existing batches by cocktail name
       const existingBatchesMap = new Map<string, BatchState>()
       prevBatches.forEach(batch => {
         if (batch.selectedCocktail) {
@@ -134,12 +135,9 @@ export default function BatchCalculatorPage() {
         }
       })
 
-      // Create new batches for selected cocktails that don't have a batch yet
       const newBatches: BatchState[] = []
-
       selectedCocktails.forEach(cocktail => {
         if (!existingBatchesMap.has(cocktail.name)) {
-          // Deep copy of the recipe for editing
           const editableRecipe = JSON.parse(JSON.stringify(cocktail)) as CocktailRecipe
           newBatches.push({
             id: nextIdRef.current++,
@@ -151,7 +149,6 @@ export default function BatchCalculatorPage() {
         }
       })
 
-      // Remove batches for cocktails that are no longer selected
       const selectedCocktailNames = new Set(selectedCocktails.map(c => c.name))
       const filteredBatches = prevBatches.filter(
         batch => !batch.selectedCocktail || selectedCocktailNames.has(batch.selectedCocktail.name)
@@ -161,110 +158,70 @@ export default function BatchCalculatorPage() {
     })
   }, [selectedCocktails])
 
-  // --- CRUD Handlers for Batches Array (Memoized using useCallback) ---
+  // --- Handlers (Existing Logic) ---
 
   const handleUpdateBatch = useCallback((id: number, updates: Partial<BatchState>) => {
     setBatches(prev => prev.map(batch => (batch.id === id ? { ...batch, ...updates } : batch)))
   }, [])
 
-  const handleRemoveBatch = useCallback(
-    (idToRemove: number) => {
-      const batchToRemove = batches.find(b => b.id === idToRemove)
-      if (batchToRemove?.selectedCocktail) {
-        // Remove from selected cocktails
-        setSelectedCocktails(prev => prev.filter(c => c.id !== batchToRemove.selectedCocktail!.id))
-      }
-      setBatches(prev => prev.filter(batch => batch.id !== idToRemove))
-    },
-    [batches]
-  )
+  const handleRemoveBatch = useCallback((idToRemove: number) => {
+    const batchToRemove = batches.find(b => b.id === idToRemove)
+    if (batchToRemove?.selectedCocktail) {
+      setSelectedCocktails(prev => prev.filter(c => c.id !== batchToRemove.selectedCocktail!.id))
+    }
+    setBatches(prev => prev.filter(batch => batch.id !== idToRemove))
+  }, [batches])
 
-  // Handler for when cocktails are selected/deselected from the search bar
-  const handleCocktailSelectionChange = useCallback((selected: CocktailRecipe[]) => {
-    setSelectedCocktails(selected)
-  }, [])
-
-  // --- Specific Data Handlers (Memoized using useCallback) ---
-
-  const handleServingsChange = useCallback(
-    (id: number, value: string) => {
-      // Clear error state when user starts typing
-      if (batchesWithMissingServings.has(id)) {
-        setBatchesWithMissingServings(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-      }
-
-      // Allow empty string to clear the input
-      if (value === "") {
-        handleUpdateBatch(id, { servings: "" })
-        return
-      }
-
-      const num = parseInt(value, 10)
-      // Only update if it's a valid non-negative number
-      if (!isNaN(num) && num >= 0) {
-        handleUpdateBatch(id, { servings: num })
-      }
-    },
-    [handleUpdateBatch, batchesWithMissingServings]
+  const handleServingsChange = useCallback((id: number, value: string) => {
+    if (batchesWithMissingServings.has(id)) {
+      setBatchesWithMissingServings(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(id)
+        return newSet
+      })
+    }
+    if (value === "") {
+      handleUpdateBatch(id, { servings: "" })
+      return
+    }
+    const num = parseInt(value, 10)
+    if (!isNaN(num) && num >= 0) {
+      handleUpdateBatch(id, { servings: num })
+    }
+  }, [handleUpdateBatch, batchesWithMissingServings]
   )
 
   const handleIngredientChange = useCallback((id: number, newIngredients: Ingredient[]) => {
-    setBatches(prev =>
-      prev.map(batch => {
-        if (batch.id === id) {
-          if (batch.editableRecipe) {
-            return {
-              ...batch,
-              editableRecipe: { ...batch.editableRecipe, ingredients: newIngredients },
-            }
-          }
-        }
-        return batch
-      })
-    )
+    setBatches(prev => prev.map(batch => {
+      if (batch.id === id && batch.editableRecipe) {
+        return { ...batch, editableRecipe: { ...batch.editableRecipe, ingredients: newIngredients } }
+      }
+      return batch
+    }))
   }, [])
 
   const handleNameChange = useCallback((id: number, newName: string) => {
-    setBatches(prev =>
-      prev.map(batch => {
-        if (batch.id === id) {
-          if (batch.editableRecipe) {
-            return {
-              ...batch,
-              editableRecipe: { ...batch.editableRecipe, name: newName },
-            }
-          }
-        }
-        return batch
-      })
-    )
+    setBatches(prev => prev.map(batch => {
+      if (batch.id === id && batch.editableRecipe) {
+        return { ...batch, editableRecipe: { ...batch.editableRecipe, name: newName } }
+      }
+      return batch
+    }))
   }, [])
 
   const handleMethodChange = useCallback((id: number, newMethod: CocktailMethod) => {
-    setBatches(prev =>
-      prev.map(batch => {
-        if (batch.id === id) {
-          if (batch.editableRecipe) {
-            return {
-              ...batch,
-              editableRecipe: { ...batch.editableRecipe, method: newMethod },
-            }
-          }
-        }
-        return batch
-      })
-    )
+    setBatches(prev => prev.map(batch => {
+      if (batch.id === id && batch.editableRecipe) {
+        return { ...batch, editableRecipe: { ...batch.editableRecipe, method: newMethod } }
+      }
+      return batch
+    }))
   }, [])
 
   const canExport = batches.some(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
 
-  // Calculate progress for servings
   const servingsProgress = useMemo(() => {
     const totalBatches = batches.filter(b => b.editableRecipe).length
     const batchesWithServings = batches.filter(
@@ -273,453 +230,368 @@ export default function BatchCalculatorPage() {
     return { completed: batchesWithServings, total: totalBatches }
   }, [batches])
 
-  const handleGenerateShoppingList = () => {
-    generateShoppingListPdf(batches)
-  }
+  const handleGenerateShoppingList = () => generateShoppingListPdf(batches)
 
   const handleGenerateBatchCalculations = () => {
-    // Check if any batch is missing servings
     const batchesWithoutServings = batches.filter(
       b => b.editableRecipe && (b.servings === "" || b.servings === 0 || (typeof b.servings === "number" && b.servings <= 0))
     )
-
     if (batchesWithoutServings.length > 0) {
-      const cocktailNames = batchesWithoutServings
-        .map(b => b.selectedCocktail?.name || `Batch #${b.id}`)
-        .join(", ")
-
       const missingIds = new Set(batchesWithoutServings.map(b => b.id))
       setBatchesWithMissingServings(missingIds)
-
-      setMissingServingsMessage(
-        `Please enter servings for all cocktails before generating batch calculations.\n\nMissing servings for: ${cocktailNames}\n\nServings are required to generate accurate batch calculations.`
-      )
+      const names = batchesWithoutServings.map(b => b.selectedCocktail?.name).join(", ")
+      setMissingServingsMessage(`Missing servings for: ${names}`)
       setShowServingsModal(true)
       return
     }
-
     setBatchesWithMissingServings(new Set())
     generateBatchCalculationsPdf(batches)
   }
 
   const handleGeneratePdfReport = () => {
-    // Check if any batch is missing servings
     const batchesWithoutServings = batches.filter(
       b => b.editableRecipe && (b.servings === "" || b.servings === 0 || (typeof b.servings === "number" && b.servings <= 0))
     )
-
     if (batchesWithoutServings.length > 0) {
-      const cocktailNames = batchesWithoutServings
-        .map(b => b.selectedCocktail?.name || `Batch #${b.id}`)
-        .join(", ")
-
-      // Highlight batches with missing servings
       const missingIds = new Set(batchesWithoutServings.map(b => b.id))
       setBatchesWithMissingServings(missingIds)
-
-      setMissingServingsMessage(
-        `Please enter servings for all cocktails before downloading.\n\nMissing servings for: ${cocktailNames}\n\nServings are required to generate accurate batch calculations.`
-      )
+      const names = batchesWithoutServings.map(b => b.selectedCocktail?.name).join(", ")
+      setMissingServingsMessage(`Missing servings for: ${names}`)
       setShowServingsModal(true)
       return
     }
-
-    // Clear error state if all servings are entered
     setBatchesWithMissingServings(new Set())
-
     if (!canExport) return
     generatePdfReport(batches)
   }
 
-  // Favorite cocktails to show when no cocktails are selected
-  // Handle create new recipe
+  // Handle create/update/delete cocktails
   const handleCreateCocktail = useCallback(async (recipe: CocktailRecipe) => {
-    const newRecipe = await createCocktail({
-      name: recipe.name,
-      method: recipe.method,
-      instructions: recipe.instructions,
-      ingredients: recipe.ingredients,
-    })
-
+    const newRecipe = await createCocktail(recipe)
     if (newRecipe) {
-      success(`Recipe "${newRecipe.name}" created successfully!`)
+      success(`Recipe "${newRecipe.name}" created!`)
       await refetchCocktails()
-      // Optionally add to selected cocktails
       setSelectedCocktails(prev => [...prev, newRecipe])
       setShowAddModal(false)
     } else {
-      showError("Failed to create recipe. Please try again.")
+      showError("Failed to create recipe.")
     }
   }, [createCocktail, refetchCocktails, success, showError])
 
-  // Handle update recipe
   const handleUpdateCocktail = useCallback(async (updatedRecipe: CocktailRecipe) => {
-    // Update local batches if this recipe is in use
-    setBatches(prev =>
-      prev.map(batch => {
-        if (batch.selectedCocktail?.id === updatedRecipe.id || batch.editableRecipe?.id === updatedRecipe.id) {
-          return {
-            ...batch,
-            selectedCocktail: updatedRecipe,
-            editableRecipe: updatedRecipe,
-          }
-        }
-        return batch
-      })
-    )
-
-    // Update selected cocktails list
-    setSelectedCocktails(prev =>
-      prev.map(cocktail => (cocktail.id === updatedRecipe.id ? updatedRecipe : cocktail))
-    )
-
-    // Refresh cocktails list from database
-    await Promise.all([refetchCocktails(), refetchFilteredCocktails()])
-    success(`Recipe "${updatedRecipe.name}" updated successfully!`)
+    // Update logic same as before...
+    setBatches(prev => prev.map(batch => {
+      if (batch.selectedCocktail?.id === updatedRecipe.id || batch.editableRecipe?.id === updatedRecipe.id) {
+        return { ...batch, selectedCocktail: updatedRecipe, editableRecipe: updatedRecipe }
+      }
+      return batch
+    }))
+    setSelectedCocktails(prev => prev.map(c => (c.id === updatedRecipe.id ? updatedRecipe : c)))
+    await refetchCocktails()
+    success("Recipe updated!")
     setShowEditModal(false)
-  }, [refetchCocktails, refetchFilteredCocktails, success])
+  }, [refetchCocktails, success])
 
-  // Handle delete recipe
   const handleDeleteCocktail = useCallback(async () => {
     if (!editingCocktail) return
-
-    // Remove from selected cocktails if it's selected
     setSelectedCocktails(prev => prev.filter(c => c.id !== editingCocktail.id))
-
-    // Remove batches using this recipe
     setBatches(prev => prev.filter(batch => batch.selectedCocktail?.id !== editingCocktail.id))
-
-    // Refresh cocktails list
-    await Promise.all([refetchCocktails(), refetchFilteredCocktails()])
-    success(`Recipe "${editingCocktail.name}" deleted successfully!`)
+    await refetchCocktails()
+    success("Recipe deleted!")
     setShowEditModal(false)
-  }, [editingCocktail, refetchCocktails, refetchFilteredCocktails, success])
+  }, [editingCocktail, refetchCocktails, success])
 
-  // Open edit modal
-  const handleOpenEditModal = useCallback((cocktail: CocktailRecipe, cocktailId?: number) => {
-    setEditingCocktail(cocktail)
-    setEditingCocktailId(cocktailId)
-    setShowEditModal(true)
-  }, [])
 
-  const hasSelectedCocktails = selectedCocktails.length > 0
+  // Toggle Selection
+  const toggleSelection = (cocktail: CocktailRecipe) => {
+    const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
+    if (isSelected) {
+      setSelectedCocktails(prev => prev.filter(c => c.id !== cocktail.id))
+    } else {
+      setSelectedCocktails(prev => [...prev, cocktail])
+    }
+  }
 
   return (
-    <div className="min-h-screen text-gray-900 font-sans py-6 sm:py-8">
-      <div className="w-full">
-        {/* Toast Notifications */}
-        <ToastContainer toasts={toasts} onRemove={removeToast} />
+    <div className="min-h-screen text-gray-900 pb-24">
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-        {/* Header with Add Recipe Button */}
-        <div className="mb-6 px-0 flex justify-between items-center gap-4">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Batch Calculator</h1>
+      {/* 1. Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Curated Gallery</h1>
+          <p className="text-lg text-gray-500">Manage and batch seasonal beverage programs.</p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="inline-flex items-center justify-center px-6 py-3 bg-[#BA6634] text-white font-semibold rounded-lg hover:bg-[#A35529] transition-all shadow-sm gap-2"
+        >
+          <Plus className="w-5 h-5" />
+          New Recipe
+        </button>
+      </div>
+
+      {/* 2. Filters & Search */}
+      <div className="bg-white p-2 rounded-xl border border-gray-200 shadow-sm mb-8 flex flex-col md:flex-row gap-2 md:items-center">
+        {/* Search Input */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search by name or ingredient..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-[#BA6634]/20 focus:bg-white transition-all text-gray-900 placeholder:text-gray-400"
+          />
+        </div>
+
+        {/* Separator on Desktop */}
+        <div className="hidden md:block w-px h-8 bg-gray-200 mx-1"></div>
+
+        {/* Filters Row */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0">
+          {/* Spirit Filter */}
+          <div className="relative group min-w-[120px]">
+            <select
+              value={selectedSpirit}
+              onChange={(e) => setSelectedSpirit(e.target.value)}
+              className="appearance-none w-full pl-3 pr-8 py-2.5 bg-gray-100/50 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+            >
+              <option value="All">Spirit: All</option>
+              {availableLiquors.map(l => <option key={l} value={l}>Spirit: {l}</option>)}
+            </select>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition duration-200 shadow-md flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Add Recipe
+
+          {/* Style Filter */}
+          <div className="relative group min-w-[120px]">
+            <select
+              value={selectedStyle}
+              onChange={(e) => setSelectedStyle(e.target.value)}
+              className="appearance-none w-full pl-3 pr-8 py-2.5 bg-gray-100/50 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+            >
+              <option value="All">Style: All</option>
+              <option value="Shaken">Style: Shaken</option>
+              <option value="Stirred/Built">Style: Stirred</option>
+            </select>
+          </div>
+
+          {/* Glass Filter */}
+          <div className="relative group min-w-[120px]">
+            <select
+              value={selectedGlass}
+              onChange={(e) => setSelectedGlass(e.target.value)}
+              className="appearance-none w-full pl-3 pr-8 py-2.5 bg-gray-100/50 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+            >
+              <option value="All">Glass: All</option>
+              <option value="Coupe">Glass: Coupe</option>
+              <option value="Rocks">Glass: Rocks</option>
+              <option value="Highball">Glass: Highball</option>
+              <option value="Flute">Glass: Flute</option>
+              <option value="Martini">Glass: Martini</option>
+            </select>
+          </div>
+
+          {/* Filter Icon Button (Visual) */}
+          <button className="p-2.5 text-[#BA6634] bg-[#BA6634]/10 rounded-lg hover:bg-[#BA6634]/20 transition-colors">
+            <Filter className="w-5 h-5" />
           </button>
         </div>
+      </div>
 
-        {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* 3. Grid Gallery */}
+      {cocktailsLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 text-[#BA6634] animate-spin" />
+        </div>
+      ) : filteredCocktails.length === 0 ? (
+        <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-gray-300">
+          <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+            <Search className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">No recipes found</h3>
+          <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your search terms or filters to find what you're looking for.</p>
+          <button
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setSelectedStyle('All'); setSelectedGlass('All'); }}
+            className="mt-6 text-[#BA6634] font-medium hover:underline"
+          >
+            Clear all filters
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredCocktails.map(cocktail => {
+            const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
+            const glass = inferGlassType(cocktail.instructions)
+            const mainSpirit = cocktail.ingredients.find(i => availableLiquors.includes(i.name) || i.name.includes("Vodka") || i.name.includes("Gin") || i.name.includes("Rum") || i.name.includes("Whiskey") || i.name.includes("Tequila") || i.name.includes("Bourbon"))?.name || "Spirit"
 
-          {/* LEFT COLUMN: Cocktail Selection */}
-          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6 lg:sticky lg:top-8">
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-gray-900">Select Cocktails</h2>
-                <p className="text-sm text-gray-500">Search or filter to add to your batch.</p>
-              </div>
+            // Determine tags
+            const tags = []
+            if (cocktail.featured) tags.push({ label: "SIGNATURE", color: "bg-[#BA6634]" })
+            else if (cocktail.method === 'Build') tags.push({ label: "CLASSIC", color: "bg-slate-700" })
+            else tags.push({ label: "SEASONAL", color: "bg-amber-500" })
 
-              {/* Database Status
-              {cocktailsLoading ? (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-600 text-sm mb-4">
-                  Loading cocktails from database...
-                </div>
-              ) : cocktailsError ? (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-600 text-sm mb-4">
-                  ⚠️ Database unavailable, using static data fallback. Error: {cocktailsError}
-                </div>
-              ) : apiCocktails.length > 0 ? (
-                <div className="p-2 bg-green-50 border border-green-200 rounded-lg text-green-700 text-xs mb-4">
-                  ✓ Loaded {apiCocktails.length} cocktails from database
-                </div>
-              ) : null} */}
+            // Zero proof check (naive)
+            const isZeroProof = !cocktail.ingredients.some(i => ["Vodka", "Gin", "Rum", "Whiskey", "Tequila", "Bourbon", "Pisco", "Mezcal", "Liqueur"].some(spirit => i.name.includes(spirit)))
+            if (isZeroProof) tags.push({ label: "ZERO-PROOF", color: "bg-emerald-600" })
 
-              {/* Search Bar + Filter Dropdowns */}
-              <div className="mb-4 flex flex-col gap-3">
-                <div className="w-full relative">
-                  <MultiSelectCocktailSearch
-                    cocktails={availableCocktails}
-                    selectedCocktails={selectedCocktails}
-                    onSelectionChange={handleCocktailSelectionChange}
-                    label="Search by name..."
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Featured/All Filter Dropdown */}
-                  <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value as 'featured' | 'all')}
-                    className="w-full px-3 py-2 rounded-lg font-medium bg-gray-50 text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-orange-500 focus:outline-none transition-all text-sm"
-                  >
-                    <option value="featured">Featured</option>
-                    <option value="all">All</option>
-                  </select>
-
-                  {/* Liquor Filter Dropdown */}
-                  <select
-                    value={selectedLiquor}
-                    onChange={(e) => setSelectedLiquor(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg font-medium bg-gray-50 text-gray-700 border border-gray-200 hover:border-gray-300 focus:border-orange-500 focus:outline-none transition-all text-sm"
-                  >
-                    <option value="">All Liquors</option>
-                    {availableLiquors.map((liquor) => (
-                      <option key={liquor} value={liquor}>
-                        {liquor}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Selected Cocktails Chips */}
-              {selectedCocktails.length > 0 && (
-                <div className="flex flex-wrap gap-2 p-2 mt-2 bg-gray-50 border border-gray-200 rounded-lg">
-                  {selectedCocktails.map(cocktail => (
-                    <div
-                      key={cocktail.name}
-                      className="flex items-center gap-1 px-3 py-1 bg-orange-100 border border-orange-300 rounded-full text-sm font-semibold text-gray-900"
-                    >
-                      <span>{cocktail.name}</span>
-                      <button
-                        onClick={() => handleCocktailSelectionChange(selectedCocktails.filter(c => c.id !== cocktail.id))}
-                        className="ml-1 hover:bg-orange-200 rounded-full p-0.5 transition-colors"
-                        title="Remove cocktail"
-                      >
-                        <X className="w-3 h-3 text-orange-700" />
-                      </button>
+            return (
+              <div
+                key={cocktail.id}
+                className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border ${isSelected ? 'border-[#BA6634] ring-2 ring-[#BA6634]/20' : 'border-gray-200 hover:border-gray-300'}`}
+              >
+                {/* Image Area */}
+                <div
+                  className="aspect-[4/5] relative overflow-hidden bg-gray-100 cursor-pointer"
+                  onClick={() => toggleSelection(cocktail)}
+                >
+                  {cocktail.image ? (
+                    <Image
+                      src={cocktail.image}
+                      alt={cocktail.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-400 p-6 text-center">
+                      <GlassWater className="w-12 h-12 mb-3 opacity-20" />
+                      <span className="text-xs font-semibold uppercase tracking-wider opacity-40">No Image</span>
                     </div>
-                  ))}
+                  )}
+
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
+
+                  {/* Tags */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-2">
+                    {tags.map((tag, idx) => (
+                      <span key={idx} className={`${tag.color} text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm tracking-wider uppercase`}>
+                        {tag.label}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Selection Checkmark Overlay */}
+                  {isSelected && (
+                    <div className="absolute inset-0 bg-[#BA6634]/20 flex items-center justify-center backdrop-blur-[1px]">
+                      <div className="bg-white rounded-full p-2 shadow-lg">
+                        <CheckCheck className="w-8 h-8 text-[#BA6634]" />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Content Area */}
+                <div className="p-5">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight group-hover:text-[#BA6634] transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
+                    {cocktail.name}
+                  </h3>
+                  <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide mt-2">
+                    <span className="text-[#BA6634]">{mainSpirit.toUpperCase()}</span>
+                    <span>•</span>
+                    <span>{glass ? glass.toUpperCase() : "GLASSWARE"}</span>
+                  </div>
+
+                  {/* Actions (Hover) */}
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSelection(cocktail); }}
+                      className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-all ${isSelected ? 'bg-[#BA6634] text-white border-[#BA6634]' : 'bg-white text-gray-700 border-gray-200 hover:border-[#BA6634] hover:text-[#BA6634]'}`}
+                    >
+                      {isSelected ? 'Selected' : 'Select'}
+                    </button>
+                    <button
+                      onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}
+                      className="px-3 py-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* 4. Floating Action Bar (Batch) */}
+      <div className={`fixed bottom-0 left-0 md:left-64 right-0 p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 z-30 ${selectedCocktails.length > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-[#BA6634] rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm">
+              {selectedCocktails.length}
             </div>
-
-            {/* Cocktails List */}
-            <div className="mb-2 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
-              {filteredLoading ? (
-                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
-                  Loading cocktails...
-                </div>
-              ) : filteredCocktails.length === 0 ? (
-                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 text-sm">
-                  {filter === 'featured' ? 'No featured cocktails found.' : 'No cocktails found.'}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  {filteredCocktails.map(cocktail => {
-                    const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
-                    return (
-                      <button
-                        key={cocktail.id || cocktail.name}
-                        onClick={() => {
-                          if (isSelected) {
-                            handleCocktailSelectionChange(selectedCocktails.filter(c => c.id !== cocktail.id))
-                          } else {
-                            handleCocktailSelectionChange([...selectedCocktails, cocktail])
-                          }
-                        }}
-                        className={`p-4 rounded-lg border text-left transition-all duration-200 ${isSelected
-                          ? 'bg-orange-50 border-orange-300'
-                          : 'bg-white border-gray-200 hover:border-orange-200 hover:shadow-sm'
-                          }`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 mb-1 text-base">{cocktail.name}</h3>
-                            {cocktail.featured && (
-                              <span className="inline-block px-1.5 py-0.5 bg-orange-100 text-orange-800 text-[10px] uppercase font-bold tracking-wider rounded mb-1">
-                                Featured
-                              </span>
-                            )}
-
-                            <p className="text-xs text-gray-500 line-clamp-2">
-                              {cocktail.ingredients.map(ing => ing.name).join(', ')}
-                            </p>
-                          </div>
-                          {isSelected && (
-                            <div className="ml-2 text-orange-600">
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
+            <div>
+              <h3 className="font-bold text-gray-900 text-lg">Recipes Selected</h3>
+              <p className="text-sm text-gray-500">Ready to calculate batch volumes.</p>
             </div>
           </div>
-
-
-          {/* RIGHT COLUMN: Batch Calculator Workspace */}
-          <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-            {!hasSelectedCocktails ? (
-              <div className="h-full min-h-[400px] flex flex-col items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl text-center">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                  <Calculator className="w-8 h-8 text-gray-300" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Cocktails Selected</h3>
-                <p className="text-gray-500 max-w-sm">
-                  Select cocktails from the list on the left to start calculating your batches.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="mb-6 pb-4 border-b border-gray-100">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      <div>
-                        <h2 className="text-xl font-bold text-gray-900">Batch Worksheet</h2>
-                        <p className="text-sm text-gray-500 mt-1">Set servings and adjust recipes.</p>
-                      </div>
-                      {servingsProgress.total > 0 && (
-                        <div className="flex items-center gap-3 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                          <span className="text-sm font-medium text-gray-600">
-                            Progress: {servingsProgress.completed}/{servingsProgress.total}
-                          </span>
-                          <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-orange-500 transition-all duration-300"
-                              style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    {/* Render all independent cocktail batch slots */}
-                    {batches.map(batch => (
-                      <BatchItem
-                        key={batch.id}
-                        batch={batch}
-                        onServingsChange={handleServingsChange}
-                        onIngredientChange={handleIngredientChange}
-                        onNameChange={handleNameChange}
-                        onMethodChange={handleMethodChange}
-                        onRemove={handleRemoveBatch}
-                        onEditRecipe={handleOpenEditModal}
-                        isOnlyItem={batches.length === 1}
-                        hasError={batchesWithMissingServings.has(batch.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Print/Export Options moved here inside the right column */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Shopping List Button */}
-                  <button
-                    onClick={handleGenerateShoppingList}
-                    className="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:shadow-md transition-all duration-200 group"
-                  >
-                    <ShoppingCart className="w-6 h-6 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="font-semibold text-gray-900">Shopping List</span>
-                    <span className="text-xs text-gray-500 mt-1">Total ingredients</span>
-                  </button>
-
-                  {/* Batch Calculations Button */}
-                  <button
-                    onClick={handleGenerateBatchCalculations}
-                    disabled={!canExport}
-                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-200 group ${canExport
-                      ? "bg-white border-gray-200 hover:border-orange-300 hover:shadow-md"
-                      : "bg-gray-50 border-gray-100 cursor-not-allowed opacity-50"
-                      }`}
-                  >
-                    <Calculator className={`w-6 h-6 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
-                    <span className={`font-semibold ${canExport ? "text-gray-900" : "text-gray-400"}`}>
-                      Batch Sheets
-                    </span>
-                    <span className="text-xs text-gray-500 mt-1">Individual guides</span>
-                  </button>
-
-                  {/* Full Report Button */}
-                  <button
-                    onClick={handleGeneratePdfReport}
-                    disabled={!canExport}
-                    className={`flex flex-col items-center justify-center p-4 border rounded-xl transition-all duration-200 group ${canExport
-                      ? "bg-white border-gray-200 hover:border-orange-300 hover:shadow-md"
-                      : "bg-gray-50 border-gray-100 cursor-not-allowed opacity-50"
-                      }`}
-                  >
-                    <FileText className={`w-6 h-6 mb-2 transition-transform ${canExport ? "text-orange-600 group-hover:scale-110" : "text-gray-400"}`} />
-                    <span className={`font-semibold ${canExport ? "text-gray-900" : "text-gray-400"}`}>
-                      Full Report
-                    </span>
-                    <span className="text-xs text-gray-500 mt-1">Everything combined</span>
-                  </button>
-                </div>
-              </>
-            )}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSelectedCocktails([])}
+              className="px-4 py-2 text-gray-500 font-semibold hover:text-gray-900 transition-colors"
+            >
+              Clear Selection
+            </button>
+            <button
+              onClick={() => setShowBatchModal(true)}
+              className="px-6 py-3 bg-[#BA6634] text-white font-bold rounded-lg shadow-lg hover:bg-[#A35529] hover:shadow-xl transition-all flex items-center gap-2"
+            >
+              <CheckCheck className="w-5 h-5" />
+              Review Batch
+            </button>
           </div>
         </div>
+      </div>
 
+      {/* Modals */}
+      <BatchCalculatorModal
+        isOpen={showBatchModal}
+        onClose={() => setShowBatchModal(false)}
+        batches={batches}
+        onServingsChange={handleServingsChange}
+        onIngredientChange={handleIngredientChange}
+        onNameChange={handleNameChange}
+        onMethodChange={handleMethodChange}
+        onRemove={handleRemoveBatch}
+        onEditRecipe={(c, id) => { setShowBatchModal(false); setEditingCocktail(c); setEditingCocktailId(id); setShowEditModal(true); }}
+        batchesWithMissingServings={batchesWithMissingServings}
+        servingsProgress={servingsProgress}
+        onGenerateShoppingList={handleGenerateShoppingList}
+        onGenerateBatchCalculations={handleGenerateBatchCalculations}
+        onGeneratePdfReport={handleGeneratePdfReport}
+        canExport={canExport}
+      />
 
+      <Modal
+        isOpen={showServingsModal}
+        onClose={() => setShowServingsModal(false)}
+        title="Servings Required"
+        message={missingServingsMessage}
+      />
 
-
-        {/* Servings Required Modal */}
-        <Modal
-          isOpen={showServingsModal}
-          onClose={() => setShowServingsModal(false)}
-          title="Servings Required"
-          message={missingServingsMessage}
-        />
-
-        {/* Add Recipe Modal */}
+      {showAddModal && (
         <EditRecipeModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           recipe={null}
           mode="create"
           onSave={handleCreateCocktail}
-          onSaveSuccess={() => {
-            setShowAddModal(false)
-          }}
+          onSaveSuccess={() => setShowAddModal(false)}
         />
+      )}
 
-        {/* Edit Recipe Modal */}
-        {editingCocktail && (
-          <EditRecipeModal
-            isOpen={showEditModal}
-            onClose={() => {
-              setShowEditModal(false)
-              setEditingCocktail(null)
-              setEditingCocktailId(undefined)
-            }}
-            recipe={editingCocktail}
-            cocktailId={editingCocktailId}
-            mode="edit"
-            onSave={handleUpdateCocktail}
-            onDelete={handleDeleteCocktail}
-            onSaveSuccess={() => {
-              setShowEditModal(false)
-              setEditingCocktail(null)
-              setEditingCocktailId(undefined)
-            }}
-          />
-        )}
-      </div>
+      {editingCocktail && (
+        <EditRecipeModal
+          isOpen={showEditModal}
+          onClose={() => { setShowEditModal(false); setEditingCocktail(null); setEditingCocktailId(undefined); }}
+          recipe={editingCocktail}
+          cocktailId={editingCocktailId}
+          mode="edit"
+          onSave={handleUpdateCocktail}
+          onDelete={handleDeleteCocktail}
+          onSaveSuccess={() => { setShowEditModal(false); setEditingCocktail(null); setEditingCocktailId(undefined); }}
+        />
+      )}
     </div>
   )
 }
-
