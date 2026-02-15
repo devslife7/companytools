@@ -1,5 +1,8 @@
 @theme inline {
     --color-brand-primary: var(--brand-primary);
+    --color-brand-primary-foreground: var(--brand-primary-foreground);
+    --color-brand-primary-hover: var(--brand-primary-hover);
+
     --color-brand-secondary: var(--brand-secondary);
     --color-brand-accent: var(--brand-accent);
     --color-brand-gray: var(--brand-gray);
@@ -8,35 +11,39 @@
 :root {
     /* 
     BRAND IDENTITY 
-    Change these values to update your brand colors across the app.
+    Updated to new primary: #F54A00
   */
 
-    /* Primary: Main brand color, used for buttons, links, and active states */
-    --brand-primary: #2563ea;
-    /* Royal Blue */
+    /* Primary: Vibrant Orange - Replaces Burnt Orange */
+    --brand-primary: #F54A00;
+    --brand-primary-foreground: #ffffff;
+    --brand-primary-hover: #D13F00;
+    /* Darker shade for hovers */
 
-    /* Secondary: Supporting color for headers, important UI elements */
-    --brand-secondary: #1e293b;
-    /* Slate 800 */
+    /* Secondary: Deep Charcoal - Provides strong contrast */
+    --brand-secondary: #0F172A;
+    /* Slate 900 - Darker than before for better contrast with bright orange */
 
-    /* Accent: Used for highlights, calls to action, or emphasis */
-    --brand-accent: #f59e0b;
-    /* Amber 500 */
+    /* Accent: Golden Yellow - Harmonious with the orange but distinct */
+    --brand-accent: #FFC107;
+    /* Amber 400 */
 
-    /* Neutral: Used for backgrounds, borders, and subtle text */
-    --brand-gray: #64748b;
+    /* Neutral: Cool Gray */
+    --brand-gray: #64748B;
     /* Slate 500 */
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --brand-primary: #3b82f6;
-        /* Blue 500 */
-        --brand-secondary: #f8fafc;
+        --brand-primary: #F54A00;
+        --brand-primary-foreground: #ffffff;
+        --brand-primary-hover: #D13F00;
+
+        --brand-secondary: #F8FAFC;
         /* Slate 50 */
-        --brand-accent: #fbbf24;
-        /* Amber 400 */
-        --brand-gray: #94a3b8;
+        --brand-accent: #FFD54F;
+        /* Amber 300 - Brighter for dark mode */
+        --brand-gray: #94A3B8;
         /* Slate 400 */
     }
 }

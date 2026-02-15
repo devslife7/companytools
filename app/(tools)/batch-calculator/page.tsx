@@ -311,7 +311,7 @@ export default function BatchCalculatorPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center justify-center px-6 py-3.5 bg-[#BA6634] text-white font-bold rounded-xl hover:bg-[#A35529] transition-all shadow-sm gap-2 active:scale-[0.98]"
+          className="inline-flex items-center justify-center px-6 py-3.5 bg-brand-primary text-brand-primary-foreground font-bold rounded-xl hover:bg-brand-primary-hover transition-all shadow-sm gap-2 active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           New Recipe
@@ -328,7 +328,7 @@ export default function BatchCalculatorPage() {
             placeholder="Search by name or ingredient..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-[#BA6634]/20 focus:bg-white focus:border-[#BA6634]/20 transition-all text-gray-900 placeholder:text-gray-400"
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:bg-white focus:border-brand-primary/20 transition-all text-gray-900 placeholder:text-gray-400"
           />
         </div>
 
@@ -342,7 +342,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
               <option value="All">Spirit: All</option>
               {availableLiquors.map(l => <option key={l} value={l}>Spirit: {l}</option>)}
@@ -357,7 +357,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedStyle}
               onChange={(e) => setSelectedStyle(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
               <option value="All">Style: All</option>
               <option value="Shaken">Style: Shaken</option>
@@ -373,7 +373,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedGlass}
               onChange={(e) => setSelectedGlass(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
               <option value="All">Glass: All</option>
               <option value="Rocks Glass">Glass: Rocks Glass</option>
@@ -395,8 +395,8 @@ export default function BatchCalculatorPage() {
       {cocktailsLoading ? (
         <div className="flex flex-col items-center justify-center h-96 gap-4">
           <div className="relative">
-            <div className="w-16 h-16 border-4 border-[#BA6634]/20 rounded-full"></div>
-            <div className="w-16 h-16 border-4 border-t-[#BA6634] rounded-full animate-spin absolute top-0 left-0"></div>
+            <div className="w-16 h-16 border-4 border-brand-primary/20 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-t-brand-primary rounded-full animate-spin absolute top-0 left-0"></div>
           </div>
           <p className="text-gray-500 font-medium animate-pulse">Loading recipes...</p>
         </div>
@@ -409,7 +409,7 @@ export default function BatchCalculatorPage() {
           <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your search terms or filters to find what you're looking for.</p>
           <button
             onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setSelectedStyle('All'); setSelectedGlass('All'); }}
-            className="mt-8 text-[#BA6634] font-bold hover:text-[#A35529] transition-colors inline-flex items-center gap-2"
+            className="mt-8 text-brand-primary font-bold hover:text-brand-primary-hover transition-colors inline-flex items-center gap-2"
           >
             Clear all filters
           </button>
@@ -422,7 +422,7 @@ export default function BatchCalculatorPage() {
 
             // Determine tags
             const tags = []
-            if (cocktail.featured) tags.push({ label: "SIGNATURE", color: "bg-[#BA6634]" })
+            if (cocktail.featured) tags.push({ label: "SIGNATURE", color: "bg-brand-primary" })
             else if (cocktail.method === 'Build') tags.push({ label: "CLASSIC", color: "bg-slate-700" })
             else tags.push({ label: "SEASONAL", color: "bg-amber-500" })
 
@@ -433,7 +433,7 @@ export default function BatchCalculatorPage() {
             return (
               <div
                 key={cocktail.id}
-                className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border ${isSelected ? 'border-[#BA6634] ring-2 ring-[#BA6634]/20' : 'border-gray-200 hover:border-gray-300'}`}
+                className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border ${isSelected ? 'border-brand-primary ring-2 ring-brand-primary/20' : 'border-gray-200 hover:border-gray-300'}`}
               >
                 {/* Image Area */}
                 <div
@@ -468,9 +468,9 @@ export default function BatchCalculatorPage() {
 
                   {/* Selection Checkmark Overlay */}
                   {isSelected && (
-                    <div className="absolute inset-0 bg-[#BA6634]/20 flex items-center justify-center backdrop-blur-[1px]">
+                    <div className="absolute inset-0 bg-brand-primary/20 flex items-center justify-center backdrop-blur-[1px]">
                       <div className="bg-white rounded-full p-2 shadow-lg">
-                        <CheckCheck className="w-8 h-8 text-[#BA6634]" />
+                        <CheckCheck className="w-8 h-8 text-brand-primary" />
                       </div>
                     </div>
                   )}
@@ -478,11 +478,11 @@ export default function BatchCalculatorPage() {
 
                 {/* Content Area */}
                 <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight group-hover:text-[#BA6634] transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
                     {cocktail.name}
                   </h3>
                   <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide mt-2">
-                    <span className="text-[#BA6634]">{mainSpirit.toUpperCase()}</span>
+                    <span className="text-brand-primary">{mainSpirit.toUpperCase()}</span>
                     <span>•</span>
                     <span>{cocktail.glassType?.toUpperCase() ?? "GLASSWARE"}</span>
                   </div>
@@ -491,7 +491,7 @@ export default function BatchCalculatorPage() {
                   <div className="mt-4 flex gap-2">
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleSelection(cocktail); }}
-                      className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-all ${isSelected ? 'bg-[#BA6634] text-white border-[#BA6634]' : 'bg-white text-gray-700 border-gray-200 hover:border-[#BA6634] hover:text-[#BA6634]'}`}
+                      className={`flex-1 py-2 rounded-lg text-sm font-semibold border transition-all ${isSelected ? 'bg-brand-primary text-brand-primary-foreground border-brand-primary' : 'bg-white text-gray-700 border-gray-200 hover:border-brand-primary hover:text-brand-primary'}`}
                     >
                       {isSelected ? 'Selected' : 'Select'}
                     </button>
@@ -513,7 +513,7 @@ export default function BatchCalculatorPage() {
       <div className={`fixed bottom-0 left-0 md:left-64 right-0 p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 z-30 ${selectedCocktails.length > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-[#BA6634] rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            <div className="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-brand-primary-foreground font-bold text-lg shadow-sm">
               {selectedCocktails.length}
             </div>
             <div>
@@ -530,7 +530,7 @@ export default function BatchCalculatorPage() {
             </button>
             <button
               onClick={() => setShowBatchModal(true)}
-              className="px-6 py-3 bg-[#BA6634] text-white font-bold rounded-lg shadow-lg hover:bg-[#A35529] hover:shadow-xl transition-all flex items-center gap-2"
+              className="px-6 py-3 bg-brand-accent text-brand-secondary font-bold rounded-lg shadow-lg hover:bg-brand-accent/90 hover:shadow-xl transition-all flex items-center gap-2"
             >
               <CheckCheck className="w-5 h-5" />
               Review Batch
