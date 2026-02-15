@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect } from "react"
 import { X, PlusCircle, Trash2, Save, Loader2, AlertCircle } from "lucide-react"
-import type { CocktailRecipe, Ingredient, CocktailMethod } from "../types"
+import type { CocktailRecipe, Ingredient, CocktailMethod, GlassType } from "../types"
 import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
 import { parseAmount } from "../lib/calculations"
 
@@ -136,6 +136,10 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     setEditedRecipe({ ...editedRecipe, method: value })
   }
 
+  const handleGlassTypeChange = (value: string) => {
+    setEditedRecipe({ ...editedRecipe, glassType: value as GlassType || undefined })
+  }
+
   const handleInstructionsChange = (value: string) => {
     setEditedRecipe({ ...editedRecipe, instructions: value })
   }
@@ -196,6 +200,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       const updatedRecipe = await updateCocktail(cocktailId, {
         name: editedRecipe.name.trim(),
         method: editedRecipe.method,
+        glassType: editedRecipe.glassType,
         instructions: editedRecipe.instructions?.trim() || undefined,
         ingredients: validIngredients,
       })
@@ -308,10 +313,29 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             />
           </div>
 
+          {/* Glass Type */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Glass Type</label>
+            <select
+              value={editedRecipe.glassType || ""}
+              onChange={e => handleGlassTypeChange(e.target.value)}
+              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
+            >
+              <option value="">Select glass type...</option>
+              <option value="Rocks Glass">Rocks Glass</option>
+              <option value="Coupe">Coupe</option>
+              <option value="Martini">Martini</option>
+              <option value="Highball">Highball</option>
+              <option value="Flute">Flute</option>
+              <option value="Wine Glass">Wine Glass</option>
+              <option value="Served Up">Served Up</option>
+            </select>
+          </div>
+
           {/* Instructions */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
-            
+
             {/* Method */}
             <div className="mb-4">
               <div className="flex gap-2">

@@ -39,7 +39,12 @@ function formatCocktail(cocktail: CocktailRecipe, index: number, total: number):
   if (cocktail.featured) {
     lines.push(`    featured: true,`)
   }
-  
+
+  // Glass type (if set)
+  if (cocktail.glassType) {
+    lines.push(`    glassType: ${JSON.stringify(cocktail.glassType)},`)
+  }
+
   // Ingredients
   lines.push('    ingredients: [')
   cocktail.ingredients.forEach((ing, ingIndex) => {

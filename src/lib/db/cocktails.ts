@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import type { CocktailRecipe, CocktailMethod } from '@/features/batch-calculator/types'
+import type { CocktailRecipe, CocktailMethod, GlassType } from '@/features/batch-calculator/types'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -42,6 +42,7 @@ function transformCocktailToRecipe(cocktail: {
   name: string
   method: CocktailMethod | string
   instructions?: string | null
+  glass?: string | null
   featured: boolean
   image?: string | null
   ingredients: Array<{
@@ -62,6 +63,7 @@ function transformCocktailToRecipe(cocktail: {
     id: cocktail.id,  // Include database ID
     name: cocktail.name,
     method: validMethod,
+    ...(cocktail.glass && { glassType: cocktail.glass as GlassType }),
     ...(cocktail.instructions && { instructions: cocktail.instructions }),
     featured: cocktail.featured,
     ...(cocktail.image && { image: cocktail.image }),
@@ -216,6 +218,7 @@ export async function createCocktail(
       name: data.name,
       method: data.method,
       instructions: data.instructions || null,
+      glass: data.glassType || null,
       category: data.category,
       tags: data.tags || [],
       createdBy: data.createdBy,
@@ -277,6 +280,7 @@ export async function updateCocktail(
   if (data.name !== undefined) updateData.name = data.name
   if (data.method !== undefined) updateData.method = data.method
   if (data.instructions !== undefined) updateData.instructions = data.instructions || null
+  if (data.glassType !== undefined) updateData.glass = data.glassType || null
   if (data.category !== undefined) updateData.category = data.category
   if (data.tags !== undefined) updateData.tags = data.tags
   if (data.featured !== undefined) updateData.featured = data.featured

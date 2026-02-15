@@ -20,18 +20,6 @@ import { EditRecipeModal } from "@/features/batch-calculator/components/EditReci
 import { Modal } from "@/components/ui"
 import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2 } from "lucide-react"
 
-// --- helper for extracting glass type ---
-const inferGlassType = (instructions: string = ""): string | null => {
-  const lower = instructions.toLowerCase()
-  if (lower.includes("coupe")) return "Coupe"
-  if (lower.includes("rocks") || lower.includes("old fashioned")) return "Rocks"
-  if (lower.includes("highball") || lower.includes("collins")) return "Highball"
-  if (lower.includes("flute") || lower.includes("champagne")) return "Flute"
-  if (lower.includes("martini")) return "Martini"
-  if (lower.includes("mug")) return "Mug"
-  return null
-}
-
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
   const [batches, setBatches] = useState<BatchState[]>([])
@@ -115,10 +103,9 @@ export default function BatchCalculatorPage() {
         if (selectedStyle === 'Stirred/Built' && cocktail.method !== 'Build') return false
       }
 
-      // 4. Glass Filter (Inferred)
+      // 4. Glass Filter
       if (selectedGlass !== 'All') {
-        const glass = inferGlassType(cocktail.instructions)
-        if (!glass || glass !== selectedGlass) return false
+        if (!cocktail.glassType || cocktail.glassType !== selectedGlass) return false
       }
 
       return true
@@ -389,11 +376,13 @@ export default function BatchCalculatorPage() {
               className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
             >
               <option value="All">Glass: All</option>
+              <option value="Rocks Glass">Glass: Rocks Glass</option>
               <option value="Coupe">Glass: Coupe</option>
-              <option value="Rocks">Glass: Rocks</option>
+              <option value="Martini">Glass: Martini</option>
               <option value="Highball">Glass: Highball</option>
               <option value="Flute">Glass: Flute</option>
-              <option value="Martini">Glass: Martini</option>
+              <option value="Wine Glass">Glass: Wine Glass</option>
+              <option value="Served Up">Glass: Served Up</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
               <Citrus className="w-4 h-4" />
@@ -429,7 +418,6 @@ export default function BatchCalculatorPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredCocktails.map(cocktail => {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
-            const glass = inferGlassType(cocktail.instructions)
             const mainSpirit = cocktail.ingredients.find(i => availableLiquors.includes(i.name) || i.name.includes("Vodka") || i.name.includes("Gin") || i.name.includes("Rum") || i.name.includes("Whiskey") || i.name.includes("Tequila") || i.name.includes("Bourbon"))?.name || "Spirit"
 
             // Determine tags
@@ -496,7 +484,7 @@ export default function BatchCalculatorPage() {
                   <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide mt-2">
                     <span className="text-[#BA6634]">{mainSpirit.toUpperCase()}</span>
                     <span>•</span>
-                    <span>{glass ? glass.toUpperCase() : "GLASSWARE"}</span>
+                    <span>{cocktail.glassType?.toUpperCase() ?? "GLASSWARE"}</span>
                   </div>
 
                   {/* Actions (Hover) */}

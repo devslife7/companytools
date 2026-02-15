@@ -19,6 +19,7 @@ model Cocktail {
   featured     Boolean        @default(false)
   image        String?        @db.VarChar(255)
   instructions String?
+  glass        String?        @db.VarChar(100)
   ingredients  Ingredient[]
 
   @@index([name])
