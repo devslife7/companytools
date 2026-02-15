@@ -52,31 +52,36 @@ export function BatchCalculatorModal({
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative z-50 animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+                <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100 bg-white sticky top-0 z-10">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Batch Worksheet</h2>
-                        <p className="text-sm text-gray-500 mt-1">Configure your servings and generate reports.</p>
+                        <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Batch Worksheet</h2>
+                        <p className="text-base text-gray-500 mt-1">Configure your servings and generate reports.</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="p-2.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-7 h-7" />
                     </button>
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-8 bg-gray-50/50">
 
                     {/* Progress Bar */}
                     {servingsProgress.total > 0 && (
-                        <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-6">
-                            <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
-                                Progress: {servingsProgress.completed}/{servingsProgress.total}
-                            </span>
-                            <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="flex items-center gap-6 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                                    Progress
+                                </span>
+                                <span className="text-2xl font-black text-orange-600 tabular-nums">
+                                    {servingsProgress.completed}/{servingsProgress.total}
+                                </span>
+                            </div>
+                            <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-orange-500 transition-all duration-500 ease-out"
+                                    className="h-full bg-orange-500 transition-all duration-700 ease-out"
                                     style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}
                                 />
                             </div>
@@ -84,7 +89,7 @@ export function BatchCalculatorModal({
                     )}
 
                     {/* Batch Items List */}
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                         {batches.map((batch) => (
                             <BatchItem
                                 key={batch.id}
@@ -101,19 +106,23 @@ export function BatchCalculatorModal({
                         ))}
 
                         {batches.length === 0 && (
-                            <div className="text-center py-12 text-gray-500">
-                                <p>No cocktails selected. Close this modal and select some recipes!</p>
+                            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+                                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Calculator className="w-10 h-10 text-gray-300" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">No cocktails selected</h3>
+                                <p className="text-gray-500">Close this modal and select some recipes to begin batching.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Footer Actions */}
-                <div className="p-6 border-t border-gray-100 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div className="p-8 border-t border-gray-100 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
                     <button
                         onClick={onGenerateShoppingList}
                         disabled={batches.length === 0}
-                        className="flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-all font-semibold text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-bold text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                     >
                         <ShoppingCart className="w-5 h-5" />
                         <span>Shopping List</span>
@@ -122,7 +131,7 @@ export function BatchCalculatorModal({
                     <button
                         onClick={onGenerateBatchCalculations}
                         disabled={!canExport || batches.length === 0}
-                        className="flex items-center justify-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-all font-semibold text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center justify-center gap-3 px-6 py-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-bold text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                     >
                         <Calculator className="w-5 h-5" />
                         <span>Batch Sheets</span>
@@ -131,7 +140,7 @@ export function BatchCalculatorModal({
                     <button
                         onClick={onGeneratePdfReport}
                         disabled={!canExport || batches.length === 0}
-                        className="flex items-center justify-center gap-3 px-4 py-3 bg-gray-900 text-white border border-gray-900 rounded-xl hover:bg-gray-800 transition-all font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed group"
+                        className="flex items-center justify-center gap-3 px-6 py-4 bg-gray-900 text-white rounded-xl hover:bg-black transition-all font-bold shadow-xl shadow-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
                     >
                         <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         <span>Full Report</span>

@@ -15,7 +15,7 @@ export function Sidebar() {
     const pathname = usePathname()
 
     const navItems = [
-        { name: "Library", href: "/batch-calculator", icon: Library },
+        { name: "Gallery", href: "/batch-calculator", icon: Library },
         { name: "Events", href: "/events", icon: CalendarDays },
         { name: "Inventory", href: "/inventory", icon: Package },
         { name: "Settings", href: "/settings", icon: Settings },
@@ -45,8 +45,8 @@ export function Sidebar() {
                             key={item.name}
                             href={item.href}
                             className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${isActive
-                                    ? "bg-orange-50 text-orange-700"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                ? "bg-orange-50 text-orange-700"
+                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                                 }`}
                         >
                             <item.icon className={`w-5 h-5 ${isActive ? "text-orange-600" : "text-gray-400"}`} />

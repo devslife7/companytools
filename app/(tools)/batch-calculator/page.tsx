@@ -313,18 +313,18 @@ export default function BatchCalculatorPage() {
   }
 
   return (
-    <div className="min-h-screen text-gray-900 pb-24">
+    <div className="min-h-screen text-gray-900 pb-32">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Curated Gallery</h1>
           <p className="text-lg text-gray-500">Manage and batch seasonal beverage programs.</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center justify-center px-6 py-3 bg-[#BA6634] text-white font-semibold rounded-lg hover:bg-[#A35529] transition-all shadow-sm gap-2"
+          className="inline-flex items-center justify-center px-6 py-3.5 bg-[#BA6634] text-white font-bold rounded-xl hover:bg-[#A35529] transition-all shadow-sm gap-2 active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           New Recipe
@@ -332,55 +332,61 @@ export default function BatchCalculatorPage() {
       </div>
 
       {/* 2. Filters & Search */}
-      <div className="bg-white p-2 rounded-xl border border-gray-200 shadow-sm mb-8 flex flex-col md:flex-row gap-2 md:items-center">
+      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-gray-200 shadow-sm mb-10 flex flex-col md:flex-row gap-4 md:items-center">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
             placeholder="Search by name or ingredient..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-lg focus:ring-2 focus:ring-[#BA6634]/20 focus:bg-white transition-all text-gray-900 placeholder:text-gray-400"
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-[#BA6634]/20 focus:bg-white focus:border-[#BA6634]/20 transition-all text-gray-900 placeholder:text-gray-400"
           />
         </div>
 
         {/* Separator on Desktop */}
-        <div className="hidden md:block w-px h-8 bg-gray-200 mx-1"></div>
+        <div className="hidden md:block w-px h-10 bg-gray-200 mx-2"></div>
 
         {/* Filters Row */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0">
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0 scrollbar-hide">
           {/* Spirit Filter */}
-          <div className="relative group min-w-[120px]">
+          <div className="relative group min-w-[140px]">
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
-              className="appearance-none w-full pl-3 pr-8 py-2.5 bg-gray-100/50 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
             >
               <option value="All">Spirit: All</option>
               {availableLiquors.map(l => <option key={l} value={l}>Spirit: {l}</option>)}
             </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <Filter className="w-4 h-4" />
+            </div>
           </div>
 
           {/* Style Filter */}
-          <div className="relative group min-w-[120px]">
+          <div className="relative group min-w-[140px]">
             <select
               value={selectedStyle}
               onChange={(e) => setSelectedStyle(e.target.value)}
-              className="appearance-none w-full pl-3 pr-8 py-2.5 bg-gray-100/50 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
             >
               <option value="All">Style: All</option>
               <option value="Shaken">Style: Shaken</option>
               <option value="Stirred/Built">Style: Stirred</option>
             </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <Wine className="w-4 h-4" />
+            </div>
           </div>
 
           {/* Glass Filter */}
-          <div className="relative group min-w-[120px]">
+          <div className="relative group min-w-[140px]">
             <select
               value={selectedGlass}
               onChange={(e) => setSelectedGlass(e.target.value)}
-              className="appearance-none w-full pl-3 pr-8 py-2.5 bg-gray-100/50 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#BA6634]/20 transition-all border-none"
             >
               <option value="All">Glass: All</option>
               <option value="Coupe">Glass: Coupe</option>
@@ -389,36 +395,38 @@ export default function BatchCalculatorPage() {
               <option value="Flute">Glass: Flute</option>
               <option value="Martini">Glass: Martini</option>
             </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <Citrus className="w-4 h-4" />
+            </div>
           </div>
-
-          {/* Filter Icon Button (Visual) */}
-          <button className="p-2.5 text-[#BA6634] bg-[#BA6634]/10 rounded-lg hover:bg-[#BA6634]/20 transition-colors">
-            <Filter className="w-5 h-5" />
-          </button>
         </div>
       </div>
 
       {/* 3. Grid Gallery */}
       {cocktailsLoading ? (
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="w-8 h-8 text-[#BA6634] animate-spin" />
+        <div className="flex flex-col items-center justify-center h-96 gap-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-[#BA6634]/20 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-t-[#BA6634] rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <p className="text-gray-500 font-medium animate-pulse">Loading recipes...</p>
         </div>
       ) : filteredCocktails.length === 0 ? (
-        <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-gray-300">
-          <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-            <Search className="w-8 h-8 text-gray-400" />
+        <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+          <div className="mx-auto w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+            <Search className="w-10 h-10 text-gray-300" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No recipes found</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">No recipes found</h3>
           <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your search terms or filters to find what you're looking for.</p>
           <button
             onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setSelectedStyle('All'); setSelectedGlass('All'); }}
-            className="mt-6 text-[#BA6634] font-medium hover:underline"
+            className="mt-8 text-[#BA6634] font-bold hover:text-[#A35529] transition-colors inline-flex items-center gap-2"
           >
             Clear all filters
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredCocktails.map(cocktail => {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
             const glass = inferGlassType(cocktail.instructions)

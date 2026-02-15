@@ -145,130 +145,137 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
 
     if (!recipe)
       return (
-        <div className="p-4 bg-gray-50 border border-gray-300 rounded-xl mt-4 text-center text-gray-500">
-          <FlaskConical className="w-8 h-8 mx-auto mb-2 text-orange-600" />
-          <p>Select a cocktail above to see its recipe and batch calculations.</p>
+        <div className="p-8 bg-gray-50 border border-gray-200 rounded-2xl mt-6 text-center text-gray-500 shadow-inner">
+          <FlaskConical className="w-12 h-12 mx-auto mb-4 text-orange-200" />
+          <p className="font-medium">Select a cocktail above to see its recipe and batch calculations.</p>
         </div>
       )
 
     return (
-      <div className="mt-2">
+      <div className="space-y-8">
         {/* Name editing input when in edit mode */}
         {isEditing && (
-          <div className="mb-4 pb-4 border-b border-gray-300">
+          <div className="pb-6 border-b border-gray-100">
+            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Cocktail Name</label>
             <input
               type="text"
               value={recipe.name}
               onChange={e => onNameChange(id, e.target.value)}
-              className="text-xl font-extrabold text-gray-900 bg-white border border-gray-300 rounded px-4 md:px-2 py-3 md:py-1 w-full max-w-md focus:ring-2 focus:ring-orange-500 text-base md:text-xl min-h-[44px] md:min-h-0"
+              className="text-xl font-extrabold text-gray-900 bg-white border border-gray-200 rounded-xl px-4 py-3 w-full max-w-md focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 transition-all"
               placeholder="Cocktail Name"
               inputMode="text"
             />
           </div>
         )}
 
-        <div className="pt-2 px-0 pb-3 sm:pb-4">
+        <div className="space-y-6">
           {recipe.instructions && (
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-1.5">
-                <h4 className="text-sm font-semibold text-gray-900">Instructions:</h4>
-                <span className="text-sm text-gray-600">
-                  {recipe.method || "N/A"}
-                </span>
+            <div className="bg-white/50 p-4 rounded-xl border border-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded uppercase tracking-wider">Method: {recipe.method || "N/A"}</span>
               </div>
-              <div className="text-sm text-gray-700 whitespace-pre-line">
+              <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                 {recipe.instructions}
               </div>
             </div>
           )}
 
           {!recipe.instructions && (
-            <p className="text-sm text-gray-600 mb-3">
-              {recipe.method || "N/A"}
-            </p>
+            <div className="inline-block text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded uppercase tracking-wider mb-2">
+              Method: {recipe.method || "N/A"}
+            </div>
           )}
 
-          <h4 className="text-lg font-semibold text-orange-600 mb-2">Ingredients (1 Serving)</h4>
-          <div className="space-y-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
-            {recipe.ingredients.map((item, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center border-b border-gray-200 pb-1 last:border-b-0"
-              >
-                {isEditing ? (
-                  <div className="flex flex-col md:flex-row items-stretch md:items-center w-full gap-2 md:gap-2">
-                    <input
-                      type="text"
-                      value={item.name}
-                      onChange={e => handleIngredientUpdate(index, "name", e.target.value)}
-                      className="flex-1 py-3 md:py-1 px-3 md:px-2 bg-white text-gray-700 rounded border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base md:text-sm min-h-[44px] md:min-h-0"
-                      placeholder="Ingredient Name"
-                      inputMode="text"
-                    />
-                    <div className="flex gap-2 md:gap-1">
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div>
+              Ingredients (1 Serving)
+            </h4>
+            <div className="space-y-3 p-4 sm:p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              {recipe.ingredients.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center border-b border-gray-50 pb-3 last:border-b-0 last:pb-0"
+                >
+                  {isEditing ? (
+                    <div className="flex flex-col md:flex-row items-stretch md:items-center w-full gap-4">
                       <input
                         type="text"
-                        value={item.amount}
-                        onChange={e => handleIngredientUpdate(index, "amount", e.target.value)}
-                        className="w-24 md:w-16 py-3 md:py-1 px-3 md:px-2 text-right bg-white text-orange-600 rounded border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base md:text-sm min-h-[44px] md:min-h-0"
-                        placeholder="Amount"
-                        inputMode="decimal"
+                        value={item.name}
+                        onChange={e => handleIngredientUpdate(index, "name", e.target.value)}
+                        className="flex-1 py-3 px-4 bg-gray-50 text-gray-700 rounded-xl border border-transparent focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all text-base"
+                        placeholder="Ingredient Name"
+                        inputMode="text"
                       />
-                      <select
-                        value={item.unit || "oz"}
-                        onChange={e => handleIngredientUpdate(index, "unit", e.target.value)}
-                        className="w-28 md:w-16 py-3 md:py-1 px-2 md:px-1 text-base md:text-sm bg-white text-orange-600 rounded border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[44px] md:min-h-0"
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={item.amount}
+                          onChange={e => handleIngredientUpdate(index, "amount", e.target.value)}
+                          className="w-24 py-3 px-4 text-right bg-gray-50 text-orange-600 rounded-xl border border-transparent focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all text-base font-bold"
+                          placeholder="0"
+                          inputMode="decimal"
+                        />
+                        <select
+                          value={item.unit || "oz"}
+                          onChange={e => handleIngredientUpdate(index, "unit", e.target.value)}
+                          className="w-28 py-3 px-2 text-base bg-gray-50 text-orange-600 rounded-xl border border-transparent focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-bold cursor-pointer"
+                        >
+                          <option value="oz">oz</option>
+                          <option value="dash">dash</option>
+                          <option value="tsp">tsp</option>
+                          <option value="each">each</option>
+                        </select>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveIngredient(index)}
+                        className="px-4 py-3 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all flex items-center justify-center gap-2"
+                        aria-label="Remove ingredient"
                       >
-                        <option value="oz">oz</option>
-                        <option value="dash">dash</option>
-                        <option value="tsp">tsp</option>
-                        <option value="each">each</option>
-                      </select>
+                        <X className="w-5 h-5" />
+                        <span className="md:hidden text-sm font-bold">Remove</span>
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleRemoveIngredient(index)}
-                      className="px-4 md:p-1 py-3 md:py-1 text-red-500 hover:bg-red-100 rounded flex items-center justify-center gap-2 md:gap-0 min-h-[44px] md:min-h-0"
-                      aria-label="Remove ingredient"
-                    >
-                      <X className="w-5 h-5 md:w-4 md:h-4" />
-                      <span className="md:hidden text-sm font-medium">Remove</span>
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <span className="text-gray-700">{item.name}</span>
-                    <span className="font-mono text-orange-600">
-                      {item.amount}{item.unit ? ` ${item.unit}` : ''}
-                    </span>
-                  </>
-                )}
-              </div>
-            ))}
-            {isEditing && (
-              <button
-                onClick={handleAddIngredient}
-                className="w-full mt-2 py-3 md:py-2 flex items-center justify-center text-base md:text-sm font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded border border-dashed border-orange-300 transition-colors min-h-[44px] md:min-h-0"
-              >
-                <PlusCircle className="w-5 h-5 md:w-4 md:h-4 mr-1" /> Add Ingredient
-              </button>
-            )}
+                  ) : (
+                    <>
+                      <span className="text-gray-700 font-medium">{item.name}</span>
+                      <span className="font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg">
+                        {item.amount}{item.unit ? ` ${item.unit}` : ''}
+                      </span>
+                    </>
+                  )}
+                </div>
+              ))}
+              {isEditing && (
+                <button
+                  onClick={handleAddIngredient}
+                  className="w-full mt-4 py-4 flex items-center justify-center text-sm font-extrabold text-[#BA6634] bg-[#BA6634]/5 hover:bg-[#BA6634]/10 rounded-xl border-2 border-dashed border-[#BA6634]/20 transition-all active:scale-[0.98]"
+                >
+                  <PlusCircle className="w-5 h-5 mr-2" /> Add Ingredient
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Batch Totals Toggle Button */}
           {(servingsNum > 0 || singleServingVolumeML > 0) && (
-            <div className="mt-4">
+            <div className="pt-4">
               <button
                 onClick={() => setShowBatchTotals(!showBatchTotals)}
-                className="w-full flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition duration-200"
+                className={`w-full flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 ${
+                  showBatchTotals 
+                    ? "bg-gray-900 text-white border-gray-900 shadow-lg" 
+                    : "bg-white text-gray-900 border-gray-200 hover:border-orange-300 hover:bg-orange-50/30"
+                }`}
               >
-                <div className="flex items-center space-x-2">
-                  <Ruler className="w-6 h-6 text-orange-600" />
-                  <h4 className="text-xl font-bold text-gray-900">Batch Totals</h4>
+                <div className="flex items-center gap-3">
+                  <Ruler className={`w-6 h-6 ${showBatchTotals ? "text-orange-400" : "text-orange-600"}`} />
+                  <h4 className="text-xl font-bold">Batch Totals</h4>
                 </div>
                 {showBatchTotals ? (
-                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                  <ChevronUp className="w-5 h-5 opacity-50" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                  <ChevronDown className="w-5 h-5 opacity-50" />
                 )}
               </button>
             </div>
@@ -276,121 +283,123 @@ export const SingleBatchDisplay: React.FC<SingleBatchDisplayProps> = React.memo(
 
           {/* Batch Totals Table */}
           {showBatchTotals && (servingsNum > 0 || singleServingVolumeML > 0) && (
-            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl shadow-inner">
-              <p className="text-sm text-gray-600 mb-3 border-b border-gray-200 pb-2">
-                1 Serving Liquid Volume: {formatNumber(singleServingVolumeML / 29.5735)} oz (
-                {formatNumber(singleServingVolumeML)} ml)
+            <div className="space-y-6 p-4 sm:p-6 bg-white border border-gray-200 rounded-2xl shadow-xl animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center gap-2 p-3 bg-blue-50 text-blue-800 rounded-xl text-sm font-medium border border-blue-100">
+                <FlaskConical className="w-4 h-4" />
+                <span>
+                  1 Serving Liquid Volume: {formatNumber(singleServingVolumeML / 29.5735)} oz (
+                  {formatNumber(singleServingVolumeML)} ml)
+                </span>
                 {singleServingVolumeML === 0 && (
-                  <span className="text-red-600 ml-2"> (Cannot perform proportional batching.)</span>
+                  <span className="text-red-600 ml-2 font-bold"> (Invalid Volume)</span>
                 )}
-              </p>
+              </div>
 
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-gray-100">
                 <table className="min-w-full text-sm">
                   {/* Servings Based Calculation (Calculation 1) */}
-                  <thead className="text-gray-900 bg-gray-200/80">
-                    <tr>
-                      <th className="py-1 px-1 text-left w-1/3 border-b-2 border-orange-600" rowSpan={2}>
-                        INGREDIENT
-                      </th>
-                      <th className="py-1 px-1 text-center" colSpan={3}>
-                        Calculation 1: {servingsNum} Servings (Total {formatNumber(totalServingsLiquidML / LITER_TO_ML)}{" "}
-                        L)
+                  <thead>
+                    <tr className="text-gray-500 uppercase tracking-widest text-[10px] font-bold bg-gray-50">
+                      <th className="py-4 px-4 text-left border-b border-gray-100">Ingredient</th>
+                      <th className="py-4 px-4 text-right border-b border-gray-100" colSpan={3}>
+                        Calculation 1: {servingsNum} Servings ({formatNumber(totalServingsLiquidML / LITER_TO_ML)} L)
                       </th>
                     </tr>
-                    <tr className="bg-gray-200/80">
-                      <th className="py-1 px-1 text-right">ML</th>
-                      <th className="py-1 px-1 text-right">QUARTS (Q)</th>
-                      <th className="py-1 px-1 text-right">@750 BOTTLES</th>
+                    <tr className="bg-gray-50/50 text-[11px] font-bold text-gray-400">
+                      <th className="py-2 px-4 border-b border-gray-100"></th>
+                      <th className="py-2 px-4 text-right border-b border-gray-100">ML</th>
+                      <th className="py-2 px-4 text-right border-b border-gray-100">Quarts</th>
+                      <th className="py-2 px-4 text-right border-b border-gray-100">750ml Bottles</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-50">
                     {combinedIngredients.map((ing, ingIndex) => (
                       <tr
                         key={`${ing.name}-servings`}
-                        className="border-t border-gray-200 hover:bg-gray-100 transition duration-150"
+                        className="hover:bg-gray-50 transition-colors"
                       >
-                        <td className="py-1 px-1 text-gray-700 font-medium border-r border-gray-200">{ing.name}</td>
+                        <td className="py-3 px-4 text-gray-900 font-bold">{ing.name}</td>
                         {ing.isLiquid ? (
                           <>
-                            <td className="py-1 px-1 text-right font-mono text-gray-900">
+                            <td className="py-3 px-4 text-right font-mono text-gray-900">
                               {formatMLValue(ing.servings.ml)}
                             </td>
-                            <td className="py-1 px-1 text-right font-mono text-gray-900">
+                            <td className="py-3 px-4 text-right font-mono text-gray-900">
                               {formatNumber(ing.servings.quart)}
                             </td>
-                            <td className="py-1 px-1 text-right font-mono text-gray-900">
+                            <td className="py-3 px-4 text-right font-mono text-gray-900">
                               {formatNumber(ing.servings.bottles)}
                             </td>
                           </>
                         ) : (
-                          <td colSpan={3} className="py-1 px-1 text-center font-mono text-gray-400">
+                          <td colSpan={3} className="py-3 px-4 text-center font-bold text-gray-400 italic">
                             {ing.isCount
-                              ? `${formatNumber(ing.servings.ml, 0)} ${ing.servings.originalUnit} (Count Item)`
-                              : `${ing.servings.originalUnit} (To Taste/Top)`}
+                              ? `${formatNumber(ing.servings.ml, 0)} ${ing.servings.originalUnit}`
+                              : `To Taste`}
                           </td>
                         )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
 
                 {/* Fixed 20L Target Based Calculation (Calculation 2) */}
                 {shouldShowFixedBatch ? (
-                  <table className="min-w-full text-sm mt-6">
-                    <thead className="text-gray-900 bg-gray-200/80">
-                      <tr>
-                        <th className="py-1 px-1 text-left w-1/3 border-b-2 border-orange-600" rowSpan={2}>
-                          INGREDIENT
-                        </th>
-                        <th className="py-1 px-1 text-center" colSpan={3}>
-                          Calculation 2: Fixed Proportional Batch for {targetLiters} Liters
-                        </th>
-                      </tr>
-                      <tr className="bg-gray-200/80">
-                        <th className="py-1 px-1 text-right">ML</th>
-                        <th className="py-1 px-1 text-right">QUARTS (Q)</th>
-                        <th className="py-1 px-1 text-right">@750 BOTTLES</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {combinedIngredients.map((ing, ingIndex) => (
-                        <tr
-                          key={`${ing.name}-target`}
-                          className="border-t border-gray-200 hover:bg-gray-100 transition duration-150"
-                        >
-                          <td className="py-1 px-1 text-gray-700 font-medium border-r border-gray-200">{ing.name}</td>
-                          {ing.isLiquid ? (
-                            <>
-                              <td className="py-1 px-1 text-right font-mono text-orange-600">
-                                {formatMLValue(ing.target.ml)}
-                              </td>
-                              <td className="py-1 px-1 text-right font-mono text-orange-600">
-                                {formatNumber(ing.target.quart)}
-                              </td>
-                              <td className="py-1 px-1 text-right font-mono text-orange-600">
-                                {formatNumber(ing.target.bottles)}
-                              </td>
-                            </>
-                          ) : (
-                            <td colSpan={3} className="py-1 px-1 text-center font-mono text-gray-400">
-                              Count items cannot be proportionally batched by volume.
-                            </td>
-                          )}
+                  <div className="overflow-x-auto rounded-xl border border-orange-100 bg-orange-50/20">
+                    <table className="min-w-full text-sm">
+                      <thead>
+                        <tr className="text-[#BA6634] uppercase tracking-widest text-[10px] font-bold bg-orange-50/50">
+                          <th className="py-4 px-4 text-left border-b-2 border-orange-100">Ingredient</th>
+                          <th className="py-4 px-4 text-right border-b-2 border-orange-100" colSpan={3}>
+                            Calculation 2: Fixed Proportional {targetLiters}L Batch
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                        <tr className="bg-orange-50/30 text-[11px] font-bold text-[#BA6634]/60">
+                          <th className="py-2 px-4 border-b border-orange-100"></th>
+                          <th className="py-2 px-4 text-right border-b border-orange-100">ML</th>
+                          <th className="py-2 px-4 text-right border-b border-orange-100">Quarts</th>
+                          <th className="py-2 px-4 text-right border-b border-orange-100">750ml Bottles</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-orange-100/50">
+                        {combinedIngredients.map((ing, ingIndex) => (
+                          <tr
+                            key={`${ing.name}-target`}
+                            className="hover:bg-orange-50 transition-colors"
+                          >
+                            <td className="py-3 px-4 text-gray-900 font-bold">{ing.name}</td>
+                            {ing.isLiquid ? (
+                              <>
+                                <td className="py-3 px-4 text-right font-mono text-[#BA6634] font-bold">
+                                  {formatMLValue(ing.target.ml)}
+                                </td>
+                                <td className="py-3 px-4 text-right font-mono text-[#BA6634] font-bold">
+                                  {formatNumber(ing.target.quart)}
+                                </td>
+                                <td className="py-3 px-4 text-right font-mono text-[#BA6634] font-bold">
+                                  {formatNumber(ing.target.bottles)}
+                                </td>
+                              </>
+                            ) : (
+                              <td colSpan={3} className="py-3 px-4 text-center font-bold text-[#BA6634]/40 italic">
+                                Scaled by Volume
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 ) : (
                   singleServingVolumeML > 0 && (
-                    <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-gray-700 text-center">
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 font-medium text-center">
                       The Proportional {targetLiters}L Batch calculation is hidden because your current {servingsNum}{" "}
                       Servings Batch total ({formatNumber(totalServingsLiquidML / LITER_TO_ML)} L) is less than the{" "}
                       {targetLiters} L threshold.
                     </div>
                   )
                 )}
-              </div>
             </div>
           )}
         </div>
