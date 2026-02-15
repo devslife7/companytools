@@ -1,0 +1,42 @@
+@theme inline {
+    --color-brand-primary: var(--brand-primary);
+    --color-brand-secondary: var(--brand-secondary);
+    --color-brand-accent: var(--brand-accent);
+    --color-brand-gray: var(--brand-gray);
+}
+
+:root {
+    /* 
+    BRAND IDENTITY 
+    Change these values to update your brand colors across the app.
+  */
+
+    /* Primary: Main brand color, used for buttons, links, and active states */
+    --brand-primary: #2563ea;
+    /* Royal Blue */
+
+    /* Secondary: Supporting color for headers, important UI elements */
+    --brand-secondary: #1e293b;
+    /* Slate 800 */
+
+    /* Accent: Used for highlights, calls to action, or emphasis */
+    --brand-accent: #f59e0b;
+    /* Amber 500 */
+
+    /* Neutral: Used for backgrounds, borders, and subtle text */
+    --brand-gray: #64748b;
+    /* Slate 500 */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --brand-primary: #3b82f6;
+        /* Blue 500 */
+        --brand-secondary: #f8fafc;
+        /* Slate 50 */
+        --brand-accent: #fbbf24;
+        /* Amber 400 */
+        --brand-gray: #94a3b8;
+        /* Slate 400 */
+    }
+}
