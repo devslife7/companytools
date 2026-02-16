@@ -18,7 +18,7 @@ import { useToast, ToastContainer } from "@/components/ui"
 import { BatchCalculatorModal } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { Modal } from "@/components/ui"
-import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2, Star } from "lucide-react"
+import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2, Star, Martini } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -335,14 +335,14 @@ export default function BatchCalculatorPage() {
         {/* Filters Row */}
         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0 scrollbar-hide">
           {/* Spirit Filter */}
-          <div className="relative group min-w-[140px]">
+          <div className="relative group min-w-[100px]">
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
               className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
-              <option value="All">Spirit: All</option>
-              {availableLiquors.map(l => <option key={l} value={l}>Spirit: {l}</option>)}
+              <option value="All">Spirit</option>
+              {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
               <Filter className="w-4 h-4" />
@@ -371,7 +371,7 @@ export default function BatchCalculatorPage() {
               onChange={(e) => setSelectedGlass(e.target.value)}
               className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
             >
-              <option value="All">Show: All</option>
+              <option value="All">All Glasses</option>
               <option value="Rocks">Rocks</option>
               <option value="Coupe">Coupe</option>
               <option value="Martini">Martini</option>
@@ -381,7 +381,7 @@ export default function BatchCalculatorPage() {
               <option value="Served Up">Served Up</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <Citrus className="w-4 h-4" />
+              <Martini className="w-4 h-4" />
             </div>
           </div>
         </div>
@@ -430,7 +430,7 @@ export default function BatchCalculatorPage() {
               abvBadge = (
                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg shadow-sm border border-emerald-100 flex items-center gap-1.5 z-10 group-hover:scale-105 transition-transform">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                  <span className="text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase">Zero Proof</span>
+                  <span className="text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase">Mocktail</span>
                 </div>
               )
             } else if (cocktail.abv && cocktail.abv > 0) {

@@ -4,6 +4,7 @@ import { X, PlusCircle, Trash2, Save, Loader2, AlertCircle } from "lucide-react"
 import type { CocktailRecipe, Ingredient, CocktailMethod, GlassType } from "../types"
 import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
 import { parseAmount } from "../lib/calculations"
+import { calculateCocktailABV } from "../lib/abv"
 
 interface EditRecipeModalProps {
   isOpen: boolean
@@ -137,29 +138,51 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   }
 
   const handleGlassTypeChange = (value: string) => {
-    setEditedRecipe({ ...editedRecipe, glassType: value as GlassType || undefined })
+    setEditedRecipe(prev => ({ ...prev!, glassType: value as GlassType || undefined }))
   }
 
   const handleInstructionsChange = (value: string) => {
-    setEditedRecipe({ ...editedRecipe, instructions: value })
+    setEditedRecipe(prev => ({ ...prev!, instructions: value }))
+  }
+
+  const recalculateABV = (ingredients: Ingredient[]) => {
+    // Only calculate if ingredients exist
+    const abv = calculateCocktailABV(ingredients)
+    return abv
   }
 
   const handleIngredientChange = (index: number, field: keyof Ingredient, value: string) => {
+    if (!editedRecipe) return
     const newIngredients = [...editedRecipe.ingredients]
     newIngredients[index] = { ...newIngredients[index], [field]: value }
-    setEditedRecipe({ ...editedRecipe, ingredients: newIngredients })
+
+    // Auto-calculate ABV on ingredient change
+    const newABV = recalculateABV(newIngredients)
+
+    setEditedRecipe({
+      ...editedRecipe,
+      ingredients: newIngredients,
+      abv: newABV
+    })
   }
 
   const handleAddIngredient = () => {
+    if (!editedRecipe) return
+    const newIngredients = [...editedRecipe.ingredients, { name: "", amount: "", unit: "oz", preferredUnit: "" }]
+
     setEditedRecipe({
       ...editedRecipe,
-      ingredients: [...editedRecipe.ingredients, { name: "", amount: "", unit: "oz", preferredUnit: "" }],
+      ingredients: newIngredients,
+      // No change to ABV usually when adding empty ingredient, but let's keep consistent
     })
   }
 
   const handleRemoveIngredient = (index: number) => {
+    if (!editedRecipe) return
     const newIngredients = editedRecipe.ingredients.filter((_, i) => i !== index)
-    setEditedRecipe({ ...editedRecipe, ingredients: newIngredients })
+    const newABV = recalculateABV(newIngredients)
+
+    setEditedRecipe({ ...editedRecipe, ingredients: newIngredients, abv: newABV })
   }
 
   const handleSave = async () => {
@@ -195,6 +218,9 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
 
     setValidationError(null)
 
+    // Calculate ABV if not explicitly set by user
+    const finalABV = editedRecipe.abv !== undefined ? editedRecipe.abv : recalculateABV(validIngredients)
+
     // If editing existing recipe with database ID, save to database
     if (mode === 'edit' && cocktailId) {
       const updatedRecipe = await updateCocktail(cocktailId, {
@@ -202,7 +228,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         method: editedRecipe.method,
         glassType: editedRecipe.glassType,
         instructions: editedRecipe.instructions?.trim() || undefined,
-        abv: editedRecipe.abv,
+        abv: finalABV,
         ingredients: validIngredients,
       })
 
@@ -220,7 +246,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         name: editedRecipe.name.trim(),
         method: editedRecipe.method as CocktailMethod,
         instructions: editedRecipe.instructions?.trim() || undefined,
-        abv: editedRecipe.abv,
+        abv: finalABV,
         ingredients: validIngredients,
       })
       onClose()

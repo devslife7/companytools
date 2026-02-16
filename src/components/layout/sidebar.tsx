@@ -6,8 +6,6 @@ import {
     GlassWater,
     Library,
     CalendarDays,
-    Package,
-    Settings,
     User
 } from "lucide-react"
 
@@ -16,9 +14,7 @@ export function Sidebar() {
 
     const navItems = [
         { name: "Gallery", href: "/batch-calculator", icon: Library },
-        { name: "Events", href: "/events", icon: CalendarDays },
-        { name: "Inventory", href: "/inventory", icon: Package },
-        { name: "Settings", href: "/settings", icon: Settings },
+        { name: "Saved Events", href: "/saved-events", icon: CalendarDays },
     ]
 
     return (
