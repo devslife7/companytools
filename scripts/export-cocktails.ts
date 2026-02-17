@@ -50,6 +50,26 @@ function formatCocktail(cocktail: CocktailRecipe, index: number, total: number):
     lines.push(`    glassType: ${JSON.stringify(cocktail.glassType)},`)
   }
 
+  // Season (if set)
+  if (cocktail.season) {
+    lines.push(`    season: ${JSON.stringify(cocktail.season)},`)
+  }
+
+  // Image (if set)
+  if (cocktail.image) {
+    lines.push(`    image: ${JSON.stringify(cocktail.image)},`)
+  }
+
+  // Tags (if set and not empty)
+  if (cocktail.tags && cocktail.tags.length > 0) {
+    lines.push(`    tags: ${JSON.stringify(cocktail.tags)},`)
+  }
+
+  // Category (if set)
+  if (cocktail.category) {
+    lines.push(`    category: ${JSON.stringify(cocktail.category)},`)
+  }
+
   // Ingredients
   lines.push('    ingredients: [')
   cocktail.ingredients.forEach((ing, ingIndex) => {
@@ -116,6 +136,11 @@ function transformCocktailToRecipe(cocktail: {
     unit?: string | null
     preferredUnit?: string | null
   }>
+  glass?: string | null
+  season?: string | null
+  tags?: string[]
+  category?: string | null
+  image?: string | null
 }): CocktailRecipe {
   // Ensure method is a valid CocktailMethod (fallback to Build if invalid)
   const validMethod: CocktailMethod =
@@ -158,6 +183,26 @@ function transformCocktailToRecipe(cocktail: {
 
   if (cocktail.abv !== null && cocktail.abv !== undefined) {
     recipe.abv = cocktail.abv
+  }
+
+  if (cocktail.glass) {
+    recipe.glassType = cocktail.glass as any
+  }
+
+  if (cocktail.season) {
+    recipe.season = cocktail.season as any
+  }
+
+  if (cocktail.tags && cocktail.tags.length > 0) {
+    recipe.tags = cocktail.tags
+  }
+
+  if (cocktail.category) {
+    recipe.category = cocktail.category
+  }
+
+  if (cocktail.image) {
+    recipe.image = cocktail.image
   }
 
   return recipe

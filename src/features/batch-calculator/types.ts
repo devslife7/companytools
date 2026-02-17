@@ -25,6 +25,8 @@ export interface CocktailRecipe {
   image?: string
   abv?: number
   season?: CocktailSeason
+  tags?: string[]
+  category?: string
 }
 
 export type UnitType = "liquid" | "count" | "special"

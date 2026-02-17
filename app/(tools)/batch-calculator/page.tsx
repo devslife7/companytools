@@ -81,10 +81,10 @@ export default function BatchCalculatorPage() {
 
   // Use database cocktails if available, fallback to static data
   const allCocktails = useMemo(() => {
-    if (!cocktailsLoading && apiCocktails.length > 0) return apiCocktails
-    if (cocktailsError || (!cocktailsLoading && apiCocktails.length === 0)) return COCKTAIL_DATA
+    if (cocktailsError) return COCKTAIL_DATA
+    if (apiCocktails.length > 0) return apiCocktails
     return COCKTAIL_DATA
-  }, [apiCocktails, cocktailsLoading, cocktailsError])
+  }, [apiCocktails, cocktailsError])
 
   // Filter Logic
   const filteredCocktails = useMemo(() => {
@@ -349,11 +349,11 @@ export default function BatchCalculatorPage() {
         {/* Filters Row */}
         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0 scrollbar-hide">
           {/* Spirit Filter */}
-          <div className="relative group min-w-0">
+          <div className="relative group w-[130px] flex-shrink-0">
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none truncate"
             >
               <option value="All">All Spirits</option>
               {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
