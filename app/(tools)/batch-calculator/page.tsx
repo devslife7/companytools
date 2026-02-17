@@ -206,14 +206,6 @@ export default function BatchCalculatorPage() {
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
 
-  const servingsProgress = useMemo(() => {
-    const totalBatches = batches.filter(b => b.editableRecipe).length
-    const batchesWithServings = batches.filter(
-      b => b.editableRecipe && typeof b.servings === "number" && b.servings > 0
-    ).length
-    return { completed: batchesWithServings, total: totalBatches }
-  }, [batches])
-
   const handleGenerateShoppingList = () => generateShoppingListPdf(batches)
 
   const handleGenerateBatchCalculations = () => {
@@ -551,7 +543,6 @@ export default function BatchCalculatorPage() {
         onRemove={handleRemoveBatch}
         onEditRecipe={(c, id) => { setShowBatchModal(false); setEditingCocktail(c); setEditingCocktailId(id); setShowEditModal(true); }}
         batchesWithMissingServings={batchesWithMissingServings}
-        servingsProgress={servingsProgress}
         onGenerateShoppingList={handleGenerateShoppingList}
         onGenerateBatchCalculations={handleGenerateBatchCalculations}
         onGeneratePdfReport={handleGeneratePdfReport}

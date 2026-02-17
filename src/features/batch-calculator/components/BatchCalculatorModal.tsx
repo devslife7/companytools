@@ -14,7 +14,6 @@ interface BatchCalculatorModalProps {
     onRemove: (id: number) => void
     onEditRecipe: (recipe: CocktailRecipe, id?: number) => void
     batchesWithMissingServings: Set<number>
-    servingsProgress: { completed: number; total: number }
     onGenerateShoppingList: () => void
     onGenerateBatchCalculations: () => void
     onGeneratePdfReport: () => void
@@ -32,7 +31,6 @@ export function BatchCalculatorModal({
     onRemove,
     onEditRecipe,
     batchesWithMissingServings,
-    servingsProgress,
     onGenerateShoppingList,
     onGenerateBatchCalculations,
     onGeneratePdfReport,
@@ -67,26 +65,6 @@ export function BatchCalculatorModal({
 
                 {/* Scrollable Content */}
                 <div className="flex-1 overflow-y-auto p-8 bg-gray-50/50">
-
-                    {/* Progress Bar */}
-                    {servingsProgress.total > 0 && (
-                        <div className="flex items-center gap-6 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm mb-8">
-                            <div className="flex flex-col gap-1">
-                                <span className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-                                    Progress
-                                </span>
-                                <span className="text-2xl font-black text-orange-600 tabular-nums">
-                                    {servingsProgress.completed}/{servingsProgress.total}
-                                </span>
-                            </div>
-                            <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-orange-500 transition-all duration-700 ease-out"
-                                    style={{ width: `${(servingsProgress.completed / servingsProgress.total) * 100}%` }}
-                                />
-                            </div>
-                        </div>
-                    )}
 
                     {/* Batch Items List */}
                     <div className="space-y-8">
