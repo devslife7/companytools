@@ -9,6 +9,7 @@ import Link from "next/link"
 import type { BatchState } from "@/features/batch-calculator/types"
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
 import { generatePdfReport, generateShoppingListPdf } from "@/features/batch-calculator/lib/pdf-generator"
+import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 
 // Hooks
 import { useCocktails } from "@/features/batch-calculator/hooks"
@@ -28,6 +29,15 @@ export default function BatchReviewPage() {
     const { cocktails, loading } = useCocktails({ enabled: true })
     const [batches, setBatches] = useState<BatchState[]>([])
     const [measureSystem, setMeasureSystem] = useState<'us' | 'metric'>('us')
+    const [liquorPrices, setLiquorPrices] = useState<LiquorPriceMap | undefined>()
+
+    // Fetch liquor prices
+    useEffect(() => {
+        fetch('/api/liquor-prices')
+            .then(res => res.ok ? res.json() : null)
+            .then(data => { if (data) setLiquorPrices(data) })
+            .catch(err => console.error('Failed to fetch liquor prices:', err))
+    }, [])
 
     // Initialize batches from URL params
     useEffect(() => {
@@ -64,7 +74,7 @@ export default function BatchReviewPage() {
     }, [])
 
     const handlePrint = () => {
-        generatePdfReport(batches)
+        generatePdfReport(batches, liquorPrices)
     }
 
     if (loading) {
@@ -193,7 +203,7 @@ export default function BatchReviewPage() {
                                     Export CSV
                                 </button>
                                 <button
-                                    onClick={() => generateShoppingListPdf(batches)}
+                                    onClick={() => generateShoppingListPdf(batches, liquorPrices)}
                                     className="flex-1 py-3 bg-brand-primary text-white font-bold rounded-xl text-sm hover:bg-brand-primary-hover transition-all shadow-md shadow-brand-primary/20 flex items-center justify-center gap-2"
                                 >
                                     <ShoppingCart className="w-4 h-4" />

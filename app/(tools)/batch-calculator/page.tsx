@@ -10,6 +10,7 @@ import { COCKTAIL_SEASONS } from "@/features/batch-calculator/types"
 // Import utilities
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
 import { generatePdfReport, generateShoppingListPdf, generateBatchCalculationsPdf } from "@/features/batch-calculator/lib/pdf-generator"
+import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 import { COCKTAIL_DATA } from "@/features/batch-calculator/data/cocktails"
 
 // Import hooks
@@ -48,6 +49,7 @@ export default function BatchCalculatorPage() {
   const [selectedSeason, setSelectedSeason] = useState<string>('All')
 
   const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
+  const [liquorPrices, setLiquorPrices] = useState<LiquorPriceMap | undefined>()
 
   // Toast notifications
   const { toasts, removeToast, success, error: showError } = useToast()
@@ -57,7 +59,7 @@ export default function BatchCalculatorPage() {
     enabled: true,
   })
 
-  // Fetch unique liquors
+  // Fetch unique liquors and liquor prices
   useEffect(() => {
     const fetchLiquors = async () => {
       try {
@@ -76,7 +78,19 @@ export default function BatchCalculatorPage() {
         console.error('Failed to fetch liquors:', err)
       }
     }
+    const fetchPrices = async () => {
+      try {
+        const response = await fetch('/api/liquor-prices')
+        if (response.ok) {
+          const data = await response.json()
+          setLiquorPrices(data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch liquor prices:', err)
+      }
+    }
     fetchLiquors()
+    fetchPrices()
   }, [])
 
   const { createCocktail } = useCreateCocktail()
@@ -223,7 +237,7 @@ export default function BatchCalculatorPage() {
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
 
-  const handleGenerateShoppingList = () => generateShoppingListPdf(batches)
+  const handleGenerateShoppingList = () => generateShoppingListPdf(batches, liquorPrices)
 
   const handleGenerateBatchCalculations = () => {
     const batchesWithoutServings = batches.filter(
@@ -255,7 +269,7 @@ export default function BatchCalculatorPage() {
     }
     setBatchesWithMissingServings(new Set())
     if (!canExport) return
-    generatePdfReport(batches)
+    generatePdfReport(batches, liquorPrices)
   }
 
   // Handle create/update/delete cocktails

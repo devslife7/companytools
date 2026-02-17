@@ -6,12 +6,35 @@ import { isLiquorItem, isSodaItem, isAngosturaBitters } from "./ingredient-helpe
 const CAN_SIZE_12OZ_ML = 354.882 // 12 fluid ounces in milliliters
 const BOTTLE_SIZE_4OZ_ML = 118.294 // 4 fluid ounces in milliliters
 
+// Price map type: lowercase ingredient name -> { price per bottle, bottle size in ml }
+export type LiquorPriceMap = Record<string, { price: number; bottleSizeMl: number }>
+
+// Look up bottle price for an ingredient name (case-insensitive exact match, then keyword fallback)
+function lookupBottlePrice(name: string, priceMap: LiquorPriceMap): { price: number; bottleSizeMl: number } | null {
+  const lower = name.toLowerCase().trim()
+
+  // Exact match
+  if (priceMap[lower]) return priceMap[lower]
+
+  // Keyword fallback: check if ingredient name contains a price entry key or vice versa
+  for (const [priceName, entry] of Object.entries(priceMap)) {
+    if (lower.includes(priceName) || priceName.includes(lower)) {
+      return entry
+    }
+  }
+
+  return null
+}
+
+export interface GrandTotalsResult {
+  liquor: BatchResultWithCans[]
+  soda: BatchResultWithCans[]
+  other: BatchResultWithCans[]
+  totalLiquorCost: number
+}
+
 // Utility to calculate Grand Totals for the PDF Report
-export const calculateGrandTotals = (batches: BatchState[]): { 
-  liquor: BatchResultWithCans[]; 
-  soda: BatchResultWithCans[]; 
-  other: BatchResultWithCans[] 
-} => {
+export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPriceMap): GrandTotalsResult => {
   const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType; preferredUnit?: string; eachCount?: number }> = {}
 
   batches.forEach(batch => {
@@ -158,16 +181,28 @@ export const calculateGrandTotals = (batches: BatchState[]): {
   const soda: BatchResultWithCans[] = []
   const other: BatchResultWithCans[] = []
 
+  let totalLiquorCost = 0
+
   allItems.forEach(item => {
     // Check soda items FIRST (more specific) before liquor items (less specific)
     if (isSodaItem(item.name)) {
       soda.push(item)
     } else if (isLiquorItem(item.name)) {
+      // Look up price and calculate cost if price map is available
+      if (priceMap) {
+        const priceEntry = lookupBottlePrice(item.name, priceMap)
+        if (priceEntry) {
+          item.bottlePrice = priceEntry.price
+          item.bottlesToBuy = Math.ceil(item.ml / priceEntry.bottleSizeMl)
+          item.estimatedCost = item.bottlesToBuy * priceEntry.price
+          totalLiquorCost += item.estimatedCost
+        }
+      }
       liquor.push(item)
     } else {
       other.push(item)
     }
   })
 
-  return { liquor, soda, other }
+  return { liquor, soda, other, totalLiquorCost }
 }

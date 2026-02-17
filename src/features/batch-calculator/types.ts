@@ -68,5 +68,8 @@ export interface BatchResultWithCans extends BatchResult {
   bottles4oz?: number
   preferredUnit?: string
   preferredUnitValue?: number | null
+  bottlePrice?: number | null
+  bottlesToBuy?: number | null
+  estimatedCost?: number | null
 }
 

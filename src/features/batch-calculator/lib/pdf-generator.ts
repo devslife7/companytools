@@ -11,7 +11,7 @@ import {
   formatMLValue,
   combineAmountAndUnit,
 } from "./calculations"
-import { calculateGrandTotals } from "./grand-totals"
+import { calculateGrandTotals, type LiquorPriceMap } from "./grand-totals"
 import { isLiquorItem, isAngosturaBitters, isSodaItem } from "./ingredient-helpers"
 
 // Helper function to format preferred unit display
@@ -19,19 +19,19 @@ const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitVal
   if (!preferredUnit || preferredUnitValue === null || preferredUnitValue === undefined) {
     return "-"
   }
-  
+
   const unit = preferredUnit.toLowerCase().trim()
-  
+
   // For "each", show as whole number
   if (unit === "each") {
     return `${Math.ceil(preferredUnitValue).toFixed(0)} ${preferredUnit}`
   }
-  
+
   // For cans and bottles, round up and show as whole number with * separator
   if (unit === "12oz can" || unit === "12oz cans" || unit === "4oz bottle" || unit === "4oz bottles") {
     return `${Math.ceil(preferredUnitValue).toFixed(0)} (${preferredUnit})`
   }
-  
+
   // For liters, quarts, gallons, show with 2 decimals
   return `${formatNumber(preferredUnitValue)} ${preferredUnit}`
 }
@@ -44,10 +44,10 @@ const generateHtmlHeader = (title: string, showHeader: boolean = true, compactPa
            
         </div>
   ` : ''
-  
+
   const bodyPadding = compactPadding ? '3mm' : '10mm'
   const summaryTitleMarginTop = compactPadding ? '4px' : '15px'
-  
+
   return `
     <!DOCTYPE html>
     <html>
@@ -82,18 +82,24 @@ const generateHtmlHeader = (title: string, showHeader: boolean = true, compactPa
 }
 
 // Helper function to generate shopping list HTML
-const generateShoppingListHtml = (batches: BatchState[]) => {
+const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
   const reportData = batches.filter(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
-  const grandTotals = calculateGrandTotals(reportData)
+  const grandTotals = calculateGrandTotals(reportData, priceMap)
 
   const hasPreferredUnits = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
     item => (item as any).preferredUnit
   )
-  const totalColumns = hasPreferredUnits ? 3 : 2
+  const hasPrices = grandTotals.liquor.some(item => item.estimatedCost != null)
+
+  // Base columns: INGREDIENT = 1, optionally + Preferred Unit = 2
+  // Liquor section gets extra columns: Bottles + Est. Cost
+  const baseColumns = hasPreferredUnits ? 2 : 1
+  const liquorColumns = hasPrices ? baseColumns + 2 : baseColumns
   const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
-  
+  const liquorExtraHeaders = hasPrices ? '<th>Bottles</th><th>Est. Cost</th>' : ''
+
   return `
     <h2 class="summary-title-no-border">Inventory Shopping List (Grand Totals based on Servings)</h2>
     <div class="table-container">
@@ -102,77 +108,72 @@ const generateShoppingListHtml = (batches: BatchState[]) => {
                 <tr>
                     <th class="text-left">INGREDIENT</th>
                     ${preferredUnitHeader}
-                    <th>Total ML</th>
+                    ${liquorExtraHeaders}
                 </tr>
             </thead>
             <tbody>
                 ${grandTotals.liquor.length > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: right;">
+                    <td colspan="${liquorColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         LIQUOR ITEMS
                     </td>
                 </tr>
                 ${grandTotals.liquor
-                  .map(
-                    ing => `
+        .map(
+          ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatMLValue(ing.ml)} ml</td>
+                        ${hasPrices ? `<td>${ing.bottlesToBuy != null ? ing.bottlesToBuy : '-'}</td>` : ''}
+                        ${hasPrices ? `<td>${ing.estimatedCost != null ? `$${ing.estimatedCost.toFixed(2)}` : '-'}</td>` : ''}
                     </tr>
                 `
-                  )
-                  .join("")}
-                ` : ""}
-                ${grandTotals.liquor.length > 0 && (grandTotals.soda.length > 0 || grandTotals.other.length > 0) ? `
+        )
+        .join("")}
+                ${hasPrices && grandTotals.totalLiquorCost > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #e8e8e8; padding: 2px; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                        <!-- Divider between sections -->
-                    </td>
+                    <td colspan="${liquorColumns - 1}" style="text-align: right; font-weight: bold; background-color: #d0d0d0; padding: 4px 6px;">ESTIMATED LIQUOR COST</td>
+                    <td style="font-weight: bold; background-color: #d0d0d0;">$${grandTotals.totalLiquorCost.toFixed(2)}</td>
                 </tr>
+                ` : ''}
                 ` : ""}
+
                 ${grandTotals.soda.length > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${grandTotals.liquor.length > 0 ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: right;">
+                    <td colspan="${liquorColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${grandTotals.liquor.length > 0 ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         SODA ITEMS
                     </td>
                 </tr>
                 ${grandTotals.soda
-                  .map(
-                    ing => `
+        .map(
+          ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatMLValue(ing.ml)} ml</td>
+                        ${hasPrices ? '<td>-</td><td>-</td>' : ''}
                     </tr>
                 `
-                  )
-                  .join("")}
+        )
+        .join("")}
                 ` : ""}
-                ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) && grandTotals.other.length > 0 ? `
-                <tr>
-                    <td colspan="${totalColumns}" style="background-color: #e8e8e8; padding: 2px; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-                        <!-- Divider between sections -->
-                    </td>
-                </tr>
-                ` : ""}
+
                 ${grandTotals.other.length > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: right;">
+                    <td colspan="${liquorColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         OTHER ITEMS
                     </td>
                 </tr>
                 ${grandTotals.other
-                  .map(
-                    ing => `
+        .map(
+          ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        <td>${formatMLValue(ing.ml)} ml</td>
+                        ${hasPrices ? '<td>-</td><td>-</td>' : ''}
                     </tr>
                 `
-                  )
-                  .join("")}
+        )
+        .join("")}
                 ` : ""}
             </tbody>
         </table>
@@ -198,8 +199,8 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
       typeof batch.servings === "number"
         ? batch.servings
         : batch.servings === ""
-        ? 0
-        : parseInt(batch.servings, 10) || 0
+          ? 0
+          : parseInt(batch.servings, 10) || 0
 
     // Exclude soda items from batch volume calculations
     const singleServingVolumeML = recipe.ingredients
@@ -218,9 +219,9 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
     const servingsBatchIngredients =
       servingsNum > 0
         ? recipe.ingredients.map(item => {
-            const batchResult = calculateBatch(servingsNum, item.amount, item.unit)
-            return { name: item.name, singleAmount: item.amount, ...batchResult }
-          })
+          const batchResult = calculateBatch(servingsNum, item.amount, item.unit)
+          return { name: item.name, singleAmount: item.amount, ...batchResult }
+        })
         : []
     const totalServingsLiquidML = servingsBatchIngredients
       .filter(ing => !isSodaItem(ing.name))
@@ -230,36 +231,36 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
     const targetBatchIngredients =
       singleServingVolumeML > 0
         ? recipe.ingredients.map(item => {
-            const amountString = combineAmountAndUnit(item.amount, item.unit)
-            const { baseAmount, unit, type } = parseAmount(amountString)
+          const amountString = combineAmountAndUnit(item.amount, item.unit)
+          const { baseAmount, unit, type } = parseAmount(amountString)
 
-            if (type !== "liquid") {
-              return {
-                name: item.name,
-                singleAmount: item.amount,
-                unitType: type,
-                originalUnit: unit,
-                ml: 0,
-                quart: 0,
-                bottles: 0,
-              }
-            }
-
-            const ingredientML = baseAmount * (CONVERSION_FACTORS[unit] || 0)
-            const proportion = ingredientML / singleServingVolumeML
-            const fixedTargetML = fixedTargetLiters * LITER_TO_ML
-            const finalML = fixedTargetML * proportion
-
+          if (type !== "liquid") {
             return {
               name: item.name,
               singleAmount: item.amount,
-              unitType: "liquid",
+              unitType: type,
               originalUnit: unit,
-              ml: finalML,
-              quart: finalML / QUART_TO_ML,
-              bottles: finalML / BOTTLE_SIZE_ML,
+              ml: 0,
+              quart: 0,
+              bottles: 0,
             }
-          })
+          }
+
+          const ingredientML = baseAmount * (CONVERSION_FACTORS[unit] || 0)
+          const proportion = ingredientML / singleServingVolumeML
+          const fixedTargetML = fixedTargetLiters * LITER_TO_ML
+          const finalML = fixedTargetML * proportion
+
+          return {
+            name: item.name,
+            singleAmount: item.amount,
+            unitType: "liquid",
+            originalUnit: unit,
+            ml: finalML,
+            quart: finalML / QUART_TO_ML,
+            bottles: finalML / BOTTLE_SIZE_ML,
+          }
+        })
         : []
 
     htmlContent += `
@@ -277,57 +278,55 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
                                 <th style="text-align: center;">INGREDIENT</th>
                                 <th style="text-align: center;">1 Serving</th>
                                 ${servingsNum > 0 ? `<th style="text-align: center;">${servingsNum} Servings (ML)</th>` : ""}
-                                ${
-                                  totalServingsLiquidML > twentyLiterML && singleServingVolumeML > 0
-                                    ? `<th style="text-align: center;">${fixedTargetLiters}L Batch (ML)</th>`
-                                    : ""
-                                }
+                                ${totalServingsLiquidML > twentyLiterML && singleServingVolumeML > 0
+        ? `<th style="text-align: center;">${fixedTargetLiters}L Batch (ML)</th>`
+        : ""
+      }
                             </tr>
                         </thead>
                         <tbody>
                             ${recipe.ingredients
-                              .map((item, index) => {
-                                const servingsCalc = servingsBatchIngredients[index]
-                                const targetCalc = targetBatchIngredients[index]
-                                const amountString = combineAmountAndUnit(item.amount, item.unit)
-                                const { type } = parseAmount(amountString)
-                                const isLiquor = isLiquorItem(item.name)
-                                const isAngostura = isAngosturaBitters(item.name)
-                                const isSoda = isSodaItem(item.name)
+        .map((item, index) => {
+          const servingsCalc = servingsBatchIngredients[index]
+          const targetCalc = targetBatchIngredients[index]
+          const amountString = combineAmountAndUnit(item.amount, item.unit)
+          const { type } = parseAmount(amountString)
+          const isLiquor = isLiquorItem(item.name)
+          const isAngostura = isAngosturaBitters(item.name)
+          const isSoda = isSodaItem(item.name)
 
-                                const servingsData = servingsCalc
-                                  ? type === "liquid"
-                                    ? isSoda
-                                      ? "N/A"
-                                      : isLiquor && !isAngostura && servingsCalc.bottles > 0
-                                        ? `(${formatNumber(servingsCalc.bottles)} @750ml) ${formatMLValue(servingsCalc.ml)} ml`
-                                        : `${formatMLValue(servingsCalc.ml)} ml`
-                                    : "N/A"
-                                  : "N/A"
+          const servingsData = servingsCalc
+            ? type === "liquid"
+              ? isSoda
+                ? "N/A"
+                : isLiquor && !isAngostura && servingsCalc.bottles > 0
+                  ? `(${formatNumber(servingsCalc.bottles)} @750ml) ${formatMLValue(servingsCalc.ml)} ml`
+                  : `${formatMLValue(servingsCalc.ml)} ml`
+              : "N/A"
+            : "N/A"
 
-                                const targetData = targetCalc
-                                  ? type === "liquid"
-                                    ? isSoda
-                                      ? "N/A"
-                                      : isLiquor && !isAngostura && targetCalc.bottles > 0
-                                        ? `(${formatNumber(targetCalc.bottles)} @750ml) ${formatMLValue(targetCalc.ml)} ml`
-                                        : `${formatMLValue(targetCalc.ml)} ml`
-                                    : "N/A"
-                                  : "N/A"
+          const targetData = targetCalc
+            ? type === "liquid"
+              ? isSoda
+                ? "N/A"
+                : isLiquor && !isAngostura && targetCalc.bottles > 0
+                  ? `(${formatNumber(targetCalc.bottles)} @750ml) ${formatMLValue(targetCalc.ml)} ml`
+                  : `${formatMLValue(targetCalc.ml)} ml`
+              : "N/A"
+            : "N/A"
 
-                                const displayAmount = combineAmountAndUnit(item.amount, item.unit)
-                                return `<tr>
+          const displayAmount = combineAmountAndUnit(item.amount, item.unit)
+          return `<tr>
                                     <td class="text-left">${item.name}</td>
                                     <td>${displayAmount}</td>
                                     ${servingsNum > 0 ? `<td>${servingsData}</td>` : ""}
-                                    ${
-                                      totalServingsLiquidML > twentyLiterML && singleServingVolumeML > 0
-                                        ? `<td>${targetData}</td>`
-                                        : ""
-                                    }
+                                    ${totalServingsLiquidML > twentyLiterML && singleServingVolumeML > 0
+              ? `<td>${targetData}</td>`
+              : ""
+            }
                                 </tr>`
-                              })
-                              .join("")}
+        })
+        .join("")}
                         </tbody>
                     </table>
                 </div>
@@ -349,8 +348,8 @@ const openPdfWindow = (htmlContent: string) => {
 }
 
 // Generate shopping list PDF only
-export const generateShoppingListPdf = (batches: BatchState[]) => {
-  const htmlContent = generateHtmlHeader("Cocktail Shopping List", false, true) + generateShoppingListHtml(batches) + `</body></html>`
+export const generateShoppingListPdf = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
+  const htmlContent = generateHtmlHeader("Cocktail Shopping List", false, true) + generateShoppingListHtml(batches, priceMap) + `</body></html>`
   openPdfWindow(htmlContent)
 }
 
@@ -361,8 +360,8 @@ export const generateBatchCalculationsPdf = (batches: BatchState[]) => {
 }
 
 // Generate full report (both shopping list and batch calculations)
-export const generatePdfReport = (batches: BatchState[]) => {
+export const generatePdfReport = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
   // Generate both shopping list and batch calculations
-  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false, true) + generateShoppingListHtml(batches) + generateBatchCalculationsHtml(batches, true) + `</body></html>`
+  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false, true) + generateShoppingListHtml(batches, priceMap) + generateBatchCalculationsHtml(batches, true) + `</body></html>`
   openPdfWindow(htmlContent)
 }

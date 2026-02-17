@@ -47,6 +47,17 @@ model Ingredient {
   @@map("ingredients")
 }
 
+model LiquorPrice {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique @db.VarChar(255)
+  bottlePrice  Decimal  @map("bottle_price") @db.Decimal(10, 2)
+  bottleSizeMl Int      @default(750) @map("bottle_size_ml")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("liquor_prices")
+}
+
 enum CocktailMethod {
   Shake
   Build
