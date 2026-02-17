@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback, useMemo } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 
 // Import types
@@ -23,6 +24,7 @@ import { Plus, Search, GlassWater, CheckCheck, FilterX, ChevronDown, Funnel } fr
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
+  const router = useRouter()
   const [batches, setBatches] = useState<BatchState[]>([])
   const nextIdRef = React.useRef<number>(1)
   const [selectedCocktails, setSelectedCocktails] = useState<CocktailRecipe[]>([])
@@ -554,7 +556,10 @@ export default function BatchCalculatorPage() {
               Clear
             </button>
             <button
-              onClick={() => setShowBatchModal(true)}
+              onClick={() => {
+                const ids = selectedCocktails.map(c => c.id).join(",")
+                router.push(`/batch-calculator/review?recipes=${ids}`)
+              }}
               className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-brand-primary text-brand-primary-foreground font-bold rounded-lg shadow-lg hover:bg-brand-primary-hover hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               <CheckCheck className="w-5 h-5" />

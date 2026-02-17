@@ -359,6 +359,21 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             />
           </div>
 
+          {/* Season */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Season</label>
+            <select
+              value={editedRecipe.season || ""}
+              onChange={e => handleSeasonChange(e.target.value)}
+              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
+            >
+              <option value="">No season</option>
+              {COCKTAIL_SEASONS.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Glass Type */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Glass Type</label>
@@ -385,21 +400,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Season */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Season</label>
-            <select
-              value={editedRecipe.season || ""}
-              onChange={e => handleSeasonChange(e.target.value)}
-              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
-            >
-              <option value="">No season</option>
-              {COCKTAIL_SEASONS.map(s => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
           </div>
 
           {/* Instructions */}
