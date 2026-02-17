@@ -18,7 +18,7 @@ import { useToast, ToastContainer } from "@/components/ui"
 import { BatchCalculatorModal } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { Modal } from "@/components/ui"
-import { Plus, Search, Filter, Wine, GlassWater, Citrus, CheckCheck, Loader2, Star, Martini } from "lucide-react"
+import { Plus, Search, GlassWater, CheckCheck, FilterX, ChevronDown, Funnel } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -60,7 +60,13 @@ export default function BatchCalculatorPage() {
         const response = await fetch('/api/cocktails?liquors=true')
         if (response.ok) {
           const data = await response.json()
-          setAvailableLiquors(data.liquors || [])
+          const seen = new Map<string, string>()
+          for (const l of (data.liquors || [])) {
+            const key = l.toLowerCase()
+            const titled = l.replace(/\b\w/g, (c: string) => c.toUpperCase())
+            if (!seen.has(key)) seen.set(key, titled)
+          }
+          setAvailableLiquors(Array.from(seen.values()))
         }
       } catch (err) {
         console.error('Failed to fetch liquors:', err)
@@ -202,6 +208,8 @@ export default function BatchCalculatorPage() {
     }))
   }, [])
 
+  const hasActiveFilters = searchQuery !== '' || selectedSpirit !== 'All' || filterFeatured !== 'All' || selectedGlass !== 'All'
+
   const canExport = batches.some(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
@@ -331,13 +339,13 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
             >
-              <option value="All">Spirit</option>
+              <option value="All">All Spirits</option>
               {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <Filter className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
 
@@ -346,13 +354,13 @@ export default function BatchCalculatorPage() {
             <select
               value={filterFeatured}
               onChange={(e) => setFilterFeatured(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
             >
               <option value="All">Show: All</option>
               <option value="Featured">Show: Featured</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <Star className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
 
@@ -361,7 +369,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedGlass}
               onChange={(e) => setSelectedGlass(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all border-none"
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
             >
               <option value="All">All Glasses</option>
               <option value="Rocks">Rocks</option>
@@ -373,10 +381,22 @@ export default function BatchCalculatorPage() {
               <option value="Served Up">Served Up</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <Martini className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
         </div>
+
+        {/* Separator on Desktop */}
+        <div className="hidden md:block w-px h-10 bg-gray-200 mx-2"></div>
+
+        {/* Clear / Filter button — always visible, right side */}
+        <button
+          onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); }}
+          className={`flex-shrink-0 p-2.5 rounded-xl transition-all ${hasActiveFilters ? 'text-red-500 bg-red-50 hover:bg-red-100 cursor-pointer' : 'text-gray-300 cursor-default'}`}
+          title={hasActiveFilters ? 'Clear all filters' : 'Filters'}
+        >
+          {hasActiveFilters ? <FilterX className="w-5 h-5" /> : <Funnel className="w-5 h-5" />}
+        </button>
       </div>
 
       {/* 3. Grid Gallery */}
