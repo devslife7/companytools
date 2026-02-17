@@ -5,6 +5,7 @@ import type { CocktailRecipe, Ingredient, CocktailMethod, GlassType } from "../t
 import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
 import { parseAmount } from "../lib/calculations"
 import { calculateCocktailABV } from "../lib/abv"
+import { CoupeIcon, FluteIcon, HighballIcon, MartiniIcon, RocksIcon, ServedUpIcon } from "./GlassIcons"
 
 interface EditRecipeModalProps {
   isOpen: boolean
@@ -16,6 +17,15 @@ interface EditRecipeModalProps {
   onSaveSuccess?: () => void  // Callback after successful save
   mode?: 'edit' | 'create'  // Mode: edit existing or create new
 }
+
+const GLASS_OPTIONS = [
+  { value: "Coupe", label: "Coupe", Icon: CoupeIcon },
+  { value: "Flute", label: "Flute", Icon: FluteIcon },
+  { value: "Highball", label: "Highball", Icon: HighballIcon },
+  { value: "Martini", label: "Martini", Icon: MartiniIcon },
+  { value: "Rocks", label: "Rocks", Icon: RocksIcon },
+  { value: "Served Up", label: "Served Up", Icon: ServedUpIcon },
+]
 
 export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   isOpen,
@@ -149,24 +159,14 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     setEditedRecipe(prev => ({ ...prev!, instructions: value }))
   }
 
-  const recalculateABV = (ingredients: Ingredient[]) => {
-    // Only calculate if ingredients exist
-    const abv = calculateCocktailABV(ingredients)
-    return abv
-  }
-
   const handleIngredientChange = (index: number, field: keyof Ingredient, value: string) => {
     if (!editedRecipe) return
     const newIngredients = [...editedRecipe.ingredients]
     newIngredients[index] = { ...newIngredients[index], [field]: value }
 
-    // Auto-calculate ABV on ingredient change
-    const newABV = recalculateABV(newIngredients)
-
     setEditedRecipe({
       ...editedRecipe,
       ingredients: newIngredients,
-      abv: newABV
     })
   }
 
@@ -184,9 +184,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const handleRemoveIngredient = (index: number) => {
     if (!editedRecipe) return
     const newIngredients = editedRecipe.ingredients.filter((_, i) => i !== index)
-    const newABV = recalculateABV(newIngredients)
 
-    setEditedRecipe({ ...editedRecipe, ingredients: newIngredients, abv: newABV })
+    setEditedRecipe({ ...editedRecipe, ingredients: newIngredients })
   }
 
   const handleSave = async () => {
@@ -228,8 +227,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
 
     setValidationError(null)
 
-    // Calculate ABV if not explicitly set by user
-    const finalABV = editedRecipe.abv !== undefined ? editedRecipe.abv : recalculateABV(validIngredients)
+    // Calculate ABV from ingredients
+    const finalABV = calculateCocktailABV(validIngredients)
 
     // If editing existing recipe with database ID, save to database
     if (mode === 'edit' && cocktailId) {
@@ -295,6 +294,9 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     onClose()
   }
 
+  const displayedABV = calculateCocktailABV(editedRecipe.ingredients)
+  const isMocktail = displayedABV === 0
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
       {/* Blurred backdrop */}
@@ -354,40 +356,52 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
           {/* Glass Type */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Glass Type</label>
-            <select
-              value={editedRecipe.glassType || ""}
-              onChange={e => handleGlassTypeChange(e.target.value)}
-              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
-            >
-              <option value="">Select glass type...</option>
-              <option value="Coupe">Coupe</option>
-              <option value="Flute">Flute</option>
-              <option value="Highball">Highball</option>
-              <option value="Martini">Martini</option>
-              <option value="Rocks">Rocks</option>
-              <option value="Served Up">Served Up</option>
-            </select>
+            <div className="flex overflow-x-auto py-2 gap-3 snap-x scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+              {GLASS_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handleGlassTypeChange(option.value)}
+                  className={`
+                    flex flex-col items-center justify-center p-4 min-w-[100px] gap-3 rounded-xl border-2 transition-all duration-200 snap-center shrink-0 group
+                    ${editedRecipe.glassType === option.value
+                      ? 'bg-orange-50/80 border-orange-500 shadow-sm'
+                      : 'bg-white border-gray-100 hover:border-orange-200 hover:bg-gray-50'
+                    }
+                  `}
+                  type="button"
+                >
+                  <option.Icon className={`w-8 h-8 transition-colors duration-200 ${editedRecipe.glassType === option.value ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'
+                    }`} />
+                  <span className={`text-sm font-medium transition-colors duration-200 ${editedRecipe.glassType === option.value ? 'text-orange-700' : 'text-gray-600'
+                    }`}>
+                    {option.label}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* ABV */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">ABV (%)</label>
-            <input
-              type="number"
-              value={editedRecipe.abv ?? ''}
-              onChange={e => {
-                const val = e.target.value;
-                setEditedRecipe({
-                  ...editedRecipe,
-                  abv: val === '' ? undefined : parseFloat(val)
-                })
-              }}
-              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base"
-              placeholder="e.g. 15.5 (Leave empty for auto-detection)"
-              step="0.1"
-              min="0"
-            />
-            <p className="mt-1 text-xs text-gray-500">Set to 0 for explicit Mocktail label, or leave empty to infer from ingredients.</p>
+          {/* ABV Display */}
+          <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <label className="block text-sm font-semibold text-gray-900">ABV Estimate</label>
+                  {isMocktail && (
+                    <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider">
+                      Mocktail
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500">Calculated automatically from ingredients</p>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className={`text-3xl font-bold tracking-tight ${isMocktail ? 'text-green-600' : 'text-orange-600'}`}>
+                  {displayedABV}
+                </span>
+                <span className="text-gray-500 font-medium">%</span>
+              </div>
+            </div>
           </div>
 
           {/* Instructions */}
