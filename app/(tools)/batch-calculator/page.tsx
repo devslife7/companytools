@@ -364,11 +364,11 @@ export default function BatchCalculatorPage() {
               className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
             >
               <option value="All">All Glasses</option>
-              <option value="Rocks">Rocks</option>
               <option value="Coupe">Coupe</option>
-              <option value="Martini">Martini</option>
-              <option value="Highball">Highball</option>
               <option value="Flute">Flute</option>
+              <option value="Highball">Highball</option>
+              <option value="Martini">Martini</option>
+              <option value="Rocks">Rocks</option>
               <option value="Served Up">Served Up</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">

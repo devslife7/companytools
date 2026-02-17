@@ -350,11 +350,11 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
             >
               <option value="">Select glass type...</option>
-              <option value="Rocks">Rocks</option>
               <option value="Coupe">Coupe</option>
-              <option value="Martini">Martini</option>
-              <option value="Highball">Highball</option>
               <option value="Flute">Flute</option>
+              <option value="Highball">Highball</option>
+              <option value="Martini">Martini</option>
+              <option value="Rocks">Rocks</option>
               <option value="Served Up">Served Up</option>
             </select>
           </div>
