@@ -21,12 +21,14 @@ model Cocktail {
   abv          Float?         // Alcohol by Volume percentage (e.g. 15.5)
   instructions String?
   glass        String?        @db.VarChar(100)
+  season       String?        @db.VarChar(50)
   ingredients  Ingredient[]
 
   @@index([name])
   @@index([isActive])
   @@index([category])
   @@index([featured])
+  @@index([season])
   @@map("cocktails")
 }
 

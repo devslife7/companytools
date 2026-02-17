@@ -7,6 +7,7 @@ interface UseCocktailsOptions {
   active?: boolean
   featured?: boolean
   liquor?: string
+  season?: string
   enabled?: boolean
 }
 
@@ -18,7 +19,7 @@ interface UseCocktailsResult {
 }
 
 export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsResult {
-  const { search, category, active = true, featured, liquor, enabled = true } = options
+  const { search, category, active = true, featured, liquor, season, enabled = true } = options
   const [cocktails, setCocktails] = useState<CocktailRecipe[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -39,6 +40,7 @@ export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsRes
       if (active !== undefined) params.append('active', String(active))
       if (featured !== undefined) params.append('featured', String(featured))
       if (liquor) params.append('liquor', liquor)
+      if (season) params.append('season', season)
 
       // Create abort controller for timeout
       const controller = new AbortController()
@@ -68,7 +70,7 @@ export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsRes
       
       // Only log in development to avoid cluttering production logs
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Fetched ${cocktails.length} cocktails from database`, { filters: { search, category, active, featured, liquor } })
+        console.log(`Fetched ${cocktails.length} cocktails from database`, { filters: { search, category, active, featured, liquor, season } })
       }
       
       setCocktails(cocktails)
@@ -97,7 +99,7 @@ export function useCocktails(options: UseCocktailsOptions = {}): UseCocktailsRes
   useEffect(() => {
     fetchCocktails()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category, active, featured, liquor, enabled])
+  }, [search, category, active, featured, liquor, season, enabled])
 
   return {
     cocktails,

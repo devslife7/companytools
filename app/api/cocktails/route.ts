@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
     const active = searchParams.get('active') !== 'false' // Default to true
     const featured = searchParams.get('featured') === 'true' ? true : searchParams.get('featured') === 'false' ? false : undefined
     const liquor = searchParams.get('liquor') || undefined
+    const season = searchParams.get('season') || undefined
 
     const cocktails = await getAllCocktails({
       search,
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
       active,
       featured,
       liquor,
+      season,
     })
 
     return NextResponse.json({
@@ -92,7 +94,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, method, instructions, ingredients, category, tags, createdBy, featured, glassType } = body
+    const { name, method, instructions, ingredients, category, tags, createdBy, featured, glassType, season } = body
 
     // Validate required fields
     if (!name || !method || !ingredients || !Array.isArray(ingredients)) {
@@ -123,6 +125,7 @@ export async function POST(request: NextRequest) {
       method,
       ...(glassType !== undefined && { glassType }),
       ...(instructions !== undefined && { instructions }),
+      ...(season !== undefined && { season }),
       ingredients: ingredients.map((ing: any) => ({
         name: ing.name,
         amount: ing.amount,

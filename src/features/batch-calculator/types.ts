@@ -11,6 +11,9 @@ export type CocktailMethod = "Shake" | "Build"
 
 export type GlassType = "Rocks" | "Coupe" | "Martini" | "Highball" | "Flute" | "Served Up"
 
+export const COCKTAIL_SEASONS = ["Spring 2025", "Summer 2025", "Fall 2025", "Spring 2026"] as const
+export type CocktailSeason = typeof COCKTAIL_SEASONS[number]
+
 export interface CocktailRecipe {
   id?: number  // Database ID (optional for backward compatibility)
   name: string
@@ -21,6 +24,7 @@ export interface CocktailRecipe {
   featured?: boolean
   image?: string
   abv?: number
+  season?: CocktailSeason
 }
 
 export type UnitType = "liquid" | "count" | "special"

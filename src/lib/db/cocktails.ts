@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import type { CocktailRecipe, CocktailMethod, GlassType } from '@/features/batch-calculator/types'
+import type { CocktailRecipe, CocktailMethod, GlassType, CocktailSeason } from '@/features/batch-calculator/types'
 import { Prisma } from '@prisma/client'
 
 /**
@@ -46,6 +46,7 @@ function transformCocktailToRecipe(cocktail: {
   featured: boolean
   image?: string | null
   abv?: number | null
+  season?: string | null
   ingredients: Array<{
     name: string
     amount: Prisma.Decimal | string
@@ -69,6 +70,7 @@ function transformCocktailToRecipe(cocktail: {
     featured: cocktail.featured,
     ...(cocktail.image && { image: cocktail.image }),
     ...(cocktail.abv !== null && cocktail.abv !== undefined && { abv: cocktail.abv }),
+    ...(cocktail.season && { season: cocktail.season as CocktailSeason }),
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(ing => ({
@@ -89,6 +91,7 @@ export async function getAllCocktails(filters?: {
   active?: boolean
   featured?: boolean
   liquor?: string
+  season?: string
 }): Promise<CocktailRecipe[]> {
   try {
     const where: any = {}
@@ -112,6 +115,10 @@ export async function getAllCocktails(filters?: {
         contains: filters.search,
         mode: 'insensitive',
       }
+    }
+
+    if (filters?.season) {
+      where.season = filters.season
     }
 
     if (filters?.liquor) {
@@ -228,6 +235,7 @@ export async function createCocktail(
       image: data.image || null,
       // @ts-ignore
       abv: data.abv,
+      season: data.season || null,
       ingredients: {
         create: data.ingredients.map((ing, index) => ({
           name: ing.name,
@@ -291,6 +299,7 @@ export async function updateCocktail(
   if (data.featured !== undefined) updateData.featured = data.featured
   if (data.image !== undefined) updateData.image = data.image || null
   if (data.abv !== undefined) updateData.abv = data.abv
+  if (data.season !== undefined) updateData.season = data.season || null
 
   // Only update cocktail if there are fields to update (ingredients are handled separately above)
   if (Object.keys(updateData).length > 0) {
