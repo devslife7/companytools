@@ -183,6 +183,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     method: "Build",
     instructions: "1. Combine vodka, lemon juice, cardamon simple syrup and rose hydrolat in cocktail glass.\n2. Add grapefruit seltzer and garnish.\n3. Garnish with single baby pansy in the middle.",
     featured: true,
+    image: "/cocktails/rose-garden-v3.png",
     ingredients: [
       { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
       { name: "Lemon Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },

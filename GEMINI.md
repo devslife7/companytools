@@ -55,3 +55,6 @@ The database (managed via Prisma) consists of two primary models:
 - `src/features/batch-calculator/lib/calculations.ts`: Unit conversion and batching logic.
 - `src/lib/db/prisma.ts`: Database client configuration.
 - `app/(tools)/layout.tsx`: Shared UI structure for all tools.
+
+
+## Dot not seed database without asking user
