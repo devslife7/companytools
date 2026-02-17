@@ -19,6 +19,14 @@ import { ReviewDrinkSelection } from "@/features/batch-calculator/components/Rev
 import { ReviewBatchSheet } from "@/features/batch-calculator/components/ReviewBatchSheet"
 
 export default function BatchReviewPage() {
+    return (
+        <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500 font-medium">Loading...</div>}>
+            <BatchReviewContent />
+        </React.Suspense>
+    )
+}
+
+function BatchReviewContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const recipeIds = useMemo(() => {
