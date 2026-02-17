@@ -23,7 +23,7 @@ async function main() {
                 name: ing.name,
                 amount: ing.amount.toString(),
                 unit: ing.unit || undefined,
-                preferredUnit: ing.preferredUnit || undefined,
+                orderUnit: ing.orderUnit || undefined,
             }))
 
             const abv = calculateCocktailABV(mappedIngredients)

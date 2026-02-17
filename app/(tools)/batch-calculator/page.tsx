@@ -13,6 +13,19 @@ import { generatePdfReport, generateShoppingListPdf, generateBatchCalculationsPd
 import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 import { COCKTAIL_DATA } from "@/features/batch-calculator/data/cocktails"
 
+// Constants
+const SPIRIT_KEYWORDS = ["Vodka", "Gin", "Rum", "Whiskey", "Tequila", "Bourbon", "Pisco", "Mezcal", "Liqueur", "Brandy", "Cognac", "Vermouth", "Aperol", "Campari", "Wine", "Prosecco", "Champagne", "Beer", "Cider", "Stout", "Ale", "Lager", "Sake", "Soju", "Absinthe", "Chartreuse", "Amaro", "Bitters", "Cointreau", "Triple Sec", "Curacao", "Schnapps", "Spirit", "Alcohol"];
+
+function checkIsMocktail(cocktail: CocktailRecipe): boolean {
+  const hasAlcohol = cocktail.ingredients.some(i => SPIRIT_KEYWORDS.some(spirit => i.name.toLowerCase().includes(spirit.toLowerCase())));
+  const isExplicitMocktail = cocktail.name.toLowerCase().includes("mocktail") || cocktail.name.toLowerCase().includes("zero proof");
+  // It is a mocktail if:
+  // 1. ABV is explicitly 0
+  // 2. OR (No alcohol keyword found AND ABV is undefined/null/0)
+  // 3. OR Name contains "mocktail"/"zero proof"
+  return (cocktail.abv === 0) || (!hasAlcohol && !cocktail.abv) || isExplicitMocktail;
+}
+
 // Import hooks
 import { useCocktails, useCreateCocktail } from "@/features/batch-calculator/hooks"
 import { useToast, ToastContainer } from "@/components/ui"
@@ -21,7 +34,7 @@ import { useToast, ToastContainer } from "@/components/ui"
 import { BatchCalculatorModal } from "@/features/batch-calculator/components"
 import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 import { Modal } from "@/components/ui"
-import { Plus, Search, GlassWater, CheckCheck, FilterX, ChevronDown, Funnel } from "lucide-react"
+import { Plus, Search, GlassWater, CheckCheck, FilterX, ChevronDown } from "lucide-react"
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
@@ -44,7 +57,7 @@ export default function BatchCalculatorPage() {
   // Filters
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedSpirit, setSelectedSpirit] = useState<string>('All')
-  const [filterFeatured, setFilterFeatured] = useState<string>('Featured')
+  const [filterType, setFilterType] = useState<string>('All') // 'All', 'Featured', 'Cocktail', 'Mocktail'
   const [selectedGlass, setSelectedGlass] = useState<string>('All')
   const [selectedSeason, setSelectedSeason] = useState<string>('All')
 
@@ -103,6 +116,7 @@ export default function BatchCalculatorPage() {
   }, [apiCocktails, cocktailsError])
 
   // Filter Logic
+  // Filter Logic
   const filteredCocktails = useMemo(() => {
     return allCocktails.filter(cocktail => {
       // 1. Search Query
@@ -121,8 +135,16 @@ export default function BatchCalculatorPage() {
         if (!hasSpirit) return false
       }
 
-      // 3. Featured Filter
-      if (filterFeatured === 'Featured' && !cocktail.featured) return false
+      // 3. Type Filter (Featured, Cocktail, Mocktail)
+      if (filterType !== 'All') {
+        if (filterType === 'Featured') {
+          if (!cocktail.featured) return false
+        } else if (filterType === 'Mocktail') {
+          if (!checkIsMocktail(cocktail)) return false
+        } else if (filterType === 'Cocktail') {
+          if (checkIsMocktail(cocktail)) return false
+        }
+      }
 
       // 4. Glass Filter
       if (selectedGlass !== 'All') {
@@ -136,7 +158,7 @@ export default function BatchCalculatorPage() {
 
       return true
     })
-  }, [allCocktails, searchQuery, selectedSpirit, filterFeatured, selectedGlass, selectedSeason])
+  }, [allCocktails, searchQuery, selectedSpirit, filterType, selectedGlass, selectedSeason])
 
   // Sync batches with selected cocktails
   useEffect(() => {
@@ -231,7 +253,7 @@ export default function BatchCalculatorPage() {
     }))
   }, [])
 
-  const hasActiveFilters = searchQuery !== '' || selectedSpirit !== 'All' || filterFeatured !== 'All' || selectedGlass !== 'All' || selectedSeason !== 'All'
+  const hasActiveFilters = searchQuery !== '' || selectedSpirit !== 'All' || filterType !== 'All' || selectedGlass !== 'All' || selectedSeason !== 'All'
 
   const canExport = batches.some(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
@@ -339,54 +361,74 @@ export default function BatchCalculatorPage() {
       </div>
 
       {/* 2. Filters & Search */}
-      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-gray-200 shadow-sm mb-6 sm:mb-10 flex flex-col md:flex-row gap-3 sm:gap-4 md:items-center">
-        {/* Search + Featured */}
-        <div className="flex items-center gap-3 flex-1">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by name or ingredient..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:bg-white focus:border-brand-primary/20 transition-all text-gray-900 placeholder:text-gray-400"
-            />
-          </div>
+      {/* 2. Redesigned Search & Filters Bar */}
+      <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 p-2 mb-6 sm:mb-10 flex flex-col md:flex-row md:items-center gap-2 transition-all hover:shadow-2xl hover:shadow-gray-200/50">
 
-          {/* Featured Filter */}
-          <button
-            onClick={() => setFilterFeatured(filterFeatured === 'Featured' ? 'All' : 'Featured')}
-            className={`flex-shrink-0 px-4 py-3 rounded-xl text-sm font-bold transition-all ${filterFeatured === 'Featured' ? 'bg-brand-primary text-brand-primary-foreground shadow-sm' : 'bg-gray-100/50 text-gray-700 hover:bg-gray-100'}`}
-          >
-            Featured
-          </button>
+        {/* Search Input Section */}
+        <div className="flex-1 flex items-center px-3 sm:px-4 py-2 relative">
+          <Search className="text-gray-400 w-5 h-5 flex-shrink-0" />
+          <input
+            type="text"
+            placeholder="Search cocktails or ingredients..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-transparent border-none focus:ring-0 text-base sm:text-lg text-gray-900 placeholder:text-gray-400 font-medium px-3 sm:px-4 py-1"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 p-1 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
+            >
+              <FilterX className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
-        {/* Filters Row */}
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0 scrollbar-hide">
+        {/* Divider (Desktop) */}
+        <div className="hidden md:block w-px h-10 bg-gray-100 mx-2"></div>
+
+        {/* Horizontal Divider (Mobile) */}
+        <div className="md:hidden h-px w-full bg-gray-100 my-1"></div>
+
+        {/* Filters Section */}
+        <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto px-2 md:px-0 pb-2 md:pb-0 scrollbar-hide">
+
+          {/* Type Filter */}
+          <div className="relative group min-w-[120px]">
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
+            >
+              <option value="All">Any Type</option>
+              <option value="Featured">Featured</option>
+              <option value="Cocktail">Cocktail</option>
+              <option value="Mocktail">Mocktail</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-gray-600 transition-colors" />
+          </div>
+
           {/* Spirit Filter */}
-          <div className="relative group w-[130px] flex-shrink-0">
+          <div className="relative group min-w-[120px]">
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none truncate"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
             >
-              <option value="All">All Spirits</option>
+              <option value="All">Any Spirit</option>
               {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <ChevronDown className="w-4 h-4" />
-            </div>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-gray-600 transition-colors" />
           </div>
 
           {/* Glass Filter */}
-          <div className="relative group min-w-[140px]">
+          <div className="relative group min-w-[130px]">
             <select
               value={selectedGlass}
               onChange={(e) => setSelectedGlass(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
             >
-              <option value="All">All Glasses</option>
+              <option value="All">Any Glass</option>
               <option value="Coupe">Coupe</option>
               <option value="Flute">Flute</option>
               <option value="Highball">Highball</option>
@@ -394,36 +436,36 @@ export default function BatchCalculatorPage() {
               <option value="Rocks">Rocks</option>
               <option value="Served Up">Served Up</option>
             </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <ChevronDown className="w-4 h-4" />
-            </div>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-gray-600 transition-colors" />
           </div>
 
           {/* Season Filter */}
-          <div className="relative group min-w-[150px]">
+          <div className="relative group min-w-[130px]">
             <select
               value={selectedSeason}
               onChange={(e) => setSelectedSeason(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
             >
-              <option value="All">All Seasons</option>
+              <option value="All">Any Season</option>
               {COCKTAIL_SEASONS.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <ChevronDown className="w-4 h-4" />
-            </div>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-gray-600 transition-colors" />
           </div>
 
-          {/* Clear / Filter button — always visible, right side */}
-          <button
-            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
-            className={`flex-shrink-0 p-2.5 rounded-xl transition-all ${hasActiveFilters ? 'text-red-500 bg-red-50 hover:bg-red-100 cursor-pointer' : 'text-gray-300 cursor-default'}`}
-            title={hasActiveFilters ? 'Clear all filters' : 'Filters'}
-          >
-            {hasActiveFilters ? <FilterX className="w-5 h-5" /> : <Funnel className="w-5 h-5" />}
-          </button>
+          {/* Reset Filters */}
+          {hasActiveFilters && (
+            <div className="pl-1 md:pl-2 border-l border-gray-200 ml-1 md:ml-2">
+              <button
+                onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
+                className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                title="Clear all filters"
+              >
+                <FilterX className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -444,7 +486,7 @@ export default function BatchCalculatorPage() {
           <h3 className="text-2xl font-bold text-gray-900 mb-2">No recipes found</h3>
           <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your search terms or filters to find what you're looking for.</p>
           <button
-            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
             className="mt-8 text-brand-primary font-bold hover:text-brand-primary-hover transition-colors inline-flex items-center gap-2"
           >
             Clear all filters
@@ -458,11 +500,7 @@ export default function BatchCalculatorPage() {
 
 
             // ABV & Mocktail Logic
-            const spiritKeywords = ["Vodka", "Gin", "Rum", "Whiskey", "Tequila", "Bourbon", "Pisco", "Mezcal", "Liqueur", "Brandy", "Cognac", "Vermouth", "Aperol", "Campari", "Wine", "Prosecco", "Champagne", "Beer", "Cider", "Stout", "Ale", "Lager", "Sake", "Soju", "Absinthe", "Chartreuse", "Amaro", "Bitters", "Cointreau", "Triple Sec", "Curacao", "Schnapps", "Spirit", "Alcohol"];
-
-            const hasAlcohol = cocktail.ingredients.some(i => spiritKeywords.some(spirit => i.name.toLowerCase().includes(spirit.toLowerCase())));
-            const isExplicitMocktail = cocktail.name.toLowerCase().includes("mocktail") || cocktail.name.toLowerCase().includes("zero proof");
-            const isMocktail = (cocktail.abv === 0) || (!hasAlcohol && !cocktail.abv) || isExplicitMocktail;
+            const isMocktail = checkIsMocktail(cocktail);
 
             let abvBadge = null;
             if (isMocktail) {

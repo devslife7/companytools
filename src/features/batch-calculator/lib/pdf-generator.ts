@@ -14,26 +14,26 @@ import {
 import { calculateGrandTotals, type LiquorPriceMap } from "./grand-totals"
 import { isLiquorItem, isAngosturaBitters, isSodaItem } from "./ingredient-helpers"
 
-// Helper function to format preferred unit display
-const formatPreferredUnit = (preferredUnit: string | undefined, preferredUnitValue: number | null | undefined): string => {
-  if (!preferredUnit || preferredUnitValue === null || preferredUnitValue === undefined) {
+// Helper function to format order unit display
+const formatOrderUnit = (orderUnit: string | undefined, orderUnitValue: number | null | undefined): string => {
+  if (!orderUnit || orderUnitValue === null || orderUnitValue === undefined) {
     return "-"
   }
 
-  const unit = preferredUnit.toLowerCase().trim()
+  const unit = orderUnit.toLowerCase().trim()
 
   // For "each", show as whole number
   if (unit === "each") {
-    return `${Math.ceil(preferredUnitValue).toFixed(0)} ${preferredUnit}`
+    return `${Math.ceil(orderUnitValue).toFixed(0)} ${orderUnit}`
   }
 
   // For cans and bottles, round up and show as whole number with * separator
   if (unit === "12oz can" || unit === "12oz cans" || unit === "4oz bottle" || unit === "4oz bottles") {
-    return `${Math.ceil(preferredUnitValue).toFixed(0)} (${preferredUnit})`
+    return `${Math.ceil(orderUnitValue).toFixed(0)} (${orderUnit})`
   }
 
   // For liters, quarts, gallons, show with 2 decimals
-  return `${formatNumber(preferredUnitValue)} ${preferredUnit}`
+  return `${formatNumber(orderUnitValue)} ${orderUnit}`
 }
 
 // Helper function to generate HTML header
@@ -88,8 +88,8 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
   )
   const grandTotals = calculateGrandTotals(reportData, priceMap)
 
-  const hasPreferredUnits = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
-    item => (item as any).preferredUnit
+  const hasOrderUnits = [...grandTotals.liquor, ...grandTotals.soda, ...grandTotals.other].some(
+    item => (item as any).orderUnit
   )
   const hasPrices = grandTotals.liquor.some(item => item.estimatedCost != null)
   const hasLiquor = grandTotals.liquor.length > 0
@@ -98,13 +98,13 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
   const showBottles = hasLiquor // Always show bottles column if we have liquor
   const showCost = hasPrices
 
-  // Base columns: INGREDIENT = 1, optionally + Preferred Unit = 1
+  // Base columns: INGREDIENT = 1, optionally + Order Unit = 1
   let totalColumns = 1 // Ingredient
-  if (hasPreferredUnits) totalColumns++
+  if (hasOrderUnits) totalColumns++
   if (showBottles) totalColumns++
   if (showCost) totalColumns++
 
-  const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
+  const orderUnitHeader = hasOrderUnits ? '<th class="text-left">Order Unit</th>' : ''
   const bottlesHeader = showBottles ? '<th style="text-align: right;">Bottles (750ml)</th>' : ''
   const costHeader = showCost ? '<th style="text-align: right;">Est. Cost</th>' : ''
 
@@ -115,7 +115,7 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
             <thead>
                 <tr>
                     <th class="text-left">INGREDIENT</th>
-                    ${preferredUnitHeader}
+                    ${orderUnitHeader}
                     ${bottlesHeader}
                     ${costHeader}
                 </tr>
@@ -132,7 +132,7 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
           ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        ${hasOrderUnits ? `<td class="text-left">${formatOrderUnit(ing.orderUnit, ing.orderUnitValue)}</td>` : ''}
                         ${showBottles ? `<td>${!isAngosturaBitters(ing.name) && ing.bottles > 0
               ? `<div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px; white-space: nowrap;">
                                 <span style="font-size: 0.85em; color: #666; font-weight: normal;">(${formatNumber(ing.bottles)})</span>
@@ -163,7 +163,7 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
           ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        ${hasOrderUnits ? `<td class="text-left">${formatOrderUnit(ing.orderUnit, ing.orderUnitValue)}</td>` : ''}
                         ${showBottles ? '<td>-</td>' : ''}
                         ${showCost ? '<td>-</td>' : ''}
                     </tr>
@@ -183,7 +183,7 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
           ing => `
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
-                        ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
+                        ${hasOrderUnits ? `<td class="text-left">${formatOrderUnit(ing.orderUnit, ing.orderUnitValue)}</td>` : ''}
                         ${showBottles ? '<td>-</td>' : ''}
                         ${showCost ? '<td>-</td>' : ''}
                     </tr>

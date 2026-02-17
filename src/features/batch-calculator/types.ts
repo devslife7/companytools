@@ -4,7 +4,7 @@ export interface Ingredient {
   name: string
   amount: string
   unit?: string
-  preferredUnit?: string
+  orderUnit?: string
 }
 
 export type CocktailMethod = "Shake" | "Build"
@@ -66,8 +66,8 @@ export interface CombinedIngredient extends Ingredient {
 export interface BatchResultWithCans extends BatchResult {
   cans12oz?: number
   bottles4oz?: number
-  preferredUnit?: string
-  preferredUnitValue?: number | null
+  orderUnit?: string
+  orderUnitValue?: number | null
   bottlePrice?: number | null
   bottlesToBuy?: number | null
   estimatedCost?: number | null

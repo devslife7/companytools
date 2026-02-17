@@ -52,7 +52,7 @@ function transformCocktailToRecipe(cocktail: {
     amount: Prisma.Decimal | string
     orderIndex: number
     unit?: string | null
-    preferredUnit?: string | null
+    orderUnit?: string | null
   }>
 }): CocktailRecipe {
   // Ensure method is a valid CocktailMethod (fallback to Build if invalid)
@@ -77,7 +77,7 @@ function transformCocktailToRecipe(cocktail: {
         name: ing.name,
         amount: decimalToString(ing.amount),
         ...(ing.unit != null && ing.unit !== '' && { unit: ing.unit }),
-        ...(ing.preferredUnit != null && ing.preferredUnit !== '' && { preferredUnit: ing.preferredUnit }),
+        ...(ing.orderUnit != null && ing.orderUnit !== '' && { orderUnit: ing.orderUnit }),
       })),
   }
 }
@@ -242,7 +242,7 @@ export async function createCocktail(
           amount: stringToDecimal(ing.amount),
           orderIndex: index,
           unit: ing.unit || null,
-          preferredUnit: ing.preferredUnit || null,
+          orderUnit: ing.orderUnit || null,
         })),
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -284,7 +284,7 @@ export async function updateCocktail(
         amount: stringToDecimal(ing.amount),
         orderIndex: index,
         unit: ing.unit || null,
-        preferredUnit: ing.preferredUnit || null,
+        orderUnit: ing.orderUnit || null,
       })),
     })
   }

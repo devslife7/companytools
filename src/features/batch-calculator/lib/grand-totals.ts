@@ -1,5 +1,5 @@
 import type { BatchState, BatchResultWithCans, UnitType } from "../types"
-import { calculateBatch, convertMLToPreferredUnit, parseAmount, combineAmountAndUnit, calculateSingleServingLiquidVolumeML, CONVERSION_FACTORS, LITER_TO_ML, QUART_TO_ML, BOTTLE_SIZE_ML } from "./calculations"
+import { calculateBatch, convertMLToOrderUnit, parseAmount, combineAmountAndUnit, calculateSingleServingLiquidVolumeML, CONVERSION_FACTORS, LITER_TO_ML, QUART_TO_ML, BOTTLE_SIZE_ML } from "./calculations"
 import { isLiquorItem, isSodaItem, isAngosturaBitters } from "./ingredient-helpers"
 
 // Constants for can calculations
@@ -35,7 +35,7 @@ export interface GrandTotalsResult {
 
 // Utility to calculate Grand Totals for the PDF Report
 export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPriceMap): GrandTotalsResult => {
-  const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType; preferredUnit?: string; eachCount?: number }> = {}
+  const grandTotals: Record<string, { ml: number; bottles: number; quart: number; unitType: UnitType; orderUnit?: string; eachCount?: number }> = {}
 
   batches.forEach(batch => {
     if (!batch.editableRecipe) return
@@ -49,23 +49,23 @@ export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPri
         const result = calculateBatch(servingsNum, item.amount, item.unit)
         const key = item.name.trim()
         
-        // Check if this item has "each" as preferred unit
-        const hasEachPreferredUnit = item.preferredUnit?.toLowerCase().trim() === "each"
-        
-        // Include liquid ingredients OR items with "each" as preferred unit
-        if (result.unitType === "liquid" || hasEachPreferredUnit) {
+        // Check if this item has "each" as order unit
+        const hasEachOrderUnit = item.orderUnit?.toLowerCase().trim() === "each"
+
+        // Include liquid ingredients OR items with "each" as order unit
+        if (result.unitType === "liquid" || hasEachOrderUnit) {
           if (!grandTotals[key]) {
             grandTotals[key] = { ml: 0, bottles: 0, quart: 0, unitType: result.unitType }
           }
-          
+
           if (result.unitType === "liquid") {
             grandTotals[key].ml += result.ml
             grandTotals[key].bottles += result.bottles
             grandTotals[key].quart += result.quart
           }
-          
+
           // For "each" items, calculate total count (multiply amount per serving by servings)
-          if (hasEachPreferredUnit) {
+          if (hasEachOrderUnit) {
             const amountString = combineAmountAndUnit(item.amount, item.unit)
             const { baseAmount } = parseAmount(amountString)
             if (!grandTotals[key].eachCount) {
@@ -73,10 +73,10 @@ export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPri
             }
             grandTotals[key].eachCount = (grandTotals[key].eachCount || 0) + (baseAmount * servingsNum)
           }
-          
-          // Store preferred unit if not already set (use first one found)
-          if (item.preferredUnit && !grandTotals[key].preferredUnit) {
-            grandTotals[key].preferredUnit = item.preferredUnit
+
+          // Store order unit if not already set (use first one found)
+          if (item.orderUnit && !grandTotals[key].orderUnit) {
+            grandTotals[key].orderUnit = item.orderUnit
           }
         }
       })
@@ -93,27 +93,27 @@ export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPri
           const { baseAmount, unit, type } = parseAmount(amountString)
           const key = item.name.trim()
           
-          // Check if this item has "each" as preferred unit
-          const hasEachPreferredUnit = item.preferredUnit?.toLowerCase().trim() === "each"
-          
-          // Include liquid ingredients OR items with "each" as preferred unit
-          if (type === "liquid" || hasEachPreferredUnit) {
+          // Check if this item has "each" as order unit
+          const hasEachOrderUnit = item.orderUnit?.toLowerCase().trim() === "each"
+
+          // Include liquid ingredients OR items with "each" as order unit
+          if (type === "liquid" || hasEachOrderUnit) {
             if (!grandTotals[key]) {
               grandTotals[key] = { ml: 0, bottles: 0, quart: 0, unitType: type }
             }
-            
+
             if (type === "liquid") {
               const ingredientML = baseAmount * (CONVERSION_FACTORS[unit] || 0)
               const proportion = ingredientML / singleServingVolumeML
               const finalML = targetLitersML * proportion
-              
+
               grandTotals[key].ml += finalML
               grandTotals[key].bottles += finalML / BOTTLE_SIZE_ML
               grandTotals[key].quart += finalML / QUART_TO_ML
             }
-            
+
             // For "each" items, calculate based on number of servings in target liters
-            if (hasEachPreferredUnit) {
+            if (hasEachOrderUnit) {
               // Calculate how many servings fit in target liters
               const approximateServings = targetLitersML / singleServingVolumeML
               if (!grandTotals[key].eachCount) {
@@ -122,10 +122,10 @@ export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPri
               // baseAmount is the count per serving, multiply by number of servings
               grandTotals[key].eachCount = (grandTotals[key].eachCount || 0) + (baseAmount * approximateServings)
             }
-            
-            // Store preferred unit if not already set (use first one found)
-            if (item.preferredUnit && !grandTotals[key].preferredUnit) {
-              grandTotals[key].preferredUnit = item.preferredUnit
+
+            // Store order unit if not already set (use first one found)
+            if (item.orderUnit && !grandTotals[key].orderUnit) {
+              grandTotals[key].orderUnit = item.orderUnit
             }
           }
         })
@@ -135,38 +135,38 @@ export const calculateGrandTotals = (batches: BatchState[], priceMap?: LiquorPri
 
   const allItems: BatchResultWithCans[] = Object.entries(grandTotals)
     .map(([name, totals]) => {
-      const item: BatchResultWithCans = { 
-        name, 
-        ...totals, 
+      const item: BatchResultWithCans = {
+        name,
+        ...totals,
         originalUnit: "ml",
-        ...(totals.preferredUnit && { preferredUnit: totals.preferredUnit })
+        ...(totals.orderUnit && { orderUnit: totals.orderUnit })
       }
       // Add 12oz can quantity for all soda items
       if (isSodaItem(name)) {
         item.cans12oz = Math.ceil(item.ml / CAN_SIZE_12OZ_ML)
-        // Auto-set preferred unit for soda items if not already set
-        if (!item.preferredUnit) {
-          item.preferredUnit = "12oz can"
+        // Auto-set order unit for soda items if not already set
+        if (!item.orderUnit) {
+          item.orderUnit = "12oz can"
         }
       }
       // Add 4oz bottle quantity for Angostura bitters
       if (isAngosturaBitters(name)) {
         item.bottles4oz = Math.ceil(item.ml / BOTTLE_SIZE_4OZ_ML)
-        // Auto-set preferred unit for Angostura bitters if not already set
-        if (!item.preferredUnit) {
-          item.preferredUnit = "4oz bottle"
+        // Auto-set order unit for Angostura bitters if not already set
+        if (!item.orderUnit) {
+          item.orderUnit = "4oz bottle"
         }
       }
-      // Calculate preferred unit value if preferred unit is set
-      if (item.preferredUnit) {
-        const preferredUnitLower = item.preferredUnit.toLowerCase().trim()
-        if (preferredUnitLower === "each" && totals.eachCount !== undefined) {
+      // Calculate order unit value if order unit is set
+      if (item.orderUnit) {
+        const orderUnitLower = item.orderUnit.toLowerCase().trim()
+        if (orderUnitLower === "each" && totals.eachCount !== undefined) {
           // For "each" items, use the calculated count
-          item.preferredUnitValue = totals.eachCount
+          item.orderUnitValue = totals.eachCount
         } else {
-          item.preferredUnitValue = convertMLToPreferredUnit(
+          item.orderUnitValue = convertMLToOrderUnit(
             item.ml,
-            item.preferredUnit,
+            item.orderUnit,
             item.cans12oz,
             item.bottles4oz
           )

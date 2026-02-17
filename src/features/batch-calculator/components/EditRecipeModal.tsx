@@ -119,7 +119,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       const newRecipe: CocktailRecipe = {
         name: '',
         method: 'Build',
-        ingredients: [{ name: '', amount: '', unit: 'oz', preferredUnit: '' }],
+        ingredients: [{ name: '', amount: '', unit: 'oz', orderUnit: '' }],
       }
       setEditedRecipe(newRecipe)
       setInitialRecipeState(newRecipe)
@@ -177,7 +177,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
 
   const handleAddIngredient = () => {
     if (!editedRecipe) return
-    const newIngredients = [...editedRecipe.ingredients, { name: "", amount: "", unit: "oz", preferredUnit: "" }]
+    const newIngredients = [...editedRecipe.ingredients, { name: "", amount: "", unit: "oz", orderUnit: "" }]
 
     setEditedRecipe({
       ...editedRecipe,
@@ -217,7 +217,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         name: ing.name.trim(),
         amount: ing.amount.trim(),
         ...(ing.unit?.trim() && { unit: ing.unit.trim() }),
-        ...(ing.preferredUnit?.trim() && { preferredUnit: ing.preferredUnit.trim() }),
+        ...(ing.orderUnit?.trim() && { orderUnit: ing.orderUnit.trim() }),
       }))
     if (validIngredients.length === 0) {
       setValidationError("At least one ingredient is required")
@@ -538,15 +538,15 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Preferred Unit - Full width on mobile, fixed width on desktop */}
+                  {/* Order Unit - Full width on mobile, fixed width on desktop */}
                   <div className="w-full md:w-36">
-                    <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Preferred Unit</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Order Unit</label>
                     <select
-                      value={ingredient.preferredUnit || ""}
-                      onChange={e => handleIngredientChange(index, "preferredUnit", e.target.value)}
+                      value={ingredient.orderUnit || ""}
+                      onChange={e => handleIngredientChange(index, "orderUnit", e.target.value)}
                       className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm bg-white"
                     >
-                      <option value="">Preferred Unit</option>
+                      <option value="">Order Unit</option>
                       <option value="liters">Liters</option>
                       <option value="quarts">Quarts</option>
                       <option value="gallons">Gallons</option>

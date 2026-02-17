@@ -171,11 +171,11 @@ export const formatMLValue = (num: number): string => {
   return Math.ceil(num).toFixed(0)
 }
 
-// Convert ML to preferred unit
-export const convertMLToPreferredUnit = (ml: number, preferredUnit: string | null | undefined, existingCans12oz?: number, existingBottles4oz?: number): number | null => {
-  if (!preferredUnit || ml <= 0) return null
+// Convert ML to order unit
+export const convertMLToOrderUnit = (ml: number, orderUnit: string | null | undefined, existingCans12oz?: number, existingBottles4oz?: number): number | null => {
+  if (!orderUnit || ml <= 0) return null
 
-  const unit = preferredUnit.toLowerCase().trim()
+  const unit = orderUnit.toLowerCase().trim()
 
   switch (unit) {
     case "liters":

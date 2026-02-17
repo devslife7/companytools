@@ -32,7 +32,7 @@ async function main() {
             amount: ingredient.amount,
             orderIndex: index,
             unit: ingredient.unit || null,
-            preferredUnit: ingredient.preferredUnit || null,
+            orderUnit: ingredient.orderUnit || null,
           })),
         },
       },

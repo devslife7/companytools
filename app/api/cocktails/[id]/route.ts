@@ -97,7 +97,7 @@ export async function PUT(
         name: ing.name,
         amount: ing.amount,
         unit: ing.unit || undefined,
-        preferredUnit: ing.preferredUnit || undefined,
+        orderUnit: ing.orderUnit || undefined,
       }))
     }
     if (category !== undefined) updateData.category = category

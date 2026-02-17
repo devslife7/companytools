@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         name: ing.name,
         amount: ing.amount,
         unit: ing.unit || undefined,
-        preferredUnit: ing.preferredUnit || undefined,
+        orderUnit: ing.orderUnit || undefined,
       })),
     }
 

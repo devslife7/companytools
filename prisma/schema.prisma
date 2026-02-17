@@ -39,7 +39,7 @@ model Ingredient {
   amount        Decimal  @db.Decimal(10, 3)
   orderIndex    Int      @map("order_index")
   unit          String?  @map("unit") @db.VarChar(50)
-  preferredUnit String?  @map("preferred_unit") @db.VarChar(50)
+  orderUnit     String?  @map("order_unit") @db.VarChar(50)
   cocktail      Cocktail @relation(fields: [cocktailId], references: [id], onDelete: Cascade)
 
   @@index([cocktailId])

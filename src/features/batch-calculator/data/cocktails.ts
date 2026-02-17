@@ -11,12 +11,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/autumn-bloom-mocktail-v2.png",
     ingredients: [
-      { name: "Sparkling Apple Cider", amount: "3", unit: "oz", preferredUnit: "liters" },
-      { name: "Pear Nectar/Juice", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Orange Juice", amount: "1", unit: "oz", preferredUnit: "gallons" },
-      { name: "Cinnamon Syrup", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
-      { name: "Mint sprig", amount: "1", unit: "each", preferredUnit: "each" },
-      { name: "Lavender spring", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Sparkling Apple Cider", amount: "3", unit: "oz", orderUnit: "liters" },
+      { name: "Pear Nectar/Juice", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Orange Juice", amount: "1", unit: "oz", orderUnit: "gallons" },
+      { name: "Cinnamon Syrup", amount: "0.75", unit: "oz", orderUnit: "quarts" },
+      { name: "Mint sprig", amount: "1", unit: "each", orderUnit: "each" },
+      { name: "Lavender spring", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -31,13 +31,13 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Summer 2025",
     image: "/cocktails/blackberry-collins-v2.png",
     ingredients: [
-      { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
-      { name: "Lemon Juice", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
-      { name: "Simple Syrup", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
-      { name: "Blackberry Puree", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Ginger Beer", amount: "3", unit: "oz", preferredUnit: "12oz can" },
-      { name: "Blackberry", amount: "1", unit: "each", preferredUnit: "each" },
-      { name: "Mint Leaf", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Vodka", amount: "1.5", unit: "oz", orderUnit: "liters" },
+      { name: "Lemon Juice", amount: "0.75", unit: "oz", orderUnit: "quarts" },
+      { name: "Simple Syrup", amount: "0.75", unit: "oz", orderUnit: "quarts" },
+      { name: "Blackberry Puree", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Ginger Beer", amount: "3", unit: "oz", orderUnit: "12oz can" },
+      { name: "Blackberry", amount: "1", unit: "each", orderUnit: "each" },
+      { name: "Mint Leaf", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -51,9 +51,9 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Spring 2025",
     image: "/cocktails/blue-yellow-mimosa-v2.png",
     ingredients: [
-      { name: "Prosecco", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Orange Juice", amount: "2", unit: "oz", preferredUnit: "quarts" },
-      { name: "Blue Curacao", amount: "0.25", unit: "oz", preferredUnit: "liters" }
+      { name: "Prosecco", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Orange Juice", amount: "2", unit: "oz", orderUnit: "quarts" },
+      { name: "Blue Curacao", amount: "0.25", unit: "oz", orderUnit: "liters" }
     ],
   },
 
@@ -67,10 +67,10 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Summer 2025",
     image: "/cocktails/classic-pisco-sour-v2.png",
     ingredients: [
-      { name: "Pisco", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Lime Juice", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Simple Syrup", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
-      { name: "Egg White", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Pisco", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Lime Juice", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Simple Syrup", amount: "0.75", unit: "oz", orderUnit: "quarts" },
+      { name: "Egg White", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -84,12 +84,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/cranberry-cinnamon-whiskey-sour.png",
     ingredients: [
-      { name: "Bourbon", amount: "1.5", unit: "oz", preferredUnit: "liters" },
-      { name: "Lemon Juice", amount: "0.75", unit: "oz", preferredUnit: "quarts" },
-      { name: "Cranberry Cinnamon Syrup", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Angostura Bitters", amount: "1", unit: "dash", preferredUnit: "4oz bottle" },
-      { name: "Fee foam", amount: "1", unit: "dash", preferredUnit: "4oz bottle" },
-      { name: "Cranberries", amount: "3", unit: "each", preferredUnit: "each" }
+      { name: "Bourbon", amount: "1.5", unit: "oz", orderUnit: "liters" },
+      { name: "Lemon Juice", amount: "0.75", unit: "oz", orderUnit: "quarts" },
+      { name: "Cranberry Cinnamon Syrup", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Angostura Bitters", amount: "1", unit: "dash", orderUnit: "4oz bottle" },
+      { name: "Fee foam", amount: "1", unit: "dash", orderUnit: "4oz bottle" },
+      { name: "Cranberries", amount: "3", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -104,11 +104,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/espresso-martini.png",
     ingredients: [
-      { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Espresso", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Kahlua (Coffee Liqueur)", amount: "0.5", unit: "oz", preferredUnit: "liters" },
-      { name: "Simple Syrup", amount: "0.25", unit: "oz", preferredUnit: "quarts" },
-      { name: "Coffee Bean", amount: "3", unit: "each", preferredUnit: "each" }
+      { name: "Vodka", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Espresso", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Kahlua (Coffee Liqueur)", amount: "0.5", unit: "oz", orderUnit: "liters" },
+      { name: "Simple Syrup", amount: "0.25", unit: "oz", orderUnit: "quarts" },
+      { name: "Coffee Bean", amount: "3", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -123,12 +123,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/maple-bourbon-cider.png",
     ingredients: [
-      { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Apple Cider", amount: "4", unit: "oz", preferredUnit: "gallons" },
-      { name: "Lemon Juice", amount: "0.25", unit: "oz", preferredUnit: "quarts" },
-      { name: "Maple Syrup", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Cinnamon", amount: "1", unit: "each", preferredUnit: "each" },
-      { name: "Green Apple Slice", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Bourbon", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Apple Cider", amount: "4", unit: "oz", orderUnit: "gallons" },
+      { name: "Lemon Juice", amount: "0.25", unit: "oz", orderUnit: "quarts" },
+      { name: "Maple Syrup", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Cinnamon", amount: "1", unit: "each", orderUnit: "each" },
+      { name: "Green Apple Slice", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -140,8 +140,8 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     glassType: "Served Up",
     season: "Spring 2026",
     ingredients: [
-      { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Simple sirup", amount: "1", unit: "oz", preferredUnit: "quarts" }
+      { name: "Vodka", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Simple sirup", amount: "1", unit: "oz", orderUnit: "quarts" }
     ],
   },
 
@@ -155,10 +155,10 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/old-fashioned-v2.png",
     ingredients: [
-      { name: "Bourbon or Rye", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Simple Syrup", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Angostura Bitters", amount: "3", unit: "dash", preferredUnit: "4oz bottles" },
-      { name: "Lemon Twist", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Bourbon or Rye", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Simple Syrup", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Angostura Bitters", amount: "3", unit: "dash", orderUnit: "4oz bottles" },
+      { name: "Lemon Twist", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -172,12 +172,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Summer 2025",
     image: "/cocktails/pear-ginger-moscow-mule-v2.png",
     ingredients: [
-      { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Pear Puree", amount: "2", unit: "oz", preferredUnit: "quarts" },
-      { name: "Lime Juice", amount: "0.5", unit: "oz", preferredUnit: "gallons" },
-      { name: "Ground Cardamom", amount: "0.25", unit: "tsp", preferredUnit: "quarts" },
-      { name: "Ginger Beer", amount: "0.4", unit: "oz", preferredUnit: "12oz cans" },
-      { name: "Pear slice", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Vodka", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Pear Puree", amount: "2", unit: "oz", orderUnit: "quarts" },
+      { name: "Lime Juice", amount: "0.5", unit: "oz", orderUnit: "gallons" },
+      { name: "Ground Cardamom", amount: "0.25", unit: "tsp", orderUnit: "quarts" },
+      { name: "Ginger Beer", amount: "0.4", unit: "oz", orderUnit: "12oz cans" },
+      { name: "Pear slice", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -191,9 +191,9 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/pear-cranberry-bellini.png",
     ingredients: [
-      { name: "Sparkling wine", amount: "4", unit: "oz", preferredUnit: "liters" },
-      { name: "White Cramberry", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Pear  Nectar", amount: "1.5", unit: "oz", preferredUnit: "quarts" }
+      { name: "Sparkling wine", amount: "4", unit: "oz", orderUnit: "liters" },
+      { name: "White Cramberry", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Pear  Nectar", amount: "1.5", unit: "oz", orderUnit: "quarts" }
     ],
   },
 
@@ -207,13 +207,13 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/pear-bourbon-sour.png",
     ingredients: [
-      { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Pear Liqueur", amount: "1", unit: "oz", preferredUnit: "liters" },
-      { name: "Simple syrup", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Lemon Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Angostura Bitters", amount: "2", unit: "dash", preferredUnit: "4oz bottle" },
-      { name: "Pear Slice", amount: "1", unit: "each", preferredUnit: "each" },
-      { name: "Dry Cherry", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Bourbon", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Pear Liqueur", amount: "1", unit: "oz", orderUnit: "liters" },
+      { name: "Simple syrup", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Lemon Juice", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Angostura Bitters", amount: "2", unit: "dash", orderUnit: "4oz bottle" },
+      { name: "Pear Slice", amount: "1", unit: "each", orderUnit: "each" },
+      { name: "Dry Cherry", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -227,12 +227,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Summer 2025",
     image: "/cocktails/peruvian-garden-spritz.png",
     ingredients: [
-      { name: "Pisco", amount: "1.5", unit: "oz", preferredUnit: "liters" },
-      { name: "Lime Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Sparkling Wine", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Soda Water", amount: "2", unit: "oz", preferredUnit: "12oz cans" },
-      { name: "Thin Cucumber Slices", amount: "1", unit: "each", preferredUnit: "each" },
-      { name: "Mint Leaves", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Pisco", amount: "1.5", unit: "oz", orderUnit: "liters" },
+      { name: "Lime Juice", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Sparkling Wine", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Soda Water", amount: "2", unit: "oz", orderUnit: "12oz cans" },
+      { name: "Thin Cucumber Slices", amount: "1", unit: "each", orderUnit: "each" },
+      { name: "Mint Leaves", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -247,12 +247,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Spring 2025",
     image: "/cocktails/rose-garden-v4.png",
     ingredients: [
-      { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
-      { name: "Lemon Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Cardamon Simple Syrup", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Spindrift GrapeFruit Seltzer", amount: "3", unit: "oz", preferredUnit: "12oz can" },
-      { name: "Rose Hydrolat", amount: "3", unit: "dash", preferredUnit: "4oz bottle" },
-      { name: "Baby Pansy", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Vodka", amount: "1.5", unit: "oz", orderUnit: "liters" },
+      { name: "Lemon Juice", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Cardamon Simple Syrup", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Spindrift GrapeFruit Seltzer", amount: "3", unit: "oz", orderUnit: "12oz can" },
+      { name: "Rose Hydrolat", amount: "3", unit: "dash", orderUnit: "4oz bottle" },
+      { name: "Baby Pansy", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -266,11 +266,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Summer 2025",
     image: "/cocktails/ruby-red-anniversary-daiquiri.png",
     ingredients: [
-      { name: "White Rum", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Fresh Ruby Red Grapefruit Juice", amount: "1", unit: "oz", preferredUnit: "gallons" },
-      { name: "Fresh Lime Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Simple Syrup", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Maraschino Liqueur (Optional)", amount: "0.25", unit: "oz", preferredUnit: "liters" }
+      { name: "White Rum", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Fresh Ruby Red Grapefruit Juice", amount: "1", unit: "oz", orderUnit: "gallons" },
+      { name: "Fresh Lime Juice", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Simple Syrup", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Maraschino Liqueur (Optional)", amount: "0.25", unit: "oz", orderUnit: "liters" }
     ],
   },
 
@@ -284,12 +284,12 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Fall 2025",
     image: "/cocktails/sage-and-ginger-paloma.png",
     ingredients: [
-      { name: "Tequila (Reposado)", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Sage Infused Honey", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Grapefruit Juice", amount: "2", unit: "oz", preferredUnit: "quarts" },
-      { name: "Lime Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Ginger Beer", amount: "2", unit: "oz", preferredUnit: "12oz can" },
-      { name: "Sage Leaf", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Tequila (Reposado)", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Sage Infused Honey", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Grapefruit Juice", amount: "2", unit: "oz", orderUnit: "quarts" },
+      { name: "Lime Juice", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Ginger Beer", amount: "2", unit: "oz", orderUnit: "12oz can" },
+      { name: "Sage Leaf", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -303,9 +303,9 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Spring 2026",
     image: "/cocktails/sangue-di-bergamotto-mocktail.png",
     ingredients: [
-      { name: "Hibiscus Tea", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Ginger syrup", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Bergamot puree", amount: "1", unit: "oz", preferredUnit: "quarts" }
+      { name: "Hibiscus Tea", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Ginger syrup", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Bergamot puree", amount: "1", unit: "oz", orderUnit: "quarts" }
     ],
   },
 
@@ -319,11 +319,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Spring 2025",
     image: "/cocktails/sparkling-pear-french-75.png",
     ingredients: [
-      { name: "Gin", amount: "1", unit: "oz", preferredUnit: "liters" },
-      { name: "Lemon Juice", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Peary Syrup", amount: "1", unit: "oz", preferredUnit: "quarts" },
-      { name: "Champagne", amount: "3", unit: "oz", preferredUnit: "liters" },
-      { name: "Lemos Peel", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Gin", amount: "1", unit: "oz", orderUnit: "liters" },
+      { name: "Lemon Juice", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Peary Syrup", amount: "1", unit: "oz", orderUnit: "quarts" },
+      { name: "Champagne", amount: "3", unit: "oz", orderUnit: "liters" },
+      { name: "Lemos Peel", amount: "1", unit: "each", orderUnit: "each" }
     ],
   },
 
@@ -337,11 +337,11 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     season: "Summer 2025",
     image: "/cocktails/whiskey-honey-lemonade.png",
     ingredients: [
-      { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
-      { name: "Lemonade", amount: "4", unit: "oz", preferredUnit: "gallons" },
-      { name: "Honey-Lavender Syrup", amount: "0.5", unit: "oz", preferredUnit: "quarts" },
-      { name: "Mint Sprigs", amount: "3.5", unit: "each", preferredUnit: "each" },
-      { name: "Baby Pansy", amount: "1", unit: "each", preferredUnit: "each" }
+      { name: "Bourbon", amount: "2", unit: "oz", orderUnit: "liters" },
+      { name: "Lemonade", amount: "4", unit: "oz", orderUnit: "gallons" },
+      { name: "Honey-Lavender Syrup", amount: "0.5", unit: "oz", orderUnit: "quarts" },
+      { name: "Mint Sprigs", amount: "3.5", unit: "each", orderUnit: "each" },
+      { name: "Baby Pansy", amount: "1", unit: "each", orderUnit: "each" }
     ],
   }
 ]

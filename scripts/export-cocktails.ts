@@ -79,8 +79,8 @@ function formatCocktail(cocktail: CocktailRecipe, index: number, total: number):
     if (ing.unit) {
       parts.push(`unit: ${JSON.stringify(ing.unit)}`)
     }
-    if (ing.preferredUnit) {
-      parts.push(`preferredUnit: ${JSON.stringify(ing.preferredUnit)}`)
+    if (ing.orderUnit) {
+      parts.push(`orderUnit: ${JSON.stringify(ing.orderUnit)}`)
     }
 
     lines.push(`      { ${parts.join(', ')} }${isLast ? '' : ','}`)
@@ -134,7 +134,7 @@ function transformCocktailToRecipe(cocktail: {
     amount: any // Decimal type from Prisma
     orderIndex: number
     unit?: string | null
-    preferredUnit?: string | null
+    orderUnit?: string | null
   }>
   glass?: string | null
   season?: string | null
@@ -169,8 +169,8 @@ function transformCocktailToRecipe(cocktail: {
         if (ing.unit) {
           ingredient.unit = ing.unit
         }
-        if (ing.preferredUnit) {
-          ingredient.preferredUnit = ing.preferredUnit
+        if (ing.orderUnit) {
+          ingredient.orderUnit = ing.orderUnit
         }
 
         return ingredient
