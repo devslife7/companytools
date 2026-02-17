@@ -9,7 +9,7 @@ export interface Ingredient {
 
 export type CocktailMethod = "Shake" | "Build"
 
-export type GlassType = "Rocks" | "Coupe" | "Martini" | "Highball" | "Flute" | "Wine Glass" | "Served Up"
+export type GlassType = "Rocks" | "Coupe" | "Martini" | "Highball" | "Flute" | "Served Up"
 
 export interface CocktailRecipe {
   id?: number  // Database ID (optional for backward compatibility)

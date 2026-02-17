@@ -355,7 +355,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               <option value="Martini">Martini</option>
               <option value="Highball">Highball</option>
               <option value="Flute">Flute</option>
-              <option value="Wine Glass">Wine Glass</option>
               <option value="Served Up">Served Up</option>
             </select>
           </div>

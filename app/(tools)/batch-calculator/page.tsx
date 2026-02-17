@@ -369,7 +369,6 @@ export default function BatchCalculatorPage() {
               <option value="Martini">Martini</option>
               <option value="Highball">Highball</option>
               <option value="Flute">Flute</option>
-              <option value="Wine Glass">Wine Glass</option>
               <option value="Served Up">Served Up</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
