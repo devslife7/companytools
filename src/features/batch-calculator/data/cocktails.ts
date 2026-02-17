@@ -8,6 +8,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Add all ingredients (except cider) to a shaker with ice.\n2. Shake briefly to chill.\n3. Strain into a glass with fresh ice.\n4. Top with sparkling cider and stir gently.",
     abv: 0,
     glassType: "Highball",
+    season: "Fall 2025",
     image: "/cocktails/autumn-bloom-mocktail-v2.png",
     ingredients: [
       { name: "Sparkling Apple Cider", amount: "3", unit: "oz", preferredUnit: "liters" },
@@ -27,6 +28,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     featured: true,
     abv: 9.2,
     glassType: "Highball",
+    season: "Summer 2025",
     image: "/cocktails/blackberry-collins-v2.png",
     ingredients: [
       { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
@@ -46,6 +48,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Add orange juice and prosecco into a champagne glass.\n2. Add blue curacao slowly into the side of the glass.",
     abv: 6.6,
     glassType: "Flute",
+    season: "Spring 2025",
     image: "/cocktails/blue-yellow-mimosa-v2.png",
     ingredients: [
       { name: "Prosecco", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -61,6 +64,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Add Pisco, Lime Juice, Simple Syrup, and Egg White to a shaker and dry-shake (without ice) vigorously. 2. Add ice and shake again until well-chilled. 3. Strain into a chilled glass (Timeless Cocktail). 4. Garnish with Angostura bitters drops.",
     abv: 21.3,
     glassType: "Coupe",
+    season: "Summer 2025",
     image: "/cocktails/classic-pisco-sour-v2.png",
     ingredients: [
       { name: "Pisco", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -77,6 +81,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine bourbon, lemon, syrup, bitters and foam into a cocktail shaker filled with ice.\n2. Shake until ingredients are properly chilled.\n3. Strain in ice filled rocks glass.\n4. Garnish with 3 cranberry skewer",
     abv: 18.5,
     glassType: "Rocks",
+    season: "Fall 2025",
     image: "/cocktails/cranberry-cinnamon-whiskey-sour.png",
     ingredients: [
       { name: "Bourbon", amount: "1.5", unit: "oz", preferredUnit: "liters" },
@@ -96,6 +101,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     featured: true,
     abv: 18.9,
     glassType: "Coupe",
+    season: "Fall 2025",
     image: "/cocktails/espresso-martini.png",
     ingredients: [
       { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -114,6 +120,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     featured: true,
     abv: 11.9,
     glassType: "Rocks",
+    season: "Fall 2025",
     image: "/cocktails/maple-bourbon-cider.png",
     ingredients: [
       { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -126,12 +133,26 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
   },
 
   {
+    id: 113,
+    name: "Master",
+    method: "Build",
+    instructions: "Hdjdbdbbdd",
+    glassType: "Served Up",
+    season: "Spring 2026",
+    ingredients: [
+      { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
+      { name: "Simple sirup", amount: "1", unit: "oz", preferredUnit: "quarts" }
+    ],
+  },
+
+  {
     id: 102,
     name: "Old Fashioned",
     method: "Build",
     instructions: "1. Combine all ingredients in a tin filled with ice.\n2. Stir until well-chilled.\n3. Strain into a rocks glass filled with fresh ice.",
     abv: 32.4,
     glassType: "Rocks",
+    season: "Fall 2025",
     image: "/cocktails/old-fashioned-v2.png",
     ingredients: [
       { name: "Bourbon or Rye", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -148,6 +169,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine vodka, pear puree, lime juice, and cardamom with ice.\n2. Shake well.\n3. Strain into a glass with ice.\n4. Top with ginger beer and stir gently.\n5. Garnish with pear slice",
     abv: 16.2,
     glassType: "Highball",
+    season: "Summer 2025",
     image: "/cocktails/pear-ginger-moscow-mule-v2.png",
     ingredients: [
       { name: "Vodka", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -166,6 +188,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine pear nectar and cranberry juice (unsweetened works best) into a chilled champagne flute.\n2. Top with cold Prosecco or your favorite sparkling wine, pouring slowly to manage the fizz.",
     abv: 7.4,
     glassType: "Flute",
+    season: "Fall 2025",
     image: "/cocktails/pear-cranberry-bellini.png",
     ingredients: [
       { name: "Sparkling wine", amount: "4", unit: "oz", preferredUnit: "liters" },
@@ -181,6 +204,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine 2 oz bourbon with 2 oz pear nectar/juice, lemon juice, and simple syrup in a shaker.\n2. Add ice to the shaker and shake vigorously for 10-15 seconds until very cold.\n3. Strain into a rocks glass filled with fresh ice.\n4. Garnish with pear and dry cherry skewer.\n5. dont forget the pear slice",
     abv: 25.3,
     glassType: "Rocks",
+    season: "Fall 2025",
     image: "/cocktails/pear-bourbon-sour.png",
     ingredients: [
       { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -200,6 +224,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Muddle Cucumber Slices and Mint Leaves.\n2. Add Pisco and Lime Juice to Infuse.\n3. Fill Glass with Ice and Strain Mixture.\n4. Top with Sparkling Wine and Soda Water.\n5. Stir gently.",
     abv: 14,
     glassType: "Served Up",
+    season: "Summer 2025",
     image: "/cocktails/peruvian-garden-spritz.png",
     ingredients: [
       { name: "Pisco", amount: "1.5", unit: "oz", preferredUnit: "liters" },
@@ -219,6 +244,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     featured: true,
     abv: 10.7,
     glassType: "Served Up",
+    season: "Spring 2025",
     image: "/cocktails/rose-garden-v4.png",
     ingredients: [
       { name: "Vodka", amount: "1.5", unit: "oz", preferredUnit: "liters" },
@@ -237,6 +263,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine all ingredients in a shaker with ice.\n2. Shake vigorously until chilled.\n3. Double-strain into a coupe glass.",
     abv: 20.7,
     glassType: "Coupe",
+    season: "Summer 2025",
     image: "/cocktails/ruby-red-anniversary-daiquiri.png",
     ingredients: [
       { name: "White Rum", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -254,6 +281,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Lightly crush 2–3 sage leaves in your shaker with a splash of lime juice.\n2. Add Tequila and Grapefruit juice with ice.\n3. Shake briefly to chill.\n4. Strain into a glass with fresh ice and top with Ginger Beer.\n5. Garnish with grapefruit slice and a sage leaf.",
     abv: 10.7,
     glassType: "Highball",
+    season: "Fall 2025",
     image: "/cocktails/sage-and-ginger-paloma.png",
     ingredients: [
       { name: "Tequila (Reposado)", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -272,6 +300,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine hibiscus tea, ginger syrup, and bergamot puree into a cocktail glass with ice.\n2. Shake well until chilled.",
     abv: 0,
     glassType: "Rocks",
+    season: "Spring 2026",
     image: "/cocktails/sangue-di-bergamotto-mocktail.png",
     ingredients: [
       { name: "Hibiscus Tea", amount: "2", unit: "oz", preferredUnit: "liters" },
@@ -287,6 +316,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine gin, pear brandy (or Pear Nectar), and lemon juice into a shaker with ice.\n2. Shake for 10 seconds until cold.\n3. Pour into a chilled champagne flute.\n4. Top off with champagne or prosecco.\n5. Garnish with a thin pear slice or a lemon twist.",
     abv: 13.8,
     glassType: "Flute",
+    season: "Spring 2025",
     image: "/cocktails/sparkling-pear-french-75.png",
     ingredients: [
       { name: "Gin", amount: "1", unit: "oz", preferredUnit: "liters" },
@@ -304,6 +334,7 @@ export const COCKTAIL_DATA: CocktailRecipe[] = [
     instructions: "1. Combine whiskey (Bourbon works best),  lemon juice, and honey syrup (equal parts honey/water) into cocktail glass with ice.\n2. Add a splash of Soda water if you want it bubbly (optional).\n3. Garnish with a lemon wheel or a sprig of mint.",
     abv: 12.3,
     glassType: "Rocks",
+    season: "Summer 2025",
     image: "/cocktails/whiskey-honey-lemonade.png",
     ingredients: [
       { name: "Bourbon", amount: "2", unit: "oz", preferredUnit: "liters" },
