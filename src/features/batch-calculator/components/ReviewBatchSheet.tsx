@@ -137,6 +137,11 @@ export function ReviewBatchSheet({ batches, measureSystem }: ReviewBatchSheetPro
                                         <div className="col-span-3 text-right">
                                             <div className="font-bold text-gray-900">{displayQty}</div>
                                             <div className="text-xs text-gray-400 font-medium">{subQty}</div>
+                                            {calculated.bottles >= 0.1 && (
+                                                <div className="text-xs text-gray-400 font-medium">
+                                                    ~{formatNumber(calculated.bottles, 1)} bottles @750ml
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )

@@ -67,7 +67,7 @@ const generateHtmlHeader = (title: string, showHeader: boolean = true, compactPa
             table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9.5pt; }
             th, td { border: 1px solid #000; padding: 3px 4px; text-align: right; font-size: 9.5pt; }
             th { text-align: left; background-color: #f0f0f0; font-weight: bold; }
-            .total-row td { font-weight: bold; background-color: #e0e0e0; }
+            .total-row td { font-weight: bold; background-color: #fff; }
             .summary-title { margin-top: ${summaryTitleMarginTop}; border-bottom: 1px solid #000; padding-bottom: 3px; }
             .summary-title-no-border { margin-top: ${summaryTitleMarginTop}; padding-bottom: 3px; }
             .text-left { text-align: left; }
@@ -92,13 +92,21 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
     item => (item as any).preferredUnit
   )
   const hasPrices = grandTotals.liquor.some(item => item.estimatedCost != null)
+  const hasLiquor = grandTotals.liquor.length > 0
 
-  // Base columns: INGREDIENT = 1, optionally + Preferred Unit = 2
-  // Liquor section gets extra columns: Bottles + Est. Cost
-  const baseColumns = hasPreferredUnits ? 2 : 1
-  const liquorColumns = hasPrices ? baseColumns + 2 : baseColumns
+  // Column visibility
+  const showBottles = hasLiquor // Always show bottles column if we have liquor
+  const showCost = hasPrices
+
+  // Base columns: INGREDIENT = 1, optionally + Preferred Unit = 1
+  let totalColumns = 1 // Ingredient
+  if (hasPreferredUnits) totalColumns++
+  if (showBottles) totalColumns++
+  if (showCost) totalColumns++
+
   const preferredUnitHeader = hasPreferredUnits ? '<th class="text-left">Preferred Unit</th>' : ''
-  const liquorExtraHeaders = hasPrices ? '<th>Bottles</th><th>Est. Cost</th>' : ''
+  const bottlesHeader = showBottles ? '<th style="text-align: right;">Bottles (750ml)</th>' : ''
+  const costHeader = showCost ? '<th style="text-align: right;">Est. Cost</th>' : ''
 
   return `
     <h2 class="summary-title-no-border">Inventory Shopping List (Grand Totals based on Servings)</h2>
@@ -108,13 +116,14 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
                 <tr>
                     <th class="text-left">INGREDIENT</th>
                     ${preferredUnitHeader}
-                    ${liquorExtraHeaders}
+                    ${bottlesHeader}
+                    ${costHeader}
                 </tr>
             </thead>
             <tbody>
                 ${grandTotals.liquor.length > 0 ? `
                 <tr>
-                    <td colspan="${liquorColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 2px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         LIQUOR ITEMS
                     </td>
                 </tr>
@@ -124,15 +133,20 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        ${hasPrices ? `<td>${ing.bottlesToBuy != null ? ing.bottlesToBuy : '-'}</td>` : ''}
-                        ${hasPrices ? `<td>${ing.estimatedCost != null ? `$${ing.estimatedCost.toFixed(2)}` : '-'}</td>` : ''}
+                        ${showBottles ? `<td>${!isAngosturaBitters(ing.name) && ing.bottles > 0
+              ? `<div style="display: flex; justify-content: flex-end; align-items: center; gap: 4px; white-space: nowrap;">
+                                <span style="font-size: 0.85em; color: #666; font-weight: normal;">(${formatNumber(ing.bottles)})</span>
+                                <strong>${Math.ceil(ing.bottles)}</strong>
+                               </div>`
+              : '-'}</td>` : ''}
+                        ${showCost ? `<td>${ing.estimatedCost != null ? `$${ing.estimatedCost.toFixed(2)}` : '-'}</td>` : ''}
                     </tr>
                 `
         )
         .join("")}
                 ${hasPrices && grandTotals.totalLiquorCost > 0 ? `
                 <tr>
-                    <td colspan="${liquorColumns - 1}" style="text-align: right; font-weight: bold; background-color: #d0d0d0; padding: 4px 6px;">ESTIMATED LIQUOR COST</td>
+                    <td colspan="${totalColumns - 1}" style="text-align: right; font-weight: bold; background-color: #d0d0d0; padding: 4px 6px;">ESTIMATED LIQUOR COST</td>
                     <td style="font-weight: bold; background-color: #d0d0d0;">$${grandTotals.totalLiquorCost.toFixed(2)}</td>
                 </tr>
                 ` : ''}
@@ -140,7 +154,7 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
 
                 ${grandTotals.soda.length > 0 ? `
                 <tr>
-                    <td colspan="${liquorColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${grandTotals.liquor.length > 0 ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${grandTotals.liquor.length > 0 ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         SODA ITEMS
                     </td>
                 </tr>
@@ -150,7 +164,8 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        ${hasPrices ? '<td>-</td><td>-</td>' : ''}
+                        ${showBottles ? '<td>-</td>' : ''}
+                        ${showCost ? '<td>-</td>' : ''}
                     </tr>
                 `
         )
@@ -159,7 +174,7 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
 
                 ${grandTotals.other.length > 0 ? `
                 <tr>
-                    <td colspan="${liquorColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: ${(grandTotals.liquor.length > 0 || grandTotals.soda.length > 0) ? '1px' : '2px'} solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         OTHER ITEMS
                     </td>
                 </tr>
@@ -169,7 +184,8 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
                     <tr class="total-row">
                         <td class="text-left">${ing.name}</td>
                         ${hasPreferredUnits ? `<td class="text-left">${formatPreferredUnit(ing.preferredUnit, ing.preferredUnitValue)}</td>` : ''}
-                        ${hasPrices ? '<td>-</td><td>-</td>' : ''}
+                        ${showBottles ? '<td>-</td>' : ''}
+                        ${showCost ? '<td>-</td>' : ''}
                     </tr>
                 `
         )
