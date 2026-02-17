@@ -40,7 +40,7 @@ export default function BatchCalculatorPage() {
   // Filters
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedSpirit, setSelectedSpirit] = useState<string>('All')
-  const [filterFeatured, setFilterFeatured] = useState<string>('All')
+  const [filterFeatured, setFilterFeatured] = useState<string>('Featured')
   const [selectedGlass, setSelectedGlass] = useState<string>('All')
 
   const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
@@ -317,25 +317,32 @@ export default function BatchCalculatorPage() {
 
       {/* 2. Filters & Search */}
       <div className="bg-white p-3 sm:p-4 rounded-2xl border border-gray-200 shadow-sm mb-10 flex flex-col md:flex-row gap-4 md:items-center">
-        {/* Search Input */}
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Search by name or ingredient..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:bg-white focus:border-brand-primary/20 transition-all text-gray-900 placeholder:text-gray-400"
-          />
-        </div>
+        {/* Search + Featured */}
+        <div className="flex items-center gap-3 flex-1">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search by name or ingredient..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:bg-white focus:border-brand-primary/20 transition-all text-gray-900 placeholder:text-gray-400"
+            />
+          </div>
 
-        {/* Separator on Desktop */}
-        <div className="hidden md:block w-px h-10 bg-gray-200 mx-2"></div>
+          {/* Featured Filter */}
+          <button
+            onClick={() => setFilterFeatured(filterFeatured === 'Featured' ? 'All' : 'Featured')}
+            className={`flex-shrink-0 px-4 py-3 rounded-xl text-sm font-bold transition-all ${filterFeatured === 'Featured' ? 'bg-brand-primary text-brand-primary-foreground shadow-sm' : 'bg-gray-100/50 text-gray-700 hover:bg-gray-100'}`}
+          >
+            Featured
+          </button>
+        </div>
 
         {/* Filters Row */}
         <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 px-1 md:px-0 scrollbar-hide">
           {/* Spirit Filter */}
-          <div className="relative group min-w-[100px]">
+          <div className="relative group min-w-0">
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
@@ -343,21 +350,6 @@ export default function BatchCalculatorPage() {
             >
               <option value="All">All Spirits</option>
               {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-              <ChevronDown className="w-4 h-4" />
-            </div>
-          </div>
-
-          {/* Featured Filter */}
-          <div className="relative group min-w-[140px]">
-            <select
-              value={filterFeatured}
-              onChange={(e) => setFilterFeatured(e.target.value)}
-              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
-            >
-              <option value="All">Show: All</option>
-              <option value="Featured">Show: Featured</option>
             </select>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
               <ChevronDown className="w-4 h-4" />
@@ -384,19 +376,16 @@ export default function BatchCalculatorPage() {
               <ChevronDown className="w-4 h-4" />
             </div>
           </div>
+
+          {/* Clear / Filter button — always visible, right side */}
+          <button
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); }}
+            className={`flex-shrink-0 p-2.5 rounded-xl transition-all ${hasActiveFilters ? 'text-red-500 bg-red-50 hover:bg-red-100 cursor-pointer' : 'text-gray-300 cursor-default'}`}
+            title={hasActiveFilters ? 'Clear all filters' : 'Filters'}
+          >
+            {hasActiveFilters ? <FilterX className="w-5 h-5" /> : <Funnel className="w-5 h-5" />}
+          </button>
         </div>
-
-        {/* Separator on Desktop */}
-        <div className="hidden md:block w-px h-10 bg-gray-200 mx-2"></div>
-
-        {/* Clear / Filter button — always visible, right side */}
-        <button
-          onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); }}
-          className={`flex-shrink-0 p-2.5 rounded-xl transition-all ${hasActiveFilters ? 'text-red-500 bg-red-50 hover:bg-red-100 cursor-pointer' : 'text-gray-300 cursor-default'}`}
-          title={hasActiveFilters ? 'Clear all filters' : 'Filters'}
-        >
-          {hasActiveFilters ? <FilterX className="w-5 h-5" /> : <Funnel className="w-5 h-5" />}
-        </button>
       </div>
 
       {/* 3. Grid Gallery */}
@@ -426,7 +415,6 @@ export default function BatchCalculatorPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredCocktails.map(cocktail => {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
-            const mainSpirit = cocktail.ingredients.find(i => availableLiquors.includes(i.name) || i.name.includes("Vodka") || i.name.includes("Gin") || i.name.includes("Rum") || i.name.includes("Whiskey") || i.name.includes("Tequila") || i.name.includes("Bourbon"))?.name || "Spirit"
 
 
 
