@@ -28,6 +28,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   mode = 'edit',
 }) => {
   const [editedRecipe, setEditedRecipe] = useState<CocktailRecipe | null>(null)
+  const [initialRecipeState, setInitialRecipeState] = useState<CocktailRecipe | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
   const [deletePassword, setDeletePassword] = useState("")
@@ -101,13 +102,16 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         }
       })
       setEditedRecipe(parsedRecipe)
+      setInitialRecipeState(parsedRecipe)
     } else if (mode === 'create') {
       // Initialize empty recipe for create mode
-      setEditedRecipe({
+      const newRecipe: CocktailRecipe = {
         name: '',
         method: 'Build',
         ingredients: [{ name: '', amount: '', unit: 'oz', preferredUnit: '' }],
-      })
+      }
+      setEditedRecipe(newRecipe)
+      setInitialRecipeState(newRecipe)
     }
     setValidationError(null)
   }, [recipe, isOpen, mode])
@@ -186,6 +190,12 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   }
 
   const handleSave = async () => {
+    // Check if changes were made
+    if (initialRecipeState && JSON.stringify(editedRecipe) === JSON.stringify(initialRecipeState)) {
+      onClose()
+      return
+    }
+
     // Validation
     if (!editedRecipe.name.trim()) {
       setValidationError("Cocktail name is required")
