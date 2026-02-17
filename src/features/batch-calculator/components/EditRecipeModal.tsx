@@ -362,22 +362,100 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                   key={option.value}
                   onClick={() => handleGlassTypeChange(option.value)}
                   className={`
-                    flex flex-col items-center justify-center p-4 min-w-[100px] gap-3 rounded-xl border-2 transition-all duration-200 snap-center shrink-0 group
+                    flex flex-col items-center justify-center p-3 min-w-[90px] gap-2 rounded-xl border transition-all duration-200 snap-center shrink-0 group
                     ${editedRecipe.glassType === option.value
-                      ? 'bg-orange-50/80 border-orange-500 shadow-sm'
-                      : 'bg-white border-gray-100 hover:border-orange-200 hover:bg-gray-50'
+                      ? 'bg-white border-orange-600'
+                      : 'bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                     }
                   `}
                   type="button"
                 >
-                  <option.Icon className={`w-8 h-8 transition-colors duration-200 ${editedRecipe.glassType === option.value ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'
+                  <option.Icon className={`w-7 h-7 transition-colors duration-200 ${editedRecipe.glassType === option.value ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'
                     }`} />
-                  <span className={`text-sm font-medium transition-colors duration-200 ${editedRecipe.glassType === option.value ? 'text-orange-700' : 'text-gray-600'
+                  <span className={`text-xs font-medium transition-colors duration-200 ${editedRecipe.glassType === option.value ? 'text-orange-600' : 'text-gray-600'
                     }`}>
                     {option.label}
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+
+
+
+          {/* Instructions */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
+
+            {/* Method */}
+            <div className="mb-4">
+              <div className="flex gap-3">
+                <label className={`flex flex-col items-center justify-center p-3 min-w-[90px] gap-2 rounded-xl border transition-all duration-200 cursor-pointer group ${editedRecipe.method === 'Build'
+                  ? 'bg-white border-orange-600'
+                  : 'bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                  }`}>
+                  <input
+                    type="radio"
+                    name="method"
+                    value="Build"
+                    checked={editedRecipe.method === 'Build'}
+                    onChange={e => handleMethodChange(e.target.value as CocktailMethod)}
+                    className="sr-only"
+                  />
+                  <div className={`w-7 h-7 flex items-center justify-center transition-colors duration-200 ${editedRecipe.method === 'Build' ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'
+                    }`}>
+                    {/* Build Icon (Layered/Building) */}
+                    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                  </div>
+                  <span className={`text-xs font-medium transition-colors duration-200 ${editedRecipe.method === 'Build' ? 'text-orange-600' : 'text-gray-600'
+                    }`}>Build</span>
+                </label>
+
+                <label className={`flex flex-col items-center justify-center p-3 min-w-[90px] gap-2 rounded-xl border transition-all duration-200 cursor-pointer group ${editedRecipe.method === 'Shake'
+                  ? 'bg-white border-orange-600'
+                  : 'bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                  }`}>
+                  <input
+                    type="radio"
+                    name="method"
+                    value="Shake"
+                    checked={editedRecipe.method === 'Shake'}
+                    onChange={e => handleMethodChange(e.target.value as CocktailMethod)}
+                    className="sr-only"
+                  />
+                  <div className={`w-7 h-7 flex items-center justify-center transition-colors duration-200 ${editedRecipe.method === 'Shake' ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600'
+                    }`}>
+                    {/* Shake Icon (Shaker) */}
+                    <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 6h14" />
+                      <path d="M19 6L17 20a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6" />
+                      <path d="M8.5 2h7" />
+                      <path d="M9 2v4" />
+                      <path d="M15 2v4" />
+                    </svg>
+                  </div>
+                  <span className={`text-xs font-medium transition-colors duration-200 ${editedRecipe.method === 'Shake' ? 'text-orange-600' : 'text-gray-600'
+                    }`}>Shake</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Textarea with custom placeholder */}
+            <div className="relative">
+              <textarea
+                value={editedRecipe.instructions || ''}
+                onChange={e => handleInstructionsChange(e.target.value)}
+                rows={6}
+                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base resize-none relative z-10"
+                placeholder=""
+              />
+              {!editedRecipe.instructions && (
+                <div className="absolute top-3 md:top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
+                  Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build
+                </div>
+              )}
             </div>
           </div>
 
@@ -401,61 +479,6 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </span>
                 <span className="text-gray-500 font-medium">%</span>
               </div>
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
-
-            {/* Method */}
-            <div className="mb-4">
-              <div className="flex gap-2">
-                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${editedRecipe.method === 'Build'
-                  ? 'bg-white text-orange-600 border-orange-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                  }`}>
-                  <input
-                    type="radio"
-                    name="method"
-                    value="Build"
-                    checked={editedRecipe.method === 'Build'}
-                    onChange={e => handleMethodChange(e.target.value as CocktailMethod)}
-                    className="sr-only"
-                  />
-                  <span>Build</span>
-                </label>
-                <label className={`flex items-center justify-center flex-1 px-5 py-3 md:py-2 rounded-lg border text-base md:text-sm font-medium cursor-pointer transition-all duration-200 min-h-[44px] md:min-h-0 ${editedRecipe.method === 'Shake'
-                  ? 'bg-white text-orange-600 border-orange-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                  }`}>
-                  <input
-                    type="radio"
-                    name="method"
-                    value="Shake"
-                    checked={editedRecipe.method === 'Shake'}
-                    onChange={e => handleMethodChange(e.target.value as CocktailMethod)}
-                    className="sr-only"
-                  />
-                  <span>Shake</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Textarea with custom placeholder */}
-            <div className="relative">
-              <textarea
-                value={editedRecipe.instructions || ''}
-                onChange={e => handleInstructionsChange(e.target.value)}
-                rows={6}
-                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base resize-none relative z-10"
-                placeholder=""
-              />
-              {!editedRecipe.instructions && (
-                <div className="absolute top-3 md:top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
-                  Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build
-                </div>
-              )}
             </div>
           </div>
 
