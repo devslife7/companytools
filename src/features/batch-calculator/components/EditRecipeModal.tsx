@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react"
 import { X, PlusCircle, Trash2, Save, Loader2, AlertCircle } from "lucide-react"
 import type { CocktailRecipe, Ingredient, CocktailMethod, GlassType } from "../types"
+import { COCKTAIL_SEASONS } from "../types"
 import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
 import { parseAmount } from "../lib/calculations"
 import { calculateCocktailABV } from "../lib/abv"
@@ -155,6 +156,10 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     setEditedRecipe(prev => ({ ...prev!, glassType: value as GlassType || undefined }))
   }
 
+  const handleSeasonChange = (value: string) => {
+    setEditedRecipe(prev => ({ ...prev!, season: value as CocktailRecipe['season'] || undefined }))
+  }
+
   const handleInstructionsChange = (value: string) => {
     setEditedRecipe(prev => ({ ...prev!, instructions: value }))
   }
@@ -238,6 +243,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         glassType: editedRecipe.glassType,
         instructions: editedRecipe.instructions?.trim() || undefined,
         abv: finalABV,
+        season: editedRecipe.season,
         ingredients: validIngredients,
       })
 
@@ -381,7 +387,20 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             </div>
           </div>
 
-
+          {/* Season */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Season</label>
+            <select
+              value={editedRecipe.season || ""}
+              onChange={e => handleSeasonChange(e.target.value)}
+              className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-base bg-white"
+            >
+              <option value="">No season</option>
+              {COCKTAIL_SEASONS.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
 
           {/* Instructions */}
           <div>
@@ -459,32 +478,19 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             </div>
           </div>
 
-          {/* ABV Display */}
-          <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <label className="block text-sm font-semibold text-gray-900">ABV Estimate</label>
-                  {isMocktail && (
-                    <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider">
-                      Mocktail
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-gray-500">Calculated automatically from ingredients</p>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className={`text-3xl font-bold tracking-tight ${isMocktail ? 'text-green-600' : 'text-orange-600'}`}>
-                  {displayedABV}
-                </span>
-                <span className="text-gray-500 font-medium">%</span>
-              </div>
-            </div>
-          </div>
+
 
           {/* Ingredients */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">Ingredients</label>
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-sm font-semibold text-gray-700">Ingredients</label>
+              <div className="flex items-center gap-2 px-2 py-1 bg-gray-50 border border-gray-200 rounded">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">ABV</span>
+                <span className={`text-sm font-bold ${isMocktail ? 'text-green-600' : 'text-orange-600'}`}>
+                  {displayedABV}%
+                </span>
+              </div>
+            </div>
             <div className="space-y-3">
               {editedRecipe.ingredients.map((ingredient, index) => (
                 <div

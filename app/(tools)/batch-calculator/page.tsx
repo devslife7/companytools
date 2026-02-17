@@ -4,6 +4,7 @@ import Image from "next/image"
 
 // Import types
 import type { Ingredient, CocktailRecipe, BatchState, CocktailMethod } from "@/features/batch-calculator/types"
+import { COCKTAIL_SEASONS } from "@/features/batch-calculator/types"
 
 // Import utilities
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
@@ -42,6 +43,7 @@ export default function BatchCalculatorPage() {
   const [selectedSpirit, setSelectedSpirit] = useState<string>('All')
   const [filterFeatured, setFilterFeatured] = useState<string>('Featured')
   const [selectedGlass, setSelectedGlass] = useState<string>('All')
+  const [selectedSeason, setSelectedSeason] = useState<string>('All')
 
   const [availableLiquors, setAvailableLiquors] = useState<string[]>([])
 
@@ -111,9 +113,14 @@ export default function BatchCalculatorPage() {
         if (!cocktail.glassType || cocktail.glassType !== selectedGlass) return false
       }
 
+      // 5. Season Filter
+      if (selectedSeason !== 'All') {
+        if (!cocktail.season || cocktail.season !== selectedSeason) return false
+      }
+
       return true
     })
-  }, [allCocktails, searchQuery, selectedSpirit, filterFeatured, selectedGlass])
+  }, [allCocktails, searchQuery, selectedSpirit, filterFeatured, selectedGlass, selectedSeason])
 
   // Sync batches with selected cocktails
   useEffect(() => {
@@ -208,7 +215,7 @@ export default function BatchCalculatorPage() {
     }))
   }, [])
 
-  const hasActiveFilters = searchQuery !== '' || selectedSpirit !== 'All' || filterFeatured !== 'All' || selectedGlass !== 'All'
+  const hasActiveFilters = searchQuery !== '' || selectedSpirit !== 'All' || filterFeatured !== 'All' || selectedGlass !== 'All' || selectedSeason !== 'All'
 
   const canExport = batches.some(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
@@ -376,9 +383,26 @@ export default function BatchCalculatorPage() {
             </div>
           </div>
 
+          {/* Season Filter */}
+          <div className="relative group min-w-[150px]">
+            <select
+              value={selectedSeason}
+              onChange={(e) => setSelectedSeason(e.target.value)}
+              className="appearance-none w-full pl-4 pr-10 py-3 bg-gray-100/50 hover:bg-gray-100 rounded-xl text-sm font-bold text-gray-700 cursor-pointer focus:outline-none focus:ring-0 border-none"
+            >
+              <option value="All">All Seasons</option>
+              {COCKTAIL_SEASONS.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+              <ChevronDown className="w-4 h-4" />
+            </div>
+          </div>
+
           {/* Clear / Filter button — always visible, right side */}
           <button
-            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); }}
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
             className={`flex-shrink-0 p-2.5 rounded-xl transition-all ${hasActiveFilters ? 'text-red-500 bg-red-50 hover:bg-red-100 cursor-pointer' : 'text-gray-300 cursor-default'}`}
             title={hasActiveFilters ? 'Clear all filters' : 'Filters'}
           >
@@ -404,7 +428,7 @@ export default function BatchCalculatorPage() {
           <h3 className="text-2xl font-bold text-gray-900 mb-2">No recipes found</h3>
           <p className="text-gray-500 max-w-sm mx-auto">Try adjusting your search terms or filters to find what you're looking for.</p>
           <button
-            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); }}
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterFeatured('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
             className="mt-8 text-brand-primary font-bold hover:text-brand-primary-hover transition-colors inline-flex items-center gap-2"
           >
             Clear all filters
@@ -494,6 +518,12 @@ export default function BatchCalculatorPage() {
                   <h3 className="text-sm sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
                     {cocktail.name}
                   </h3>
+
+                  {cocktail.season && (
+                    <span className="inline-block mt-0.5 sm:mt-1 px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-[9px] sm:text-[10px] font-bold text-sky-700 tracking-wider uppercase">
+                      {cocktail.season}
+                    </span>
+                  )}
 
                   <p className="text-xs sm:text-sm text-gray-400 font-medium mt-0.5 sm:mt-1 truncate">
                     {cocktail.ingredients.slice(0, 3).map(i => i.name).join(' • ')}
