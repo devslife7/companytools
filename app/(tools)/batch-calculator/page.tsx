@@ -519,11 +519,7 @@ export default function BatchCalculatorPage() {
                     {cocktail.name}
                   </h3>
 
-                  {cocktail.season && (
-                    <span className="inline-block mt-0.5 sm:mt-1 px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-[9px] sm:text-[10px] font-bold text-sky-700 tracking-wider uppercase">
-                      {cocktail.season}
-                    </span>
-                  )}
+
 
                   <p className="text-xs sm:text-sm text-gray-400 font-medium mt-0.5 sm:mt-1 truncate">
                     {cocktail.ingredients.slice(0, 3).map(i => i.name).join(' • ')}
