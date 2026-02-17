@@ -297,14 +297,14 @@ export default function BatchCalculatorPage() {
   }
 
   return (
-    <div className="min-h-screen text-gray-900 pb-32">
+    <div className="min-h-screen text-gray-900 pb-24 sm:pb-32">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-10">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Curated Gallery</h1>
-          <p className="text-lg text-gray-500">Manage and batch seasonal beverage programs.</p>
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-1 sm:mb-2">Curated Gallery</h1>
+          <p className="text-sm sm:text-lg text-gray-500">Manage and batch seasonal beverage programs.</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -316,7 +316,7 @@ export default function BatchCalculatorPage() {
       </div>
 
       {/* 2. Filters & Search */}
-      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-gray-200 shadow-sm mb-10 flex flex-col md:flex-row gap-4 md:items-center">
+      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-gray-200 shadow-sm mb-6 sm:mb-10 flex flex-col md:flex-row gap-3 sm:gap-4 md:items-center">
         {/* Search + Featured */}
         <div className="flex items-center gap-3 flex-1">
           <div className="relative flex-1">
@@ -397,7 +397,7 @@ export default function BatchCalculatorPage() {
           <p className="text-gray-500 font-medium animate-pulse">Loading recipes...</p>
         </div>
       ) : filteredCocktails.length === 0 ? (
-        <div className="text-center py-32 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+        <div className="text-center py-16 sm:py-32 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
           <div className="mx-auto w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
             <Search className="w-10 h-10 text-gray-300" />
           </div>
@@ -411,7 +411,7 @@ export default function BatchCalculatorPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-8">
           {filteredCocktails.map(cocktail => {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
 
@@ -427,15 +427,15 @@ export default function BatchCalculatorPage() {
             let abvBadge = null;
             if (isMocktail) {
               abvBadge = (
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg shadow-sm border border-emerald-100 flex items-center gap-1.5 z-10 group-hover:scale-105 transition-transform">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                  <span className="text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase">Mocktail</span>
+                <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-sm border border-emerald-100 flex items-center gap-1 sm:gap-1.5 z-10 group-hover:scale-105 transition-transform">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-500"></div>
+                  <span className="text-[8px] sm:text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase">Mocktail</span>
                 </div>
               )
             } else if (cocktail.abv && cocktail.abv > 0) {
               abvBadge = (
-                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg shadow-sm border border-amber-100 flex items-center gap-1.5 z-10 group-hover:scale-105 transition-transform">
-                  <span className="text-[10px] font-extrabold text-amber-700 tracking-wider uppercase">{cocktail.abv}% ABV</span>
+                <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-sm border border-amber-100 flex items-center gap-1 sm:gap-1.5 z-10 group-hover:scale-105 transition-transform">
+                  <span className="text-[8px] sm:text-[10px] font-extrabold text-amber-700 tracking-wider uppercase">{cocktail.abv}% ABV</span>
                 </div>
               )
             }
@@ -447,7 +447,7 @@ export default function BatchCalculatorPage() {
               >
                 {/* Image Area */}
                 <div
-                  className="aspect-[4/5] relative overflow-hidden bg-gray-100 cursor-pointer"
+                  className="aspect-[3/4] sm:aspect-[4/5] relative overflow-hidden bg-gray-100 cursor-pointer"
                   onClick={() => toggleSelection(cocktail)}
                 >
                   {cocktail.image ? (
@@ -469,8 +469,8 @@ export default function BatchCalculatorPage() {
 
                   {/* Featured Badge */}
                   {cocktail.featured && (
-                    <div className="absolute top-3 left-3 bg-brand-primary/95 px-3 py-1 rounded-lg shadow-sm border border-brand-primary/20 flex items-center z-10">
-                      <span className="text-[10px] font-extrabold text-brand-primary-foreground tracking-wider uppercase">Featured</span>
+                    <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-brand-primary/95 px-2 sm:px-3 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-sm border border-brand-primary/20 flex items-center z-10">
+                      <span className="text-[8px] sm:text-[10px] font-extrabold text-brand-primary-foreground tracking-wider uppercase">Featured</span>
                     </div>
                   )}
 
@@ -490,12 +490,12 @@ export default function BatchCalculatorPage() {
                 </div>
 
                 {/* Content Area */}
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
+                <div className="p-3 sm:p-5">
+                  <h3 className="text-sm sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1 leading-tight group-hover:text-brand-primary transition-colors cursor-pointer" onClick={() => { setEditingCocktail(cocktail); setEditingCocktailId(cocktail.id); setShowEditModal(true); }}>
                     {cocktail.name}
                   </h3>
 
-                  <p className="text-sm text-gray-400 font-medium mt-1 truncate">
+                  <p className="text-xs sm:text-sm text-gray-400 font-medium mt-0.5 sm:mt-1 truncate">
                     {cocktail.ingredients.slice(0, 3).map(i => i.name).join(' • ')}
                   </p>
 
@@ -509,27 +509,27 @@ export default function BatchCalculatorPage() {
       )}
 
       {/* 4. Floating Action Bar (Batch) */}
-      <div className={`fixed bottom-0 left-0 md:left-64 right-0 p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 z-30 ${selectedCocktails.length > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-brand-primary-foreground font-bold text-lg shadow-sm">
+      <div className={`fixed bottom-0 left-0 md:left-64 right-0 p-3 sm:p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 z-30 ${selectedCocktails.length > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-primary rounded-full flex items-center justify-center text-brand-primary-foreground font-bold text-base sm:text-lg shadow-sm flex-shrink-0">
               {selectedCocktails.length}
             </div>
-            <div>
-              <h3 className="font-bold text-gray-900 text-lg">Recipes Selected</h3>
-              <p className="text-sm text-gray-500">Ready to calculate batch volumes.</p>
+            <div className="min-w-0">
+              <h3 className="font-bold text-gray-900 text-base sm:text-lg">Recipes Selected</h3>
+              <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Ready to calculate batch volumes.</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setSelectedCocktails([])}
-              className="px-4 py-2 text-gray-500 font-semibold hover:text-gray-900 transition-colors"
+              className="px-3 sm:px-4 py-2 text-gray-500 font-semibold hover:text-gray-900 transition-colors text-sm sm:text-base"
             >
-              Clear Selection
+              Clear
             </button>
             <button
               onClick={() => setShowBatchModal(true)}
-              className="px-6 py-3 bg-brand-primary text-brand-primary-foreground font-bold rounded-lg shadow-lg hover:bg-brand-primary-hover hover:shadow-xl transition-all flex items-center gap-2"
+              className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-brand-primary text-brand-primary-foreground font-bold rounded-lg shadow-lg hover:bg-brand-primary-hover hover:shadow-xl transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
             >
               <CheckCheck className="w-5 h-5" />
               Review Batch

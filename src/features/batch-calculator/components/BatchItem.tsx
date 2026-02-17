@@ -28,43 +28,41 @@ export const BatchItem: React.FC<BatchItemProps> = React.memo(
 
     return (
       <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-2xl transition-all duration-300 hover:border-orange-300 shadow-sm hover:shadow-md">
-        <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-          <div className="flex items-center gap-4">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 flex items-center gap-2">
-              <FlaskConical className="w-8 h-8 text-orange-600" />
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+            <FlaskConical className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600 flex-shrink-0" />
+            <h2 className="text-lg sm:text-3xl font-extrabold text-gray-900 truncate">
               {selectedCocktail ? selectedCocktail.name : `Cocktail Slot #${id}`}
             </h2>
             {editableRecipe && (
               <button
                 onClick={() => {
-                  // If onEditRecipe callback is provided, use it (for database save)
-                  // Otherwise, use local modal
                   if (onEditRecipe) {
                     onEditRecipe(editableRecipe, editableRecipe.id)
                   } else {
                     setShowEditModal(true)
                   }
                 }}
-                className="p-2 rounded-xl transition duration-200 shadow-sm border bg-white border-gray-200 hover:bg-gray-50 hover:border-orange-200 group"
+                className="p-2 rounded-xl transition duration-200 shadow-sm border bg-white border-gray-200 hover:bg-gray-50 hover:border-orange-200 group flex-shrink-0"
                 title="Edit Recipe"
               >
-                <Edit2 className="w-5 h-5 text-gray-400 group-hover:text-orange-600" />
+                <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-orange-600" />
               </button>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
             {servingsNum > 0 && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-50 text-orange-700 border border-orange-100 tabular-nums tracking-wider uppercase">
+              <span className="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-orange-50 text-orange-700 border border-orange-100 tabular-nums tracking-wider uppercase">
                 {servingsNum} SERVINGS
               </span>
             )}
             {!isOnlyItem && (
               <button
                 onClick={() => onRemove(id)}
-                className="p-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 shadow-sm"
+                className="p-2 sm:p-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 shadow-sm"
                 title="Remove this batch"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             )}
           </div>
