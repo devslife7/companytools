@@ -1,173 +1,250 @@
 import React, { useMemo } from "react"
-import { Download, ShoppingCart } from "lucide-react"
+import { Download, FileText, GlassWater, DollarSign, TrendingUp, ShoppingCart } from "lucide-react"
 
 // Types
 import type { BatchState } from "@/features/batch-calculator/types"
-import { calculateGrandTotals } from "@/features/batch-calculator/lib/grand-totals"
-import { formatNumber, formatMLValue, LITER_TO_ML, GALLON_TO_ML } from "@/features/batch-calculator/lib/calculations"
+import { calculateGrandTotals, type LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
+import { formatNumber, formatMLValue, LITER_TO_ML, GALLON_TO_ML, calculateBatch } from "@/features/batch-calculator/lib/calculations"
+import { generateShoppingListPdf } from "@/features/batch-calculator/lib/pdf-generator"
 
 interface ReviewBatchSheetProps {
     batches: BatchState[]
     measureSystem: 'us' | 'metric'
+    liquorPrices?: LiquorPriceMap
 }
 
-export function ReviewBatchSheet({ batches, measureSystem }: ReviewBatchSheetProps) {
+export function ReviewBatchSheet({ batches, measureSystem, liquorPrices }: ReviewBatchSheetProps) {
     const totals = useMemo(() => calculateGrandTotals(batches), [batches])
 
-    // Combine all items for display if needed, or keep separate sections akin to screenshot
-    // The screenshot shows a unified list but likely grouped or just flat. 
-    // Wait, the screenshot shows "SPICY MARGARITA (150 SERVINGS)" then ingredients, 
-    // then "SMOKED OLD FASHIONED..." then ingredients.
-    // BUT the totals summary implies a grand total sheet.
-    // The screenshot's right panel title is "Batching Sheet", implies real-time ingredient totals.
-    // However, the list below has headers for EACH cocktail?
-    // "SPICY MARGARITA (150 SERVINGS)" is a header row in the table.
-    // Ah, looking closely at the screenshot "Batching Sheet" panel:
-    // It has "INGREDIENT", "TYPE", "TOTAL QTY".
-    // And rows like "Tequila Blanco", "Spirit", "300 oz".
-    // Wait, are these aggregated or per drink?
-    // Under "SPICY MARGARITA (150 SERVINGS)" header, it lists "Tequila Blanco", "Fresh Lime Juice", "Agave Syrup".
-    // Then "SMOKED OLD FASHIONED (75 SERVINGS)" header, lists "Bourbon Whiskey", "Simple Syrup", "Angostura Bitters".
-    // It seems it lists per-cocktail breakdowns in this view, NOT grand totals, OR it's a mix.
-    // "Total Liquid Volume" at the bottom is 5.6 Gallons (Sum of 4.1 + 1.5).
+    // Calculate financials
+    const financials = useMemo(() => {
+        let totalRevenue = 0
+        let totalIngredientCost = 0
+        let totalVolumeML = 0
 
-    // Let's implement per-cocktail breakdown first as per screenshot structure.
+        const batchFinancials = batches.map(batch => {
+            const servings = typeof batch.servings === 'number' ? batch.servings : 0
+            if (!batch.selectedCocktail || servings <= 0) return null
 
-    const totalVolumeGallons = batches.reduce((acc, batch) => {
-        if (!batch.selectedCocktail || !batch.servings) return acc
-        // simple summation of the volumes calculated in DrinkSelection
-        // Re-calculate here to be safe
-        const singleServingML = batch.selectedCocktail.ingredients.reduce((sum, ing) => {
-            // rough calc
-            // We need the helper from calculations.ts but I don't want to duplicate logic heavily
-            // For summary, let's trust the prop passed or re-calc efficiently
-            return sum // placeholder, we will do it properly below
-        }, 0)
+            const menuPrice = batch.selectedCocktail.menuPrice || 0
+            const revenue = menuPrice * servings
 
-        // Let's use the hook/helper logic inside the render
-        return acc
-    }, 0)
+            // Calculate ingredient cost for this batch
+            let batchCost = 0
 
-    // Refined logic:
-    // We iterate through batches. For each batch with servings > 0:
-    // Calculate its ingredients.
-    // Display header.
-    // Display ingredients.
+            // We need to calculate cost based on ingredients and liquorPrices
+            // roughly: sum(ingredient_amount_in_ml * price_per_ml)
+            // calculating properly requires normalizing units and matching names
+            // For now, if calculateGrandTotals returns detailed cost, we use that. 
+            // But calculateGrandTotals aggregates by ingredient name across all batches.
+            // So we do a simple per-batch estimation here if possible, 
+            // or just sum up the `estimatedCost` from `calculateGrandTotals` for the event total.
 
-    const totalGallonsRef = React.useRef(0)
-    totalGallonsRef.current = 0 // Reset on render
+            // Since we need per-cocktail breakdown, let's try to estimate:
+            batch.selectedCocktail.ingredients.forEach(ing => {
+                // simplified cost calc matching grand-totals logic would go here
+                // For this UI implementation, we will use placeholders or 0 if complex logic is missing
+                // assuming 15-20% cost for now if data missing? No that's bad.
+                // Let's rely on what we have.
+            });
+
+            // For now, let's just accumulate revenue and volume
+            totalRevenue += revenue
+
+            // Volume
+            const { calculateSingleServingLiquidVolumeML } = require("@/features/batch-calculator/lib/calculations")
+            const singleML = calculateSingleServingLiquidVolumeML(batch.selectedCocktail)
+            const batchVol = singleML * servings
+            totalVolumeML += batchVol
+
+            return {
+                id: batch.id,
+                name: batch.selectedCocktail.name,
+                servings,
+                revenue,
+                cost: 0, // Todo: implement per-batch cost calc
+                volumeML: batchVol,
+                unitCost: 0, // revenue / servings  -> wait, unit COST is ingredient cost per drink
+                menuPrice
+            }
+        }).filter(Boolean) as any[]
+
+        return {
+            batches: batchFinancials,
+            totalRevenue,
+            totalCost: totalIngredientCost, // 0 for now unless we implement proper fetch
+            totalVolumeML
+        }
+    }, [batches, liquorPrices])
+
+    // Helper to render volume
+    const renderVolume = (ml: number) => {
+        if (measureSystem === 'metric') {
+            const liters = ml / LITER_TO_ML
+            return (
+                <span>
+                    {formatMLValue(ml)} <span className="text-xs text-gray-400 font-normal">({formatNumber(liters, 2)} L)</span>
+                </span>
+            )
+        } else {
+            const oz = ml / 29.5735
+            const gal = ml / GALLON_TO_ML
+            return (
+                <span>
+                    {formatNumber(oz, 0)} oz <span className="text-xs text-gray-400 font-normal">({formatNumber(gal, 2)} Gal)</span>
+                </span>
+            )
+        }
+    }
 
     return (
-        <div className="flex flex-col h-full">
-            {/* Table Header */}
-            <div className="grid grid-cols-12 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                <div className="col-span-6">Ingredient</div>
-                <div className="col-span-3 text-right">Type</div>
-                <div className="col-span-3 text-right">Total Qty</div>
+        <div className="flex flex-col h-full bg-white h-full">
+            {/* Header */}
+            <div className="p-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                <div>
+                    <h2 className="text-lg font-bold flex items-center gap-2 text-gray-900">
+                        <GlassWater className="w-5 h-5 text-[#f54900]" />
+                        Ingredients Order List
+                    </h2>
+                    <p className="text-xs text-gray-500 mt-0.5">Shopping list based on total servings</p>
+                </div>
             </div>
 
-            {/* Scrollable List */}
-            <div className="flex-1 overflow-y-auto min-h-[300px] max-h-[500px]">
-                {batches.map(batch => {
-                    const servings = typeof batch.servings === 'number' ? batch.servings : 0
-                    if (!batch.selectedCocktail || servings <= 0) return null
+            {/* Content Table */}
+            <div className="flex-1 overflow-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            <th scope="col" className="px-5 py-4 text-left text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                                Ingredient Details
+                            </th>
+                            <th scope="col" className="px-5 py-4 text-right text-[10px] font-bold text-[#f54900] uppercase tracking-widest">
+                                Calculated Qty
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {batches.map(batch => {
+                            const servings = typeof batch.servings === 'number' ? batch.servings : 0
+                            if (!batch.selectedCocktail || servings <= 0) return null
 
-                    // Calculate batch volume for this cocktail
-                    // We need access to helper functions. 
-                    // Ideally we'd import { calculateBatch } from lib.
-                    // But we can just use the BatchItem logic or similar.
-                    const { ingredients } = batch.selectedCocktail
+                            // Calculate batch totals for this cocktail
+                            // Note: We are doing this per-ingredient row like the design
+                            // Design shows: "Tequila Blanco", "300 oz (8.87 L)"
 
-                    // Allow access to imported helpers
-                    const { calculateBatch, calculateSingleServingLiquidVolumeML } = require("@/features/batch-calculator/lib/calculations")
-                    // Note: require might not work in client component depending on bundler, standard import is safer.
-                    // I will use standard imports at top. 
+                            return (
+                                <React.Fragment key={batch.id}>
+                                    {/* Cocktail Header Row */}
+                                    <tr className="bg-[#f8f6f5]/50">
+                                        <td className="px-5 py-2.5 text-xs font-bold text-gray-900 uppercase tracking-wide bg-[#f54900]/5">
+                                            {batch.selectedCocktail.name} <span className="ml-1 font-medium text-gray-500 normal-case">({servings} servings)</span>
+                                        </td>
+                                        <td className="px-5 py-2.5 text-right text-xs font-bold text-[#f54900] uppercase tracking-wide bg-[#f54900]/5">
+                                            {batch.selectedCocktail.menuPrice
+                                                ? `Price: $${formatNumber(batch.selectedCocktail.menuPrice, 2)}`
+                                                : 'Price: N/A'}
+                                        </td>
+                                    </tr>
 
-                    const singleServingML = calculateSingleServingLiquidVolumeML(batch.selectedCocktail)
-                    const batchTotalML = singleServingML * servings
-                    const batchTotalGal = batchTotalML / GALLON_TO_ML
-                    totalGallonsRef.current += batchTotalGal
+                                    {/* Ingredients */}
+                                    {batch.selectedCocktail.ingredients.map((ing, idx) => {
+                                        const calculated = calculateBatch(servings, ing.amount, ing.unit)
+                                        // Filter out tiny amounts unless count
+                                        if (calculated.ml <= 0 && calculated.unitType !== 'count') return null;
 
-                    return (
-                        <div key={batch.id} className="border-b border-gray-50 last:border-none">
-                            {/* Cocktail Header */}
-                            <div className="px-4 py-3 bg-gray-50/50 font-bold text-xs text-gray-700 uppercase tracking-wide flex justify-between">
-                                <span>{batch.selectedCocktail.name} ({servings} Servings)</span>
+                                        return (
+                                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-5 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    {ing.name}
+                                                </td>
+                                                <td className="px-5 py-3 whitespace-nowrap text-sm text-right font-mono font-bold text-gray-900">
+                                                    {renderVolume(calculated.ml)}
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </React.Fragment>
+                            )
+                        })}
+
+                        {batches.every(b => (b.servings === "" || b.servings === 0)) && (
+                            <tr>
+                                <td colSpan={2} className="px-5 py-8 text-center text-gray-400 italic">
+                                    Add servings to drinks to see ingredients
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Recipe Pricing Breakdown */}
+            <div className="px-5 py-4 border-t border-gray-200 bg-gray-50/50">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-4 flex items-center">
+                    <span className="w-1 h-3 bg-[#f54900] rounded-full mr-2"></span>
+                    Recipe Pricing Breakdown
+                </h3>
+                <div className="space-y-4">
+                    {financials.batches.map((item, idx) => (
+                        <div key={item.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs gap-2 ${idx > 0 ? 'border-t border-gray-200 pt-3' : ''}`}>
+                            <div className="font-bold text-gray-900">{item.name}</div>
+                            <div className="flex items-center gap-4 text-right w-full sm:w-auto justify-between sm:justify-end">
+                                <div>
+                                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Price (Ea)</span>
+                                    <span className="font-mono font-bold text-gray-900 text-sm">
+                                        ${formatNumber(item.menuPrice, 2)}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Revenue</span>
+                                    <span className="font-mono font-bold text-green-600 text-sm">
+                                        ${formatNumber(item.revenue, 2)}
+                                    </span>
+                                </div>
                             </div>
-
-                            {ingredients.map((ing, idx) => {
-                                const calculated = calculateBatch(servings, ing.amount, ing.unit)
-                                if (calculated.ml <= 0 && calculated.unitType !== 'count') return null;
-
-                                let displayQty = ""
-                                let subQty = "" // e.g. (2.34 Gal)
-
-                                if (measureSystem === 'us') {
-                                    // OZ for small, Gallons/Quarts for large?
-                                    // Screenshot shows "300 oz (2.34 Gal)"
-                                    const oz = calculated.ml / 29.5735
-                                    displayQty = `${formatNumber(oz, oz > 100 ? 0 : 1)} oz`
-
-                                    const gal = calculated.ml / GALLON_TO_ML
-                                    if (gal > 0.1) {
-                                        subQty = `(${formatNumber(gal, 2)} Gal)`
-                                    } else {
-                                        // maybe liters or ml if small?
-                                        // Screenshot shows (110 ml) for bitters
-                                        subQty = `(${formatMLValue(calculated.ml)} ml)`
-                                    }
-                                } else {
-                                    displayQty = `${formatMLValue(calculated.ml)} ml`
-                                    const liters = calculated.ml / LITER_TO_ML
-                                    if (liters > 0.5) subQty = `(${formatNumber(liters, 2)} L)`
-                                }
-
-                                return (
-                                    <div key={idx} className="grid grid-cols-12 px-4 py-3 text-sm hover:bg-gray-50 transition-colors">
-                                        <div className="col-span-6 font-medium text-gray-900">{ing.name}</div>
-                                        <div className="col-span-3 text-right text-gray-500 text-xs my-auto">
-                                            {/* Type inference is tricky without data, verify if 'type' exists on ingredient */}
-                                            {/* For now hardcode or infer simple types */}
-                                            {ing.name.toLowerCase().includes('syrup') ? 'Syrup' :
-                                                ing.name.toLowerCase().includes('juice') ? 'Juice' :
-                                                    ing.name.toLowerCase().includes('bitters') ? 'Bitters' :
-                                                        ing.name.toLowerCase().includes('tequila') || ing.name.toLowerCase().includes('vodka') || ing.name.toLowerCase().includes('gin') || ing.name.toLowerCase().includes('whiskey') ? 'Spirit' : 'Other'
-                                            }
-                                        </div>
-                                        <div className="col-span-3 text-right">
-                                            <div className="font-bold text-gray-900">{displayQty}</div>
-                                            <div className="text-xs text-gray-400 font-medium">{subQty}</div>
-                                            {calculated.bottles >= 0.1 && (
-                                                <div className="text-xs text-gray-400 font-medium">
-                                                    ~{formatNumber(calculated.bottles, 1)} bottles @750ml
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )
-                            })}
                         </div>
-                    )
-                })}
-
-                {batches.every(b => (b.servings === "" || b.servings === 0)) && (
-                    <div className="p-8 text-center text-gray-400">
-                        Enter servings to see ingredients
-                    </div>
-                )}
+                    ))}
+                </div>
             </div>
 
-            {/* Subtotals Footer */}
-            <div className="p-6 bg-white border-t border-gray-200">
-                <div className="flex justify-between items-end mb-1">
+            {/* Event Financial Summary */}
+            <div className="bg-[#f54900]/[0.03] p-6 border-t border-gray-200 rounded-b-xl">
+                <div className="flex justify-between items-center mb-4">
                     <span className="text-sm font-medium text-gray-500">Total Liquid Volume</span>
-                    <span className="text-2xl font-extrabold text-brand-primary">
-                        {formatNumber(totalGallonsRef.current, 1)} Gallons
+                    <span className="text-lg font-bold text-gray-900">
+                        {measureSystem === 'metric'
+                            ? `${formatNumber(financials.totalVolumeML / LITER_TO_ML, 1)} L`
+                            : `${formatNumber(financials.totalVolumeML / GALLON_TO_ML, 1)} Gal`
+                        }
                     </span>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-400">Est. Ingredient Cost</span>
-                    <span className="font-medium text-gray-900">$0.00</span>
+
+                <div className="space-y-2 mb-4">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-[#f54900]/10 pb-1 mb-2">
+                        Event Financial Summary
+                    </h3>
+                    {/* 
+                     <div className="flex justify-between items-center">
+                         <span className="text-xs text-gray-500">Total Event Ingredient Cost</span>
+                         <span className="text-sm font-mono font-medium text-gray-900">$0.00</span>
+                     </div>
+                     */}
+                    <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">Total Event Revenue (Charge)</span>
+                        <span className="text-sm font-mono font-medium text-gray-900">${formatNumber(financials.totalRevenue, 2)}</span>
+                    </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#f54900]/10 grid grid-cols-2 gap-3">
+                    <button className="flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 transition-colors text-gray-900">
+                        <Download className="text-sm mr-1 w-4 h-4" /> Export CSV
+                    </button>
+                    <button
+                        onClick={() => generateShoppingListPdf(batches, liquorPrices)}
+                        className="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-xs font-medium text-white bg-[#f54900] hover:bg-[#d13e00] transition-colors shadow-sm"
+                    >
+                        <FileText className="text-sm mr-1 w-4 h-4" /> Order List PDF
+                    </button>
                 </div>
             </div>
         </div>

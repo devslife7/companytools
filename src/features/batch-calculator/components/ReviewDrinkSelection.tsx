@@ -1,6 +1,5 @@
 import React, { useMemo } from "react"
-import Image from "next/image"
-import { ArrowRight, GlassWater, MoreHorizontal, ChefHat } from "lucide-react"
+import { Trash2, RotateCcw, Users, ArrowRight } from "lucide-react"
 
 // Types
 import type { BatchState } from "@/features/batch-calculator/types"
@@ -10,9 +9,11 @@ import { calculateSingleServingLiquidVolumeML, formatNumber, LITER_TO_ML, GALLON
 interface ReviewDrinkSelectionProps {
     batch: BatchState
     onServingsChange: (id: number, value: string) => void
+    onRemove?: (id: number) => void
+    measureSystem?: 'us' | 'metric'
 }
 
-export function ReviewDrinkSelection({ batch, onServingsChange }: ReviewDrinkSelectionProps) {
+export function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measureSystem = 'us' }: ReviewDrinkSelectionProps) {
     const { id, selectedCocktail, servings } = batch
 
     // Derived values
@@ -23,104 +24,120 @@ export function ReviewDrinkSelection({ batch, onServingsChange }: ReviewDrinkSel
 
     const singleServingOz = singleServingML / 29.5735
 
-    const totalVolumeGallons = useMemo(() => {
+    const totalLiquidVolume = useMemo(() => {
         const numServings = typeof servings === 'number' ? servings : 0
-        if (numServings <= 0) return 0
+
+        const unit = measureSystem === 'metric' ? 'L' : 'Gal'
+        const unitDivisor = measureSystem === 'metric' ? LITER_TO_ML : GALLON_TO_ML
+
+        if (numServings <= 0) {
+            return { value: 0, unit }
+        }
 
         const totalML = singleServingML * numServings
-        return totalML / GALLON_TO_ML
-    }, [servings, singleServingML])
-
-    const totalLiquorAndJuice = useMemo(() => {
-        if (!selectedCocktail) return ""
-        return selectedCocktail.ingredients
-            .slice(0, 4) // Show first 4 ingredients as a summary
-            .map(i => i.name)
-            .join(", ")
-    }, [selectedCocktail])
+        return {
+            value: totalML / unitDivisor,
+            unit
+        }
+    }, [servings, singleServingML, measureSystem])
 
     if (!selectedCocktail) return null
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:border-[#f54900]/30 transition-all">
             <div className="p-5 flex flex-col sm:flex-row gap-6">
                 {/* Image */}
-                <div className="relative w-full sm:w-32 h-48 sm:h-32 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100 shadow-inner">
+                <div className="relative w-full sm:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     {selectedCocktail.image ? (
-                        <Image
-                            src={selectedCocktail.image}
+                        <img
                             alt={selectedCocktail.name}
-                            fill
-                            className="object-cover"
+                            className="w-full h-full object-cover"
+                            src={selectedCocktail.image}
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300">
-                            <GlassWater className="w-8 h-8 opacity-50" />
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                            <span className="text-xs">No Image</span>
                         </div>
                     )}
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 flex flex-col justify-between py-1">
-                    <div className="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 className="text-xl font-bold text-gray-900 leading-tight mb-1">
-                                {selectedCocktail.name}
-                            </h3>
-                            <p className="text-sm text-gray-500 font-medium line-clamp-2">
-                                {totalLiquorAndJuice}
-                            </p>
+                <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    {selectedCocktail.name}
+                                </h3>
+                                <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+                                    {selectedCocktail.ingredients.map(i => i.name).join(", ")}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center pl-2 border-l border-gray-200">
+                                    {onRemove && (
+                                        <button
+                                            onClick={() => onRemove(id)}
+                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                            title="Remove Drink"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                    {/* Undo button hidden as per design usually, but can be added if needed */}
+                                    <button className="text-gray-400 hover:text-[#f54900] transition-colors p-1 hidden">
+                                        <RotateCcw className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <button className="text-gray-400 hover:text-gray-600 -mr-2">
-                            <MoreHorizontal className="w-5 h-5" />
-                        </button>
                     </div>
 
-                    <div className="flex items-end gap-3 sm:gap-6 mt-2">
+                    <div className="mt-4 flex items-end gap-4">
                         <div className="flex-1">
-                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                                 Target Servings
                             </label>
-                            <div className="relative group">
-                                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                                    <ChefHat className="w-4 h-4 text-gray-400 group-focus-within:text-brand-primary" />
+                            <div className="relative rounded-md shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Users className="text-gray-400 w-5 h-5" />
                                 </div>
                                 <input
-                                    type="number"
-                                    min="0"
+                                    className="focus:ring-[#f54900] focus:border-[#f54900] block w-full pl-10 pr-12 sm:text-lg border-gray-200 rounded-lg py-2.5 font-bold"
                                     placeholder="0"
+                                    type="number"
                                     value={servings}
                                     onChange={(e) => onServingsChange(id, e.target.value)}
-                                    className="w-full pl-10 pr-12 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all text-lg shadow-sm"
                                 />
-                                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                                    <span className="text-xs font-bold text-gray-400 uppercase">Qty</span>
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 sm:text-sm">qty</span>
                                 </div>
                             </div>
                         </div>
-
-                        <div className="text-right pb-1">
-                            <span className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-1">
-                                Total Volume
-                            </span>
-                            <div className="text-2xl font-extrabold text-brand-primary leading-none">
-                                {formatNumber(totalVolumeGallons, 1)} <span className="text-sm font-bold text-brand-primary/70">Gal</span>
-                            </div>
+                        <div className="hidden sm:block text-right">
+                            <p className="text-xs text-gray-500 mb-1">Total Volume</p>
+                            <p className="text-lg font-bold text-[#f54900]">
+                                {formatNumber(totalLiquidVolume.value || 0, 1)} {totalLiquidVolume.unit}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="bg-gray-50/50 border-t border-gray-100 px-5 py-3 flex items-center justify-between">
-                <div className="text-xs font-medium text-gray-500">
-                    Includes <span className="text-gray-900 font-bold">{formatNumber(singleServingOz, 1)} oz</span> per serving
+            <div className="bg-[#f8f6f5] px-5 py-3 border-t border-gray-200 flex justify-between items-center text-sm">
+                <span className="text-gray-500">
+                    Includes <span className="font-medium text-gray-900">{formatNumber(singleServingOz, 1)} oz</span> per serving
+                </span>
+                <div className="flex items-center gap-4">
+                    {/* Placeholder links as per design */}
+                    <button className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center">
+                        View Recipe
+                    </button>
+                    <span className="text-gray-300">|</span>
+                    <button className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center">
+                        View Batching
+                    </button>
                 </div>
-
-                <button className="text-xs font-bold text-brand-primary hover:text-brand-primary-hover flex items-center gap-1 transition-colors uppercase tracking-wide">
-                    View Recipe
-                    <ArrowRight className="w-3.5 h-3.5" />
-                </button>
             </div>
         </div>
     )
