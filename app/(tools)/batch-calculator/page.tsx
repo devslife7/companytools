@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback, useMemo } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 
 // Import types
@@ -38,7 +38,16 @@ import { Plus, Search, GlassWater, CheckCheck, FilterX, ChevronDown } from "luci
 
 // --- MAIN APP COMPONENT ---
 export default function BatchCalculatorPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500 font-medium">Loading...</div>}>
+      <BatchCalculatorContent />
+    </React.Suspense>
+  )
+}
+
+function BatchCalculatorContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [batches, setBatches] = useState<BatchState[]>([])
   const nextIdRef = React.useRef<number>(1)
   const [selectedCocktails, setSelectedCocktails] = useState<CocktailRecipe[]>([])
@@ -192,6 +201,19 @@ export default function BatchCalculatorPage() {
       return [...filteredBatches, ...newBatches]
     })
   }, [selectedCocktails])
+
+  // Restore selection from URL params when navigating back from review
+  useEffect(() => {
+    if (cocktailsLoading || allCocktails.length === 0) return
+    const ids = searchParams.get("recipes")
+    if (!ids) return
+    const parsedIds = ids.split(",").map(id => parseInt(id, 10)).filter(id => !isNaN(id))
+    if (parsedIds.length === 0) return
+    setSelectedCocktails(prev => {
+      if (prev.length > 0) return prev
+      return allCocktails.filter(c => c.id !== undefined && parsedIds.includes(c.id))
+    })
+  }, [allCocktails, cocktailsLoading, searchParams])
 
   // --- Handlers (Existing Logic) ---
 
@@ -402,7 +424,7 @@ export default function BatchCalculatorPage() {
               onChange={(e) => setFilterType(e.target.value)}
               className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
-              <option value="All">Any Type</option>
+              <option value="All">All Types</option>
               <option value="Featured">Featured</option>
               <option value="Cocktail">Cocktail</option>
               <option value="Mocktail">Mocktail</option>
@@ -417,7 +439,7 @@ export default function BatchCalculatorPage() {
               onChange={(e) => setSelectedSpirit(e.target.value)}
               className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
-              <option value="All">Any Spirit</option>
+              <option value="All">All Spirits</option>
               {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-gray-600 transition-colors" />
@@ -430,7 +452,7 @@ export default function BatchCalculatorPage() {
               onChange={(e) => setSelectedGlass(e.target.value)}
               className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
-              <option value="All">Any Glass</option>
+              <option value="All">All Glasses</option>
               <option value="Coupe">Coupe</option>
               <option value="Flute">Flute</option>
               <option value="Highball">Highball</option>
@@ -448,7 +470,7 @@ export default function BatchCalculatorPage() {
               onChange={(e) => setSelectedSeason(e.target.value)}
               className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
-              <option value="All">Any Season</option>
+              <option value="All">All Seasons</option>
               {COCKTAIL_SEASONS.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}

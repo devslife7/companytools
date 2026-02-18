@@ -108,7 +108,7 @@ function BatchReviewContent() {
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Link
-                            href="/batch-calculator"
+                            href={`/batch-calculator?recipes=${recipeIds.join(",")}`}
                             className="p-2.5 -ml-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
                         >
                             <ArrowLeft className="w-6 h-6" />
