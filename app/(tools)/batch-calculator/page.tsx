@@ -433,7 +433,7 @@ function BatchCalculatorContent() {
           </div>
 
           {/* Spirit Filter */}
-          <div className="relative group min-w-[120px]">
+          <div className="relative group min-w-[140px]">
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
@@ -446,7 +446,7 @@ function BatchCalculatorContent() {
           </div>
 
           {/* Glass Filter */}
-          <div className="relative group min-w-[130px]">
+          <div className="relative group min-w-[150px]">
             <select
               value={selectedGlass}
               onChange={(e) => setSelectedGlass(e.target.value)}
