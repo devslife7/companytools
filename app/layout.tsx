@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Company Tools",
+  title: "InternalToolsDC",
   description: "Internal tools for the team.",
 };
 

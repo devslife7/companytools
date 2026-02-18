@@ -16,7 +16,7 @@ export default function ToolsDashboard() {
     <div className="space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold text-gray-900">
-          Welcome to <span className="text-orange-600">Company Tools</span>
+          Welcome to <span className="text-orange-600">InternalToolsDC</span>
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Professional tools designed to streamline your workflow and boost productivity.
@@ -38,7 +38,7 @@ export default function ToolsDashboard() {
                 </div>
                 <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
               </div>
-              
+
               <h3 className="mt-4 text-xl font-semibold text-gray-900 group-hover:text-orange-600 transition">
                 {tool.name}
               </h3>
