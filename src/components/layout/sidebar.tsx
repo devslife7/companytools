@@ -133,7 +133,7 @@ export function Sidebar() {
             </aside>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex flex-col w-64 h-screen bg-white border-r border-gray-200 fixed left-0 top-0 z-40">
+            <aside className="hidden md:flex flex-col w-56 h-screen bg-white border-r border-gray-200 fixed left-0 top-0 z-40">
                 <SidebarContent pathname={pathname} />
             </aside>
         </>

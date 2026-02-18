@@ -365,30 +365,45 @@ export default function BatchCalculatorPage() {
       <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 p-2 mb-6 sm:mb-10 flex flex-col md:flex-row md:items-center gap-2 transition-all hover:shadow-2xl hover:shadow-gray-200/50">
 
         {/* Search Input Section */}
-        <div className="flex-1 flex items-center px-3 sm:px-4 py-2 relative">
+        <div className="flex-1 w-full md:w-auto min-w-[200px] flex items-center px-3 sm:px-4 py-2 relative rounded-xl focus-within:bg-gray-50 focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all duration-300">
           <Search className="text-gray-400 w-5 h-5 flex-shrink-0" />
           <input
             type="text"
             placeholder="Search cocktails or ingredients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent border-none focus:ring-0 text-base sm:text-lg text-gray-900 placeholder:text-gray-400 font-medium px-3 sm:px-4 py-1"
+            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-base sm:text-lg text-gray-900 placeholder:text-gray-400 font-medium px-3 sm:px-4 py-1"
           />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-4 p-1 hover:bg-gray-100 rounded-full text-gray-400 transition-colors"
-            >
-              <FilterX className="w-4 h-4" />
-            </button>
-          )}
         </div>
 
-        {/* Divider (Desktop) */}
-        <div className="hidden md:block w-px h-10 bg-gray-100 mx-2"></div>
+        {/* Reset Filters (Desktop: Next to search) */}
+        <div className="hidden md:flex items-center">
+          <button
+            onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
+            disabled={!hasActiveFilters}
+            className={`p-2 rounded-xl transition-all ${hasActiveFilters ? 'text-brand-primary hover:bg-brand-primary/10 cursor-pointer' : 'text-gray-200 cursor-default'}`}
+            title={hasActiveFilters ? "Clear all filters" : "No active filters"}
+          >
+            <FilterX className="w-5 h-5" />
+          </button>
+        </div>
+
+
 
         {/* Horizontal Divider (Mobile) */}
         <div className="md:hidden h-px w-full bg-gray-100 my-1"></div>
+
+        {/* Reset Filters (Mobile: Above filters) */}
+        {hasActiveFilters && (
+          <div className="md:hidden flex justify-end px-2 pb-1">
+            <button
+              onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
+              className="text-xs font-medium text-red-500 flex items-center gap-1"
+            >
+              <FilterX className="w-3 h-3" /> Clear Filters
+            </button>
+          </div>
+        )}
 
         {/* Filters Section */}
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto px-2 md:px-0 pb-2 md:pb-0 scrollbar-hide">
@@ -398,7 +413,7 @@ export default function BatchCalculatorPage() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
               <option value="All">Any Type</option>
               <option value="Featured">Featured</option>
@@ -413,7 +428,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedSpirit}
               onChange={(e) => setSelectedSpirit(e.target.value)}
-              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
               <option value="All">Any Spirit</option>
               {availableLiquors.map(l => <option key={l} value={l}>{l}</option>)}
@@ -426,7 +441,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedGlass}
               onChange={(e) => setSelectedGlass(e.target.value)}
-              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
               <option value="All">Any Glass</option>
               <option value="Coupe">Coupe</option>
@@ -444,7 +459,7 @@ export default function BatchCalculatorPage() {
             <select
               value={selectedSeason}
               onChange={(e) => setSelectedSeason(e.target.value)}
-              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-colors pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary/10 border border-transparent hover:border-gray-200"
+              className="appearance-none w-full bg-gray-50 hover:bg-gray-100 transition-all duration-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-semibold text-gray-700 cursor-pointer outline-none focus:bg-white border border-transparent"
             >
               <option value="All">Any Season</option>
               {COCKTAIL_SEASONS.map(s => (
@@ -454,18 +469,7 @@ export default function BatchCalculatorPage() {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none group-hover:text-gray-600 transition-colors" />
           </div>
 
-          {/* Reset Filters */}
-          {hasActiveFilters && (
-            <div className="pl-1 md:pl-2 border-l border-gray-200 ml-1 md:ml-2">
-              <button
-                onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
-                className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                title="Clear all filters"
-              >
-                <FilterX className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+
         </div>
       </div>
 
@@ -493,7 +497,7 @@ export default function BatchCalculatorPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-6 w-full">
           {filteredCocktails.map(cocktail => {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
 
@@ -589,7 +593,7 @@ export default function BatchCalculatorPage() {
       )}
 
       {/* 4. Floating Action Bar (Batch) */}
-      <div className={`fixed bottom-0 left-0 md:left-64 right-0 p-3 sm:p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 z-30 ${selectedCocktails.length > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div className={`fixed bottom-0 left-0 md:left-56 right-0 p-3 sm:p-6 bg-white border-t border-gray-200 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] transition-transform duration-300 z-30 ${selectedCocktails.length > 0 ? 'translate-y-0' : 'translate-y-full'}`}>
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-primary rounded-full flex items-center justify-center text-brand-primary-foreground font-bold text-base sm:text-lg shadow-sm flex-shrink-0">
