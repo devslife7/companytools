@@ -364,46 +364,33 @@ export default function BatchCalculatorPage() {
       {/* 2. Redesigned Search & Filters Bar */}
       <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 p-2 mb-6 sm:mb-10 flex flex-col md:flex-row md:items-center gap-2 transition-all hover:shadow-2xl hover:shadow-gray-200/50">
 
-        {/* Search Input Section */}
-        <div className="flex-1 w-full md:w-auto min-w-[200px] flex items-center px-3 sm:px-4 py-2 relative rounded-xl focus-within:bg-gray-50 focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all duration-300">
-          <Search className="text-gray-400 w-5 h-5 flex-shrink-0" />
-          <input
-            type="text"
-            placeholder="Search cocktails or ingredients..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-base sm:text-lg text-gray-900 placeholder:text-gray-400 font-medium px-3 sm:px-4 py-1"
-          />
-        </div>
+        {/* Search & Clear Wrapper */}
+        <div className="flex w-full md:w-auto flex-1 items-center gap-2">
+          {/* Search Input Section */}
+          <div className="flex-1 w-full md:w-auto min-w-[200px] flex items-center px-3 sm:px-4 py-2 relative rounded-xl focus-within:bg-gray-50 focus-within:ring-2 focus-within:ring-brand-primary/10 transition-all duration-300">
+            <Search className="text-gray-400 w-5 h-5 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Search cocktails or ingredients..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-base sm:text-lg text-gray-900 placeholder:text-gray-400 font-medium px-3 sm:px-4 py-1"
+            />
+          </div>
 
-        {/* Reset Filters (Desktop: Next to search) */}
-        <div className="hidden md:flex items-center">
+          {/* Reset Filters Button */}
           <button
             onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
             disabled={!hasActiveFilters}
-            className={`p-2 rounded-xl transition-all ${hasActiveFilters ? 'text-brand-primary hover:bg-brand-primary/10 cursor-pointer' : 'text-gray-200 cursor-default'}`}
+            className={`p-2 rounded-xl transition-all flex-shrink-0 ${hasActiveFilters ? 'text-brand-primary hover:bg-brand-primary/10 cursor-pointer' : 'text-gray-200 cursor-default'}`}
             title={hasActiveFilters ? "Clear all filters" : "No active filters"}
           >
             <FilterX className="w-5 h-5" />
           </button>
         </div>
 
-
-
         {/* Horizontal Divider (Mobile) */}
         <div className="md:hidden h-px w-full bg-gray-100 my-1"></div>
-
-        {/* Reset Filters (Mobile: Above filters) */}
-        {hasActiveFilters && (
-          <div className="md:hidden flex justify-end px-2 pb-1">
-            <button
-              onClick={() => { setSearchQuery(''); setSelectedSpirit('All'); setFilterType('All'); setSelectedGlass('All'); setSelectedSeason('All'); }}
-              className="text-xs font-medium text-red-500 flex items-center gap-1"
-            >
-              <FilterX className="w-3 h-3" /> Clear Filters
-            </button>
-          </div>
-        )}
 
         {/* Filters Section */}
         <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto px-2 md:px-0 pb-2 md:pb-0 scrollbar-hide">
