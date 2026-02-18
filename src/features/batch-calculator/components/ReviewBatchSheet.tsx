@@ -135,7 +135,7 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices }: Revie
                             return (
                                 <React.Fragment key={batch.id}>
                                     {/* Cocktail Header Row */}
-                                    <tr className="bg-[#f8f6f5]/50">
+                                    <tr className="bg-gray-50/50">
                                         <td className="px-5 py-2.5 text-xs font-bold text-gray-900 uppercase tracking-wide bg-[#f54900]/5">
                                             {batch.selectedCocktail.name} <span className="ml-1 font-medium text-gray-500 normal-case">({servings} servings)</span>
                                         </td>

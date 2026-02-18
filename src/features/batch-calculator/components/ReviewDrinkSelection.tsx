@@ -124,7 +124,7 @@ export function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measur
                 </div>
             </div>
 
-            <div className="bg-[#f8f6f5] px-5 py-3 border-t border-gray-200 flex justify-between items-center text-sm">
+            <div className="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-between items-center text-sm">
                 <span className="text-gray-500">
                     Includes <span className="font-medium text-gray-900">{formatNumber(singleServingOz, 1)} oz</span> per serving
                 </span>

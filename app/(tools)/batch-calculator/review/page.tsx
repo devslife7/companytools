@@ -121,7 +121,7 @@ function BatchReviewContent() {
 
     if (batches.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-[#f8f6f5]">
+            <div className="min-h-screen flex flex-col items-center justify-center p-8">
                 <h2 className="text-2xl font-bold mb-4 text-gray-900">No recipes selected</h2>
                 <p className="text-gray-500 mb-8">Please select some recipes from the gallery to review.</p>
                 <Link href="/batch-calculator" className="px-6 py-3 bg-[#f54900] text-white font-bold rounded-xl hover:bg-[#d13e00] transition-colors">
@@ -132,7 +132,7 @@ function BatchReviewContent() {
     }
 
     return (
-        <div className="min-h-screen bg-[#f8f6f5] font-sans pb-24 transition-colors duration-200">
+        <div className="min-h-screen font-sans pb-24 transition-colors duration-200">
             {/* Header */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
