@@ -484,7 +484,7 @@ export default function BatchCalculatorPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-6 w-full">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-6 w-full">
           {filteredCocktails.map(cocktail => {
             const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
 
