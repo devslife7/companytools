@@ -46,6 +46,7 @@ function transformCocktailToRecipe(cocktail: {
   featured: boolean
   image?: string | null
   abv?: number | null
+  menuPrice?: Prisma.Decimal | null
   season?: string | null
   ingredients: Array<{
     name: string
@@ -70,6 +71,9 @@ function transformCocktailToRecipe(cocktail: {
     featured: cocktail.featured,
     ...(cocktail.image && { image: cocktail.image }),
     ...(cocktail.abv !== null && cocktail.abv !== undefined && { abv: cocktail.abv }),
+    ...(cocktail.menuPrice !== null && cocktail.menuPrice !== undefined && {
+      menuPrice: Number(cocktail.menuPrice.toString())
+    }),
     ...(cocktail.season && { season: cocktail.season as CocktailSeason }),
     ingredients: cocktail.ingredients
       .sort((a, b) => a.orderIndex - b.orderIndex)
@@ -235,6 +239,8 @@ export async function createCocktail(
       image: data.image || null,
       // @ts-ignore
       abv: data.abv,
+      // @ts-ignore
+      menuPrice: data.menuPrice ?? null,
       season: data.season || null,
       ingredients: {
         create: data.ingredients.map((ing, index) => ({
@@ -299,6 +305,7 @@ export async function updateCocktail(
   if (data.featured !== undefined) updateData.featured = data.featured
   if (data.image !== undefined) updateData.image = data.image || null
   if (data.abv !== undefined) updateData.abv = data.abv
+  if (data.menuPrice !== undefined) updateData.menuPrice = data.menuPrice ?? null
   if (data.season !== undefined) updateData.season = data.season || null
 
   // Only update cocktail if there are fields to update (ingredients are handled separately above)

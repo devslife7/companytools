@@ -2,6 +2,7 @@ import 'dotenv/config'
 import { prisma } from '../src/lib/db/prisma'
 import { writeFileSync } from 'fs'
 import { join } from 'path'
+import { Prisma } from '@prisma/client'
 import type { CocktailRecipe, CocktailMethod } from '../src/features/batch-calculator/types'
 
 /**
@@ -43,6 +44,11 @@ function formatCocktail(cocktail: CocktailRecipe, index: number, total: number):
   // ABV (if exists)
   if (cocktail.abv !== undefined && cocktail.abv !== null) {
     lines.push(`    abv: ${cocktail.abv},`)
+  }
+
+  // Menu price (if exists)
+  if (cocktail.menuPrice !== undefined && cocktail.menuPrice !== null) {
+    lines.push(`    menuPrice: ${cocktail.menuPrice},`)
   }
 
   // Glass type (if set)
@@ -129,6 +135,7 @@ function transformCocktailToRecipe(cocktail: {
   instructions?: string | null
   featured: boolean
   abv?: number | null
+  menuPrice?: Prisma.Decimal | null
   ingredients: Array<{
     name: string
     amount: any // Decimal type from Prisma
@@ -183,6 +190,10 @@ function transformCocktailToRecipe(cocktail: {
 
   if (cocktail.abv !== null && cocktail.abv !== undefined) {
     recipe.abv = cocktail.abv
+  }
+
+  if (cocktail.menuPrice !== null && cocktail.menuPrice !== undefined) {
+    recipe.menuPrice = Number(cocktail.menuPrice.toString())
   }
 
   if (cocktail.glass) {

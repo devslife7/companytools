@@ -24,6 +24,7 @@ export interface CocktailRecipe {
   featured?: boolean
   image?: string
   abv?: number
+  menuPrice?: number
   season?: CocktailSeason
   tags?: string[]
   category?: string

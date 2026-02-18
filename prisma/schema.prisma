@@ -19,6 +19,7 @@ model Cocktail {
   featured     Boolean        @default(false)
   image        String?        @db.VarChar(255)
   abv          Float?         // Alcohol by Volume percentage (e.g. 15.5)
+  menuPrice    Decimal?       @map("menu_price") @db.Decimal(10, 2)
   instructions String?
   glass        String?        @db.VarChar(100)
   season       String?        @db.VarChar(50)
