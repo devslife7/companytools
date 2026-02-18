@@ -1,9 +1,9 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { X, PlusCircle, Trash2, Save, Loader2, AlertCircle } from "lucide-react"
 import type { CocktailRecipe, Ingredient, CocktailMethod, GlassType } from "../types"
 import { COCKTAIL_SEASONS } from "../types"
-import { useUpdateCocktail, useDeleteCocktail } from "../hooks"
+import { useUpdateCocktail, useDeleteCocktail, useIngredientNames, type IngredientSuggestion } from "../hooks"
 import { parseAmount } from "../lib/calculations"
 import { calculateCocktailABV } from "../lib/abv"
 import { CoupeIcon, FluteIcon, HighballIcon, MartiniIcon, RocksIcon, ServedUpIcon } from "./GlassIcons"
@@ -44,9 +44,17 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null)
   const [deletePassword, setDeletePassword] = useState("")
   const [deletePasswordError, setDeletePasswordError] = useState<string | null>(null)
+  const [activeAutocompleteIndex, setActiveAutocompleteIndex] = useState<number | null>(null)
+  const [highlightedSuggestion, setHighlightedSuggestion] = useState<number>(-1)
+
+  // Refs for auto-focusing new ingredients
+  const desktopIngredientRefs = useRef<(HTMLInputElement | null)[]>([])
+  const mobileIngredientRefs = useRef<(HTMLInputElement | null)[]>([])
+  const [focusNewIngredientIndex, setFocusNewIngredientIndex] = useState<number | null>(null)
 
   const { updateCocktail, loading: updateLoading, error: updateError } = useUpdateCocktail()
   const { deleteCocktail, loading: deleteLoading, error: deleteError } = useDeleteCocktail()
+  const ingredientNames = useIngredientNames()
 
   // Helper function to parse existing amount strings for backward compatibility
   const parseIngredientAmount = (ingredient: Ingredient): { amount: string; unit: string } => {
@@ -144,6 +152,28 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     }
   }, [deleteError])
 
+  // Handle focusing new ingredient inputs
+  useEffect(() => {
+    if (focusNewIngredientIndex !== null && editedRecipe) {
+      // Small timeout to ensure DOM update
+      const timeoutId = setTimeout(() => {
+        const desktopInput = desktopIngredientRefs.current[focusNewIngredientIndex]
+        const mobileInput = mobileIngredientRefs.current[focusNewIngredientIndex]
+
+        // Try to focus visible input
+        if (desktopInput && desktopInput.offsetParent !== null) {
+          desktopInput.focus()
+        } else if (mobileInput && mobileInput.offsetParent !== null) {
+          mobileInput.focus()
+        }
+
+        setFocusNewIngredientIndex(null)
+      }, 50)
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [focusNewIngredientIndex, editedRecipe])
+
   if (!isOpen || !editedRecipe) return null
 
   const handleNameChange = (value: string) => {
@@ -177,6 +207,18 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     })
   }
 
+  const handleIngredientSelect = (index: number, suggestion: IngredientSuggestion) => {
+    if (!editedRecipe) return
+    const newIngredients = [...editedRecipe.ingredients]
+    const current = newIngredients[index]
+    newIngredients[index] = {
+      ...current,
+      name: suggestion.name,
+      ...(!current.orderUnit && suggestion.orderUnit ? { orderUnit: suggestion.orderUnit } : {}),
+    }
+    setEditedRecipe({ ...editedRecipe, ingredients: newIngredients })
+  }
+
   const handleAddIngredient = () => {
     if (!editedRecipe) return
     const newIngredients = [...editedRecipe.ingredients, { name: "", amount: "", unit: "oz", orderUnit: "" }]
@@ -184,8 +226,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
     setEditedRecipe({
       ...editedRecipe,
       ingredients: newIngredients,
-      // No change to ABV usually when adding empty ingredient, but let's keep consistent
     })
+    setFocusNewIngredientIndex(newIngredients.length - 1)
   }
 
   const handleRemoveIngredient = (index: number) => {
@@ -336,7 +378,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6 bg-white/50">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 md:space-y-4 bg-white/50">
           {/* Error Messages */}
           {(validationError || updateError || deleteError) && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
@@ -384,7 +427,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
           {/* Glass Type */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Glass Type</label>
-            <div className="flex overflow-x-auto py-2 gap-3 snap-x scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="flex overflow-x-auto py-1 gap-3 snap-x scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
               {GLASS_OPTIONS.map((option) => (
                 <button
                   key={option.value}
@@ -409,12 +452,10 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
             </div>
           </div>
 
-          {/* Instructions */}
+          {/* Method */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
-
-            {/* Method */}
-            <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Method</label>
+            <div>
               <div className="flex gap-3">
                 <label className={`flex flex-col items-center justify-center p-3 min-w-[90px] gap-2 rounded-xl border transition-all duration-200 cursor-pointer group ${editedRecipe.method === 'Build'
                   ? 'bg-white border-orange-600'
@@ -467,7 +508,11 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                 </label>
               </div>
             </div>
+          </div>
 
+          {/* Instructions */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Instructions</label>
             {/* Textarea with custom placeholder */}
             <div className="relative">
               <textarea
@@ -479,7 +524,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               />
               {!editedRecipe.instructions && (
                 <div className="absolute top-3 md:top-2 left-4 text-gray-400 pointer-events-none z-20 whitespace-pre-line text-base leading-relaxed">
-                  Add step by step instructions:{'\n'}1. Combine ingredients{'\n'}2. Shake or Build
+                  1. Combine ingredients{'\n'}2. Shake or Build{'\n'}3. Garnish
                 </div>
               )}
             </div>
@@ -491,51 +536,132 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="block text-sm font-semibold text-gray-700">Ingredients</label>
-              <div className="flex items-center gap-2 px-2 py-1 bg-gray-50 border border-gray-200 rounded">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">ABV</span>
+              <div className="flex items-center gap-2 px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">ABV</span>
                 <span className={`text-sm font-bold ${isMocktail ? 'text-green-600' : 'text-orange-600'}`}>
                   {displayedABV}%
                 </span>
               </div>
             </div>
-            <div className="space-y-3">
-              {editedRecipe.ingredients.map((ingredient, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col md:flex-row md:items-center gap-3 p-3 md:p-3 bg-gray-50 border border-gray-200 rounded-lg"
-                >
-                  {/* Ingredient Name - Full width on mobile, flex-1 on desktop */}
-                  <div className="flex-1 w-full md:w-auto">
-                    <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Ingredient Name</label>
-                    <input
-                      type="text"
-                      value={ingredient.name}
-                      onChange={e => handleIngredientChange(index, "name", e.target.value)}
-                      className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm"
-                      placeholder="Ingredient name"
-                      inputMode="text"
-                    />
-                  </div>
 
-                  {/* Amount and Unit - Side by side on mobile, separate on desktop */}
-                  <div className="flex gap-2 md:gap-3 md:items-center">
-                    <div className="flex-1 md:w-24">
-                      <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Amount</label>
+            {/* Desktop: table layout */}
+            <div className="hidden md:block rounded-xl border border-gray-200">
+              {/* Column headers */}
+              <div
+                className="grid border-b border-gray-200 bg-gray-50/80 rounded-t-xl"
+                style={{ gridTemplateColumns: '1fr 76px 88px 114px 36px' }}
+              >
+                <div className="px-4 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ingredient</div>
+                <div className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Qty</div>
+                <div className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Unit</div>
+                <div className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Order As</div>
+                <div />
+              </div>
+
+              {/* Ingredient rows */}
+              <div className="bg-white divide-y divide-gray-100">
+                {editedRecipe.ingredients.map((ingredient, index) => (
+                  <div
+                    key={index}
+                    className="group grid items-stretch hover:bg-orange-50/20 transition-colors duration-100"
+                    style={{ gridTemplateColumns: '1fr 76px 88px 114px 36px' }}
+                  >
+                    {/* Name */}
+                    <div className="flex items-center gap-2 px-3 py-1.5">
+                      <span className="text-xs font-bold text-gray-200 w-4 shrink-0 tabular-nums select-none">{index + 1}</span>
+                      <div className="flex-1 relative">
+                        <input
+                          ref={el => { desktopIngredientRefs.current[index] = el }}
+                          type="text"
+                          value={ingredient.name}
+                          onChange={e => {
+                            handleIngredientChange(index, "name", e.target.value)
+                            setActiveAutocompleteIndex(index)
+                            setHighlightedSuggestion(-1)
+                          }}
+                          onFocus={() => {
+                            setActiveAutocompleteIndex(index)
+                            setHighlightedSuggestion(-1)
+                          }}
+                          onBlur={() => setTimeout(() => setActiveAutocompleteIndex(null), 150)}
+                          onKeyDown={e => {
+                            const isActive = activeAutocompleteIndex === index
+                            const currentSuggestions = isActive && ingredient.name.trim().length >= 1
+                              ? ingredientNames
+                                .filter(s => s.name.toLowerCase().includes(ingredient.name.toLowerCase().trim()))
+                                .slice(0, 8)
+                              : []
+                            if (!isActive || currentSuggestions.length === 0) return
+                            if (e.key === "ArrowDown") {
+                              e.preventDefault()
+                              setHighlightedSuggestion(h => Math.min(h + 1, currentSuggestions.length - 1))
+                            } else if (e.key === "ArrowUp") {
+                              e.preventDefault()
+                              setHighlightedSuggestion(h => Math.max(h - 1, 0))
+                            } else if (e.key === "Enter" && highlightedSuggestion >= 0) {
+                              e.preventDefault()
+                              handleIngredientSelect(index, currentSuggestions[highlightedSuggestion])
+                              setActiveAutocompleteIndex(null)
+                              setHighlightedSuggestion(-1)
+                            } else if (e.key === "Escape") {
+                              setActiveAutocompleteIndex(null)
+                              setHighlightedSuggestion(-1)
+                            }
+                          }}
+                          className="w-full px-1 py-1.5 bg-transparent border-0 border-b-2 border-transparent focus:border-orange-400 focus:outline-none text-gray-900 text-sm placeholder:text-gray-300 transition-colors"
+                          placeholder="e.g. Gin, Lime juice…"
+                          inputMode="text"
+                          autoComplete="off"
+                        />
+                        {(() => {
+                          const isActive = activeAutocompleteIndex === index
+                          const currentSuggestions = isActive && ingredient.name.trim().length >= 1
+                            ? ingredientNames
+                              .filter(s => s.name.toLowerCase().includes(ingredient.name.toLowerCase().trim()))
+                              .slice(0, 8)
+                            : []
+                          if (!isActive || currentSuggestions.length === 0) return null
+                          return (
+                            <ul className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                              {currentSuggestions.map((suggestion, si) => (
+                                <li
+                                  key={suggestion.name}
+                                  onMouseDown={() => {
+                                    handleIngredientSelect(index, suggestion)
+                                    setActiveAutocompleteIndex(null)
+                                    setHighlightedSuggestion(-1)
+                                  }}
+                                  onMouseEnter={() => setHighlightedSuggestion(si)}
+                                  className={`px-4 py-2 cursor-pointer text-sm ${highlightedSuggestion === si
+                                    ? "bg-orange-50 text-orange-700"
+                                    : "text-gray-900 hover:bg-gray-50"
+                                    }`}
+                                >
+                                  {suggestion.name}
+                                </li>
+                              ))}
+                            </ul>
+                          )
+                        })()}
+                      </div>
+                    </div>
+                    {/* Qty */}
+                    <div className="border-l border-gray-100 flex items-center px-2 py-1.5">
                       <input
                         type="text"
                         value={ingredient.amount}
                         onChange={e => handleIngredientChange(index, "amount", e.target.value)}
-                        className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm text-right md:text-right"
-                        placeholder="Amount"
+                        className="w-full px-1 py-1.5 bg-transparent border-0 border-b-2 border-transparent focus:border-orange-400 focus:outline-none text-gray-900 text-sm text-right placeholder:text-gray-300 transition-colors"
+                        placeholder="1.5"
                         inputMode="decimal"
                       />
                     </div>
-                    <div className="flex-1 md:w-28">
-                      <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Unit</label>
+                    {/* Unit */}
+                    <div className="border-l border-gray-100 flex items-center px-2 py-1.5">
                       <select
                         value={ingredient.unit || "oz"}
                         onChange={e => handleIngredientChange(index, "unit", e.target.value)}
-                        className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm bg-white"
+                        className="w-full px-1 py-1.5 bg-transparent border-0 border-b-2 border-transparent focus:border-orange-400 focus:outline-none text-gray-700 text-sm transition-colors cursor-pointer"
                       >
                         <option value="oz">oz</option>
                         <option value="dash">dash</option>
@@ -543,43 +669,194 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                         <option value="each">each</option>
                       </select>
                     </div>
+                    {/* Order As */}
+                    <div className="border-l border-gray-100 flex items-center px-2 py-1.5">
+                      <select
+                        value={ingredient.orderUnit || ""}
+                        onChange={e => handleIngredientChange(index, "orderUnit", e.target.value)}
+                        className="w-full px-1 py-1.5 bg-transparent border-0 border-b-2 border-transparent focus:border-orange-400 focus:outline-none text-gray-500 text-sm transition-colors cursor-pointer"
+                      >
+                        <option value="">—</option>
+                        <option value="liters">Liters</option>
+                        <option value="quarts">Quarts</option>
+                        <option value="gallons">Gallons</option>
+                        <option value="each">Each</option>
+                        <option value="12oz can">12oz Can</option>
+                        <option value="4oz bottle">4oz Bottle</option>
+                      </select>
+                    </div>
+                    {/* Remove */}
+                    <div className="border-l border-gray-100 flex items-center justify-center">
+                      {editedRecipe.ingredients.length > 1 && (
+                        <button
+                          onClick={() => handleRemoveIngredient(index)}
+                          className="p-1.5 text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all rounded-md hover:bg-red-50"
+                          title="Remove ingredient"
+                          aria-label="Remove ingredient"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
+                ))}
+              </div>
 
-                  {/* Order Unit - Full width on mobile, fixed width on desktop */}
-                  <div className="w-full md:w-36">
-                    <label className="block text-xs font-medium text-gray-600 mb-1 md:hidden">Order Unit</label>
-                    <select
-                      value={ingredient.orderUnit || ""}
-                      onChange={e => handleIngredientChange(index, "orderUnit", e.target.value)}
-                      className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 text-base md:text-sm bg-white"
-                    >
-                      <option value="">Order Unit</option>
-                      <option value="liters">Liters</option>
-                      <option value="quarts">Quarts</option>
-                      <option value="gallons">Gallons</option>
-                      <option value="each">Each</option>
-                      <option value="12oz can">12oz Can</option>
-                      <option value="4oz bottle">4oz Bottle</option>
-                    </select>
+              {/* Add ingredient */}
+              <button
+                onClick={handleAddIngredient}
+                className="w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-gray-400 hover:text-orange-600 hover:bg-orange-50/30 transition-colors border-t border-dashed border-gray-200 rounded-b-xl"
+              >
+                <PlusCircle className="w-4 h-4" />
+                Add ingredient
+              </button>
+            </div>
+
+            {/* Mobile: card layout */}
+            <div className="md:hidden space-y-2">
+              {editedRecipe.ingredients.map((ingredient, index) => (
+                <div
+                  key={index}
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+                >
+                  {/* Name row */}
+                  <div className="flex items-center gap-2 px-3 pt-2.5 pb-2 border-b border-gray-100">
+                    <span className="text-xs font-bold text-gray-300 w-4 shrink-0 tabular-nums select-none">{index + 1}</span>
+                    <div className="flex-1 relative">
+                      <input
+                        ref={el => { mobileIngredientRefs.current[index] = el }}
+                        type="text"
+                        value={ingredient.name}
+                        onChange={e => {
+                          handleIngredientChange(index, "name", e.target.value)
+                          setActiveAutocompleteIndex(index)
+                          setHighlightedSuggestion(-1)
+                        }}
+                        onFocus={() => {
+                          setActiveAutocompleteIndex(index)
+                          setHighlightedSuggestion(-1)
+                        }}
+                        onBlur={() => setTimeout(() => setActiveAutocompleteIndex(null), 150)}
+                        onKeyDown={e => {
+                          const isActive = activeAutocompleteIndex === index
+                          const currentSuggestions = isActive && ingredient.name.trim().length >= 1
+                            ? ingredientNames
+                              .filter(s => s.name.toLowerCase().includes(ingredient.name.toLowerCase().trim()))
+                              .slice(0, 8)
+                            : []
+                          if (!isActive || currentSuggestions.length === 0) return
+                          if (e.key === "ArrowDown") {
+                            e.preventDefault()
+                            setHighlightedSuggestion(h => Math.min(h + 1, currentSuggestions.length - 1))
+                          } else if (e.key === "ArrowUp") {
+                            e.preventDefault()
+                            setHighlightedSuggestion(h => Math.max(h - 1, 0))
+                          } else if (e.key === "Enter" && highlightedSuggestion >= 0) {
+                            e.preventDefault()
+                            handleIngredientSelect(index, currentSuggestions[highlightedSuggestion])
+                            setActiveAutocompleteIndex(null)
+                            setHighlightedSuggestion(-1)
+                          } else if (e.key === "Escape") {
+                            setActiveAutocompleteIndex(null)
+                            setHighlightedSuggestion(-1)
+                          }
+                        }}
+                        className="w-full text-sm font-medium text-gray-900 bg-transparent border-0 focus:outline-none placeholder:text-gray-300 py-1 min-h-[36px]"
+                        placeholder="Ingredient name…"
+                        inputMode="text"
+                        autoComplete="off"
+                      />
+                      {(() => {
+                        const isActive = activeAutocompleteIndex === index
+                        const currentSuggestions = isActive && ingredient.name.trim().length >= 1
+                          ? ingredientNames
+                            .filter(s => s.name.toLowerCase().includes(ingredient.name.toLowerCase().trim()))
+                            .slice(0, 8)
+                          : []
+                        if (!isActive || currentSuggestions.length === 0) return null
+                        return (
+                          <ul className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                            {currentSuggestions.map((suggestion, si) => (
+                              <li
+                                key={suggestion.name}
+                                onMouseDown={() => {
+                                  handleIngredientSelect(index, suggestion)
+                                  setActiveAutocompleteIndex(null)
+                                  setHighlightedSuggestion(-1)
+                                }}
+                                onMouseEnter={() => setHighlightedSuggestion(si)}
+                                className={`px-4 py-2 cursor-pointer text-sm ${highlightedSuggestion === si
+                                  ? "bg-orange-50 text-orange-700"
+                                  : "text-gray-900 hover:bg-gray-50"
+                                  }`}
+                              >
+                                {suggestion.name}
+                              </li>
+                            ))}
+                          </ul>
+                        )
+                      })()}
+                    </div>
+                    {editedRecipe.ingredients.length > 1 && (
+                      <button
+                        onClick={() => handleRemoveIngredient(index)}
+                        className="p-1.5 text-gray-300 hover:text-red-400 transition-colors shrink-0 hover:bg-red-50 rounded-lg"
+                        aria-label="Remove ingredient"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
-
-                  {/* Delete Button - Full width on mobile, auto on desktop */}
-                  <button
-                    onClick={() => handleRemoveIngredient(index)}
-                    className="w-full md:w-auto px-4 py-3 md:p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors flex items-center justify-center gap-2 md:gap-0 min-h-[44px] md:min-h-0"
-                    title="Remove ingredient"
-                    aria-label="Remove ingredient"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                    <span className="md:hidden text-sm font-medium">Remove</span>
-                  </button>
+                  {/* Qty / Unit / Order */}
+                  <div className="flex divide-x divide-gray-100">
+                    <div className="flex-1 px-3 py-2">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Qty</div>
+                      <input
+                        type="text"
+                        value={ingredient.amount}
+                        onChange={e => handleIngredientChange(index, "amount", e.target.value)}
+                        className="w-full text-sm text-gray-900 bg-transparent border-0 focus:outline-none placeholder:text-gray-300 p-0 min-h-[32px]"
+                        placeholder="0"
+                        inputMode="decimal"
+                      />
+                    </div>
+                    <div className="flex-1 px-3 py-2">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Unit</div>
+                      <select
+                        value={ingredient.unit || "oz"}
+                        onChange={e => handleIngredientChange(index, "unit", e.target.value)}
+                        className="w-full text-sm text-gray-700 bg-transparent border-0 focus:outline-none p-0 min-h-[32px] cursor-pointer"
+                      >
+                        <option value="oz">oz</option>
+                        <option value="dash">dash</option>
+                        <option value="tsp">tsp</option>
+                        <option value="each">each</option>
+                      </select>
+                    </div>
+                    <div className="flex-1 px-3 py-2">
+                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Order As</div>
+                      <select
+                        value={ingredient.orderUnit || ""}
+                        onChange={e => handleIngredientChange(index, "orderUnit", e.target.value)}
+                        className="w-full text-sm text-gray-500 bg-transparent border-0 focus:outline-none p-0 min-h-[32px] cursor-pointer"
+                      >
+                        <option value="">—</option>
+                        <option value="liters">Liters</option>
+                        <option value="quarts">Quarts</option>
+                        <option value="gallons">Gallons</option>
+                        <option value="each">Each</option>
+                        <option value="12oz can">12oz Can</option>
+                        <option value="4oz bottle">4oz Bottle</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               ))}
               <button
                 onClick={handleAddIngredient}
-                className="w-full py-4 md:py-3 flex items-center justify-center gap-2 text-base md:text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg border border-dashed border-orange-300 transition-colors min-h-[44px] md:min-h-0"
+                className="w-full py-4 flex items-center justify-center gap-2 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-xl border border-dashed border-orange-300 transition-colors min-h-[48px]"
               >
-                <PlusCircle className="w-5 h-5" />
+                <PlusCircle className="w-4 h-4" />
                 Add Ingredient
               </button>
             </div>
