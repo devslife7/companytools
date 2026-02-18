@@ -368,17 +368,17 @@ function BatchCalculatorContent() {
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-10">
-        <div>
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-1 sm:mb-2">Curated Gallery</h1>
-          <p className="text-sm sm:text-lg text-gray-500">Manage and batch seasonal beverage programs.</p>
+      <div className="flex items-center justify-between gap-4 mb-6 sm:mb-10">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-1 sm:mb-2 truncate">Curated Gallery</h1>
+          <p className="text-sm sm:text-lg text-gray-500 truncate sm:text-clip">Manage and batch seasonal beverage programs.</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center justify-center px-5 py-2.5 bg-brand-primary text-brand-primary-foreground font-bold rounded-xl hover:bg-brand-primary-hover transition-all shadow-sm gap-2 active:scale-[0.98]"
+          className="flex-shrink-0 inline-flex items-center justify-center px-3 py-2 sm:px-5 sm:py-2.5 bg-brand-primary text-brand-primary-foreground font-bold rounded-xl hover:bg-brand-primary-hover transition-all shadow-sm gap-1.5 sm:gap-2 active:scale-[0.98]"
         >
-          <Plus className="w-5 h-5" />
-          New Recipe
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+          <span className="text-sm sm:text-base">New Recipe</span>
         </button>
       </div>
 

@@ -119,6 +119,8 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
       const newRecipe: CocktailRecipe = {
         name: '',
         method: 'Build',
+        glassType: 'Highball',
+        season: 'Spring 2026',
         ingredients: [{ name: '', amount: '', unit: 'oz', orderUnit: '' }],
       }
       setEditedRecipe(newRecipe)
@@ -348,7 +350,12 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
           )}
           {/* Cocktail Name */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Cocktail Name</label>
+            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+              Cocktail Name
+              {mode === 'create' && (
+                <span className="text-[10px] font-medium text-gray-400">required</span>
+              )}
+            </label>
             <input
               type="text"
               value={editedRecipe.name}

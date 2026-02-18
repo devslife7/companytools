@@ -23,8 +23,8 @@ function SidebarContent({ pathname, onNavClick }: { pathname: string; onNavClick
             {/* Logo Area */}
             <div className="p-6 border-b border-gray-100">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center text-white shadow-sm">
-                        <GlassWater className="w-6 h-6" />
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <img src="/logo.svg" alt="App Logo" className="w-full h-full object-contain" />
                     </div>
                     <div>
                         <h1 className="font-bold text-gray-900 leading-tight">InternalToolsDC</h1>
@@ -94,8 +94,8 @@ export function Sidebar() {
             {/* Mobile Top Bar */}
             <div className="fixed top-0 left-0 right-0 z-40 flex md:hidden items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center text-white">
-                        <GlassWater className="w-4.5 h-4.5" />
+                    <div className="w-8 h-8 flex items-center justify-center">
+                        <img src="/logo.svg" alt="App Logo" className="w-full h-full object-contain" />
                     </div>
                     <span className="font-bold text-gray-900 text-sm">InternalToolsDC</span>
                 </div>

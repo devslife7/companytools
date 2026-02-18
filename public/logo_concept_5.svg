@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="corpGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fed7aa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+    <!-- Background: Clean White -->
+  <rect x="0" y="0" width="512" height="512" rx="32" fill="#ffffff" />
+  
+  <g transform="translate(100, 100) scale(0.65)">
+    <!-- Main "C" or Vessel Shape made of stacked segments -->
+    <path d="M100 100 
+             Q100 50 150 50 
+             L350 50 
+             Q400 50 400 100 
+             L400 350
+             Q400 450 300 450 
+             L200 450 
+             Q100 450 100 350 Z" 
+          stroke="#334155" stroke-width="32" fill="none" stroke-linejoin="round"/>
+          
+    <path d="M120 300 Q250 340 380 300 L380 350 Q380 430 300 430 L200 430 Q120 430 120 350 Z" 
+          fill="url(#corpGrad2)" />
+          
+    <!-- Data/Tool Elements -->
+    <!-- Stylized "Menu" or "Checklist" lines floating above liquid -->
+    <line x1="160" y1="150" x2="340" y2="150" stroke="#cbd5e1" stroke-width="24" stroke-linecap="round" />
+    <line x1="160" y1="210" x2="340" y2="210" stroke="#cbd5e1" stroke-width="24" stroke-linecap="round" />
+    
+    <!-- Stylized Utensil/Stirrer/Pen -->
+    <line x1="250" y1="80" x2="420" y2="-50" stroke="#ea580c" stroke-width="24" stroke-linecap="round" />
+  </g>
+</svg>
