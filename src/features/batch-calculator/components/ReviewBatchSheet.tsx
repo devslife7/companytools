@@ -173,7 +173,7 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices }: Revie
                                     <div className="font-bold text-gray-900 text-sm">{item.name}</div>
                                     <span className="text-[10px] text-gray-400 font-medium">{item.servings} servings</span>
                                 </div>
-                                <div className="grid grid-cols-5 gap-1.5">
+                                <div className="grid grid-cols-4 gap-1.5">
                                     <div>
                                         <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Price (Ea)</span>
                                         <span className="font-mono font-bold text-gray-900 text-xs">
@@ -201,12 +201,6 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices }: Revie
                                         ) : (
                                             <span className="text-gray-400 text-xs">--</span>
                                         )}
-                                    </div>
-                                    <div>
-                                        <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Batches</span>
-                                        <span className="font-mono font-bold text-gray-900 text-xs">
-                                            {item.batchCount > 0 ? formatNumber(item.batchCount, 1) : <span className="text-gray-400">--</span>}
-                                        </span>
                                     </div>
                                 </div>
                             </div>

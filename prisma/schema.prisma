@@ -59,6 +59,17 @@ model LiquorPrice {
   @@map("liquor_prices")
 }
 
+model SavedEvent {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  eventDate DateTime @map("event_date")
+  recipes   Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("saved_events")
+}
+
 enum CocktailMethod {
   Shake
   Build

@@ -6,8 +6,10 @@ import Link from "next/link"
 import {
     ArrowLeft,
     Save,
+    FileDown,
     Settings2,
-    Plus
+    Plus,
+    X
 } from "lucide-react"
 
 // Types
@@ -20,11 +22,95 @@ import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-total
 import { useCocktails } from "@/features/batch-calculator/hooks"
 
 // Components
-// Components
 import { ReviewDrinkSelection } from "@/features/batch-calculator/components/ReviewDrinkSelection"
 import { ReviewBatchSheet } from "@/features/batch-calculator/components/ReviewBatchSheet"
 import { BatchingInstructionsModal } from "@/features/batch-calculator/components/BatchingInstructionsModal"
 import { RecipeModal } from "@/features/batch-calculator/components/RecipeModal"
+
+// ── Save Event Modal ──────────────────────────────────────────────────────────
+
+interface SaveEventModalProps {
+    eventName: string
+    onClose: () => void
+    onSave: (eventDate: string) => Promise<void>
+    saveStatus: "idle" | "saving" | "saved" | "error"
+}
+
+function SaveEventModal({ eventName, onClose, onSave, saveStatus }: SaveEventModalProps) {
+    const [eventDate, setEventDate] = useState("")
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!eventDate) return
+        await onSave(eventDate)
+    }
+
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h2 className="text-lg font-bold text-gray-900">Save Event</h2>
+                    <button
+                        onClick={onClose}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Event Name
+                        </label>
+                        <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 font-medium">
+                            {eventName || "Untitled Event"}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label htmlFor="event-date" className="block text-sm font-medium text-gray-700 mb-1">
+                            Event Date <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            id="event-date"
+                            type="date"
+                            value={eventDate}
+                            onChange={(e) => setEventDate(e.target.value)}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-[#f54900] focus:border-[#f54900] outline-none"
+                        />
+                    </div>
+
+                    {saveStatus === "error" && (
+                        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200">
+                            Failed to save event. Please try again.
+                        </p>
+                    )}
+
+                    <div className="flex gap-3 pt-2">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={!eventDate || saveStatus === "saving"}
+                            className="flex-1 px-4 py-2.5 bg-[#f54900] text-white rounded-lg text-sm font-semibold hover:bg-[#d13e00] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {saveStatus === "saving" ? "Saving…" : "Save"}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function BatchReviewPage() {
     return (
@@ -55,6 +141,12 @@ function BatchReviewContent() {
     const [undoData, setUndoData] = useState<{ batch: BatchState, index: number } | null>(null)
     const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+    // Save modal state
+    const [saveModalOpen, setSaveModalOpen] = useState(false)
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
+    const [savedToast, setSavedToast] = useState(false)
+    const savedToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
     // Fetch liquor prices
     useEffect(() => {
         fetch('/api/liquor-prices')
@@ -63,23 +155,19 @@ function BatchReviewContent() {
             .catch(err => console.error('Failed to fetch liquor prices:', err))
     }, [])
 
-    // ... [Rest of initialization logic is same, will be preserved by replacement] ...
-
     // Initialize batches from URL params
     useEffect(() => {
         if (loading || cocktails.length === 0) return
-        if (batches.length > 0) return // Prevent overwriting user edits
+        if (batches.length > 0) return
 
         const selectedCocktails = cocktails.filter(c => c.id !== undefined && recipeIds.includes(c.id))
-
         if (selectedCocktails.length === 0) return
 
-        // Create initial batch state
         const newBatches: BatchState[] = selectedCocktails.map((cocktail, index) => ({
-            id: index + 1, // Simple local ID for this session
+            id: index + 1,
             selectedCocktail: cocktail,
             editableRecipe: JSON.parse(JSON.stringify(cocktail)),
-            servings: "" as const, // Default to empty/0
+            servings: "" as const,
             targetLiters: FIXED_BATCH_LITERS
         }))
 
@@ -89,11 +177,7 @@ function BatchReviewContent() {
     const handleServingsChange = useCallback((id: number, value: string) => {
         setBatches(prev => prev.map(batch => {
             if (batch.id !== id) return batch
-
-            if (value === "") {
-                return { ...batch, servings: "" }
-            }
-
+            if (value === "") return { ...batch, servings: "" }
             const num = parseInt(value, 10)
             return { ...batch, servings: isNaN(num) || num < 0 ? "" : num }
         }))
@@ -124,18 +208,13 @@ function BatchReviewContent() {
 
         setBatches(prev => {
             const newBatches = [...prev]
-            // Re-insert at original index
             if (undoData.index >= 0 && undoData.index <= newBatches.length) {
                 newBatches.splice(undoData.index, 0, undoData.batch)
             } else {
                 newBatches.push(undoData.batch)
             }
-
-            // Sync with URL
             const newRecipeIds = newBatches.map(b => b.selectedCocktail?.id).filter(Boolean)
-            const newUrl = `/batch-calculator/review?recipes=${newRecipeIds.join(",")}`
-            router.replace(newUrl, { scroll: false })
-
+            router.replace(`/batch-calculator/review?recipes=${newRecipeIds.join(",")}`, { scroll: false })
             return newBatches
         })
         setUndoData(null)
@@ -150,6 +229,42 @@ function BatchReviewContent() {
 
     const handlePrint = () => {
         generatePdfReport(batches, liquorPrices)
+    }
+
+    const handleUpdateBatch = useCallback((updatedBatch: BatchState) => {
+        setBatches(prev => prev.map(b => b.id === updatedBatch.id ? updatedBatch : b))
+        setViewingBatch(prev => prev && prev.id === updatedBatch.id ? updatedBatch : prev)
+    }, [])
+
+    const handleSaveEvent = async (eventDate: string) => {
+        setSaveStatus("saving")
+        try {
+            const res = await fetch('/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: eventName || "Untitled Event",
+                    eventDate,
+                    recipes: batches
+                        .filter(b => b.selectedCocktail != null)
+                        .map(b => ({
+                            cocktailId: b.selectedCocktail!.id,
+                            cocktailName: b.selectedCocktail!.name,
+                            servings: b.servings === "" ? 0 : b.servings,
+                        })),
+                }),
+            })
+
+            if (!res.ok) throw new Error('Save failed')
+
+            setSaveStatus("idle")
+            setSaveModalOpen(false)
+            setSavedToast(true)
+            if (savedToastTimerRef.current) clearTimeout(savedToastTimerRef.current)
+            savedToastTimerRef.current = setTimeout(() => setSavedToast(false), 5000)
+        } catch {
+            setSaveStatus("error")
+        }
     }
 
     if (loading) {
@@ -198,6 +313,13 @@ function BatchReviewContent() {
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={handlePrint}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
+                            >
+                                <FileDown className="w-4 h-4" />
+                                Export PDF
+                            </button>
+                            <button
+                                onClick={() => { setSaveStatus("idle"); setSaveModalOpen(true) }}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-[#f54900] text-white rounded-lg text-sm font-semibold hover:bg-[#d13e00] transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                             >
                                 <Save className="w-4 h-4" />
@@ -268,7 +390,7 @@ function BatchReviewContent() {
 
                         {/* Add Drink Button */}
                         <Link
-                            href={`/batch-calculator?recipes=${recipeIds.join(",")}`} // Preserve current selection? Or just back to gallery
+                            href={`/batch-calculator?recipes=${recipeIds.join(",")}`}
                             className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-400 hover:text-[#f54900] hover:border-[#f54900]/50 hover:bg-white transition-all"
                         >
                             <Plus className="w-5 h-5 mr-2" />
@@ -302,6 +424,29 @@ function BatchReviewContent() {
                 </div>
             )}
 
+            {/* Saved Toast */}
+            {savedToast && (
+                <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-4 z-50">
+                    <span className="text-sm font-medium">Event saved!</span>
+                    <Link
+                        href="/saved-events"
+                        className="text-[#f54900] font-bold text-sm hover:text-[#ff7a45] transition-colors"
+                    >
+                        View →
+                    </Link>
+                </div>
+            )}
+
+            {/* Save Event Modal */}
+            {saveModalOpen && (
+                <SaveEventModal
+                    eventName={eventName}
+                    onClose={() => setSaveModalOpen(false)}
+                    onSave={handleSaveEvent}
+                    saveStatus={saveStatus}
+                />
+            )}
+
             {/* Recipe Modal */}
             {viewingRecipe && (
                 <RecipeModal
@@ -315,6 +460,7 @@ function BatchReviewContent() {
                 <BatchingInstructionsModal
                     batch={viewingBatch}
                     onClose={() => setViewingBatch(null)}
+                    onUpdate={handleUpdateBatch}
                 />
             )}
         </div>
