@@ -11,9 +11,11 @@ interface ReviewDrinkSelectionProps {
     onServingsChange: (id: number, value: string) => void
     onRemove?: (id: number) => void
     measureSystem?: 'us' | 'metric'
+    onViewBatching?: (batch: BatchState) => void
+    onViewRecipe?: (batch: BatchState) => void
 }
 
-export function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measureSystem = 'us' }: ReviewDrinkSelectionProps) {
+export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measureSystem = 'metric', onViewBatching, onViewRecipe }: ReviewDrinkSelectionProps) {
     const { id, selectedCocktail, servings } = batch
 
     // Derived values
@@ -74,7 +76,7 @@ export function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measur
                                 </p>
                             </div>
                             <div className="flex items-center gap-4">
-                                <div className="flex items-center pl-2 border-l border-gray-200">
+                                <div className="flex items-center">
                                     {onRemove && (
                                         <button
                                             onClick={() => onRemove(id)}
@@ -103,7 +105,7 @@ export function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measur
                                     <Users className="text-gray-400 w-5 h-5" />
                                 </div>
                                 <input
-                                    className="focus:ring-[#f54900] focus:border-[#f54900] block w-full pl-10 pr-12 sm:text-lg border-gray-200 rounded-lg py-2.5 font-bold"
+                                    className="focus:ring-[#f54900] focus:border-[#f54900] block w-full pl-10 pr-12 sm:text-lg border-gray-200 rounded-lg py-2.5 font-bold bg-white text-gray-900 placeholder:text-gray-400"
                                     placeholder="0"
                                     type="number"
                                     value={servings}
@@ -130,15 +132,22 @@ export function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measur
                 </span>
                 <div className="flex items-center gap-4">
                     {/* Placeholder links as per design */}
-                    <button className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center">
+                    <button
+                        onClick={() => onViewRecipe?.(batch)}
+                        className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center"
+                    >
                         View Recipe
                     </button>
                     <span className="text-gray-300">|</span>
-                    <button className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center">
+                    <button
+                        onClick={() => onViewBatching?.(batch)}
+                        className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center"
+                    >
                         View Batching
                     </button>
                 </div>
             </div>
         </div>
     )
-}
+})
+ReviewDrinkSelection.displayName = "ReviewDrinkSelection"

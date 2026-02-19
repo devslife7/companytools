@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useMemo, useCallback } from "react"
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -20,8 +20,11 @@ import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-total
 import { useCocktails } from "@/features/batch-calculator/hooks"
 
 // Components
+// Components
 import { ReviewDrinkSelection } from "@/features/batch-calculator/components/ReviewDrinkSelection"
 import { ReviewBatchSheet } from "@/features/batch-calculator/components/ReviewBatchSheet"
+import { BatchingInstructionsModal } from "@/features/batch-calculator/components/BatchingInstructionsModal"
+import { RecipeModal } from "@/features/batch-calculator/components/RecipeModal"
 
 export default function BatchReviewPage() {
     return (
@@ -44,9 +47,13 @@ function BatchReviewContent() {
     const [measureSystem, setMeasureSystem] = useState<'us' | 'metric'>('us')
     const [liquorPrices, setLiquorPrices] = useState<LiquorPriceMap | undefined>()
 
-    // New State for UI
+    // UI State
+    const [viewingBatch, setViewingBatch] = useState<BatchState | null>(null)
+    const [viewingRecipe, setViewingRecipe] = useState<BatchState | null>(null)
     const [eventName, setEventName] = useState("Untitled Event")
     const [bulkServings, setBulkServings] = useState<string>("")
+    const [undoData, setUndoData] = useState<{ batch: BatchState, index: number } | null>(null)
+    const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     // Fetch liquor prices
     useEffect(() => {
@@ -55,6 +62,8 @@ function BatchReviewContent() {
             .then(data => { if (data) setLiquorPrices(data) })
             .catch(err => console.error('Failed to fetch liquor prices:', err))
     }, [])
+
+    // ... [Rest of initialization logic is same, will be preserved by replacement] ...
 
     // Initialize batches from URL params
     useEffect(() => {
@@ -91,8 +100,36 @@ function BatchReviewContent() {
     }, [])
 
     const handleRemoveDrink = useCallback((id: number) => {
+        let removed: { batch: BatchState; index: number } | null = null
+
         setBatches(prev => {
+            const index = prev.findIndex(b => b.id === id)
+            if (index === -1) return prev
+            removed = { batch: prev[index], index }
             const newBatches = prev.filter(b => b.id !== id)
+            const newRecipeIds = newBatches.map(b => b.selectedCocktail?.id).filter(Boolean)
+            router.replace(`/batch-calculator/review?recipes=${newRecipeIds.join(",")}`, { scroll: false })
+            return newBatches
+        })
+
+        if (removed) {
+            setUndoData(removed)
+            if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+            undoTimerRef.current = setTimeout(() => setUndoData(null), 5000)
+        }
+    }, [router])
+
+    const handleUndo = useCallback(() => {
+        if (!undoData) return
+
+        setBatches(prev => {
+            const newBatches = [...prev]
+            // Re-insert at original index
+            if (undoData.index >= 0 && undoData.index <= newBatches.length) {
+                newBatches.splice(undoData.index, 0, undoData.batch)
+            } else {
+                newBatches.push(undoData.batch)
+            }
 
             // Sync with URL
             const newRecipeIds = newBatches.map(b => b.selectedCocktail?.id).filter(Boolean)
@@ -101,8 +138,8 @@ function BatchReviewContent() {
 
             return newBatches
         })
-    }, [router])
-
+        setUndoData(null)
+    }, [undoData, router])
 
     const handleApplyBulkServings = () => {
         const num = parseInt(bulkServings, 10)
@@ -138,7 +175,7 @@ function BatchReviewContent() {
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-20 items-center">
                         <div className="flex items-center gap-4">
-                            <Link href="/batch-calculator">
+                            <Link href={`/batch-calculator?recipes=${recipeIds.join(",")}`}>
                                 <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-lg bg-gray-100 text-gray-500 border border-dashed border-gray-300 hover:bg-gray-200 hover:text-gray-700 transition-colors">
                                     <ArrowLeft className="w-5 h-5" />
                                 </div>
@@ -159,21 +196,6 @@ function BatchReviewContent() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center bg-gray-100 p-1 rounded-lg mr-2">
-                                <button
-                                    onClick={() => setMeasureSystem('us')}
-                                    className={`px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all ${measureSystem === 'us' ? 'bg-[#f54900] text-white' : 'text-gray-500 hover:text-gray-900'}`}
-                                >
-                                    US
-                                </button>
-                                <button
-                                    onClick={() => setMeasureSystem('metric')}
-                                    className={`px-3 py-1.5 text-xs font-bold rounded shadow-sm transition-all ${measureSystem === 'metric' ? 'bg-[#f54900] text-white' : 'text-gray-500 hover:text-gray-900'}`}
-                                >
-                                    Metric
-                                </button>
-                            </div>
-
                             <button
                                 onClick={handlePrint}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-[#f54900] text-white rounded-lg text-sm font-semibold hover:bg-[#d13e00] transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -210,7 +232,7 @@ function BatchReviewContent() {
                                 <div className="relative rounded-md shadow-sm w-full sm:w-32">
                                     <input
                                         id="bulk-servings"
-                                        className="focus:ring-[#f54900] focus:border-[#f54900] block w-full sm:text-sm border-gray-200 rounded-lg pl-3 pr-10 py-2 font-semibold"
+                                        className="focus:ring-[#f54900] focus:border-[#f54900] block w-full sm:text-sm border-gray-200 rounded-lg pl-3 pr-10 py-2 font-semibold bg-white text-gray-900 placeholder:text-gray-400"
                                         placeholder="100"
                                         type="number"
                                         value={bulkServings}
@@ -237,7 +259,9 @@ function BatchReviewContent() {
                                     batch={batch}
                                     onServingsChange={handleServingsChange}
                                     onRemove={handleRemoveDrink}
-                                    measureSystem={measureSystem}
+                                    measureSystem="metric"
+                                    onViewBatching={setViewingBatch}
+                                    onViewRecipe={setViewingRecipe}
                                 />
                             ))}
                         </div>
@@ -257,13 +281,42 @@ function BatchReviewContent() {
                         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full max-h-[calc(100vh-140px)]">
                             <ReviewBatchSheet
                                 batches={batches}
-                                measureSystem={measureSystem}
+                                measureSystem="metric"
                                 liquorPrices={liquorPrices}
                             />
                         </div>
                     </div>
                 </div>
             </main>
+
+            {/* Undo Toast */}
+            {undoData && (
+                <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-4 z-50">
+                    <span className="text-sm font-medium">Drink removed</span>
+                    <button
+                        onClick={handleUndo}
+                        className="text-[#f54900] font-bold text-sm hover:text-[#ff7a45] transition-colors uppercase tracking-wide"
+                    >
+                        Undo
+                    </button>
+                </div>
+            )}
+
+            {/* Recipe Modal */}
+            {viewingRecipe && (
+                <RecipeModal
+                    batch={viewingRecipe}
+                    onClose={() => setViewingRecipe(null)}
+                />
+            )}
+
+            {/* Batching Modal */}
+            {viewingBatch && (
+                <BatchingInstructionsModal
+                    batch={viewingBatch}
+                    onClose={() => setViewingBatch(null)}
+                />
+            )}
         </div>
     )
 }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 
 // Import types
 import type { Ingredient, CocktailRecipe, BatchState, CocktailMethod } from "@/features/batch-calculator/types"
@@ -32,7 +33,10 @@ import { useToast, ToastContainer } from "@/components/ui"
 
 // Import components
 import { BatchCalculatorModal } from "@/features/batch-calculator/components"
-import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
+const EditRecipeModal = dynamic(
+  () => import("@/features/batch-calculator/components/EditRecipeModal").then(m => m.EditRecipeModal),
+  { ssr: false }
+)
 import { Modal } from "@/components/ui"
 import { Plus, Search, GlassWater, CheckCheck, FilterX, ChevronDown } from "lucide-react"
 
@@ -81,38 +85,27 @@ function BatchCalculatorContent() {
     enabled: true,
   })
 
-  // Fetch unique liquors and liquor prices
+  // Fetch unique liquors and liquor prices in parallel
   useEffect(() => {
-    const fetchLiquors = async () => {
-      try {
-        const response = await fetch('/api/cocktails?liquors=true')
-        if (response.ok) {
-          const data = await response.json()
-          const seen = new Map<string, string>()
-          for (const l of (data.liquors || [])) {
-            const key = l.toLowerCase()
-            const titled = l.replace(/\b\w/g, (c: string) => c.toUpperCase())
-            if (!seen.has(key)) seen.set(key, titled)
-          }
-          setAvailableLiquors(Array.from(seen.values()))
+    Promise.all([
+      fetch('/api/cocktails?liquors=true'),
+      fetch('/api/liquor-prices'),
+    ]).then(async ([liquorsRes, pricesRes]) => {
+      if (liquorsRes.ok) {
+        const data = await liquorsRes.json()
+        const seen = new Map<string, string>()
+        for (const l of (data.liquors || [])) {
+          const key = l.toLowerCase()
+          const titled = l.replace(/\b\w/g, (c: string) => c.toUpperCase())
+          if (!seen.has(key)) seen.set(key, titled)
         }
-      } catch (err) {
-        console.error('Failed to fetch liquors:', err)
+        setAvailableLiquors(Array.from(seen.values()))
       }
-    }
-    const fetchPrices = async () => {
-      try {
-        const response = await fetch('/api/liquor-prices')
-        if (response.ok) {
-          const data = await response.json()
-          setLiquorPrices(data)
-        }
-      } catch (err) {
-        console.error('Failed to fetch liquor prices:', err)
+      if (pricesRes.ok) {
+        const data = await pricesRes.json()
+        setLiquorPrices(data)
       }
-    }
-    fetchLiquors()
-    fetchPrices()
+    }).catch(err => console.error('Failed to fetch liquors/prices:', err))
   }, [])
 
   const { createCocktail } = useCreateCocktail()
@@ -123,6 +116,21 @@ function BatchCalculatorContent() {
     if (apiCocktails.length > 0) return apiCocktails
     return COCKTAIL_DATA
   }, [apiCocktails, cocktailsError])
+
+  // Pre-compute isMocktail once per cocktail load — avoids recomputing in both filter and render loop
+  const cocktailIsMocktailMap = useMemo(() => {
+    const map = new Map<number | undefined, boolean>()
+    for (const c of allCocktails) {
+      map.set(c.id, checkIsMocktail(c))
+    }
+    return map
+  }, [allCocktails])
+
+  // O(1) selected-ID lookup — avoids .some() O(n) scan per card in the render loop
+  const selectedIds = useMemo(
+    () => new Set(selectedCocktails.map(c => c.id)),
+    [selectedCocktails]
+  )
 
   // Filter Logic
   // Filter Logic
@@ -149,9 +157,9 @@ function BatchCalculatorContent() {
         if (filterType === 'Featured') {
           if (!cocktail.featured) return false
         } else if (filterType === 'Mocktail') {
-          if (!checkIsMocktail(cocktail)) return false
+          if (!cocktailIsMocktailMap.get(cocktail.id)) return false
         } else if (filterType === 'Cocktail') {
-          if (checkIsMocktail(cocktail)) return false
+          if (cocktailIsMocktailMap.get(cocktail.id)) return false
         }
       }
 
@@ -167,7 +175,7 @@ function BatchCalculatorContent() {
 
       return true
     })
-  }, [allCocktails, searchQuery, selectedSpirit, filterType, selectedGlass, selectedSeason])
+  }, [allCocktails, searchQuery, selectedSpirit, filterType, selectedGlass, selectedSeason, cocktailIsMocktailMap])
 
   // Sync batches with selected cocktails
   useEffect(() => {
@@ -222,12 +230,14 @@ function BatchCalculatorContent() {
   }, [])
 
   const handleRemoveBatch = useCallback((idToRemove: number) => {
-    const batchToRemove = batches.find(b => b.id === idToRemove)
-    if (batchToRemove?.selectedCocktail) {
-      setSelectedCocktails(prev => prev.filter(c => c.id !== batchToRemove.selectedCocktail!.id))
-    }
-    setBatches(prev => prev.filter(batch => batch.id !== idToRemove))
-  }, [batches])
+    setBatches(prev => {
+      const batchToRemove = prev.find(b => b.id === idToRemove)
+      if (batchToRemove?.selectedCocktail) {
+        setSelectedCocktails(c => c.filter(x => x.id !== batchToRemove.selectedCocktail!.id))
+      }
+      return prev.filter(batch => batch.id !== idToRemove)
+    })
+  }, [])
 
   const handleServingsChange = useCallback((id: number, value: string) => {
     if (batchesWithMissingServings.has(id)) {
@@ -355,7 +365,7 @@ function BatchCalculatorContent() {
 
   // Toggle Selection
   const toggleSelection = (cocktail: CocktailRecipe) => {
-    const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
+    const isSelected = selectedIds.has(cocktail.id)
     if (isSelected) {
       setSelectedCocktails(prev => prev.filter(c => c.id !== cocktail.id))
     } else {
@@ -508,12 +518,10 @@ function BatchCalculatorContent() {
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-6 w-full">
           {filteredCocktails.map(cocktail => {
-            const isSelected = selectedCocktails.some(c => c.id === cocktail.id)
-
-
+            const isSelected = selectedIds.has(cocktail.id)
 
             // ABV & Mocktail Logic
-            const isMocktail = checkIsMocktail(cocktail);
+            const isMocktail = cocktailIsMocktailMap.get(cocktail.id) ?? false;
 
             let abvBadge = null;
             if (isMocktail) {
@@ -523,7 +531,7 @@ function BatchCalculatorContent() {
                   <span className="text-[8px] sm:text-[10px] font-extrabold text-emerald-700 tracking-wider uppercase">Mocktail</span>
                 </div>
               )
-            } else if (cocktail.abv && cocktail.abv > 0) {
+            } else if (cocktail.abv !== undefined && cocktail.abv > 0) {
               abvBadge = (
                 <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg shadow-sm border border-amber-100 flex items-center gap-1 sm:gap-1.5 z-10 group-hover:scale-105 transition-transform">
                   <span className="text-[8px] sm:text-[10px] font-extrabold text-amber-700 tracking-wider uppercase">{cocktail.abv}% ABV</span>
