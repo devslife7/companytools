@@ -381,3 +381,144 @@ export const generatePdfReport = (batches: BatchState[], priceMap?: LiquorPriceM
   const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false, true) + generateShoppingListHtml(batches, priceMap) + generateBatchCalculationsHtml(batches, true) + `</body></html>`
   openPdfWindow(htmlContent)
 }
+
+// Generate Event Invoice HTML
+const generateInvoiceHtml = (batches: BatchState[], event: any) => {
+  const eventDate = new Date(event.eventDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+  const invoiceDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  const invoiceNumber = `INV-${event.id.toString().padStart(4, '0')}`;
+
+  let totalAmount = 0;
+
+  const tableRows = batches.map(batch => {
+    const recipe = batch.editableRecipe;
+    if (!recipe) return '';
+    const price = recipe.menuPrice || 0;
+    const servings = typeof batch.servings === 'number' ? batch.servings : parseInt(batch.servings || '0', 10);
+    const lineTotal = price * servings;
+    totalAmount += lineTotal;
+
+    return `
+        <tr class="item-row">
+          <td class="text-left">${recipe.name}</td>
+          <td class="text-center">${servings}</td>
+          <td class="text-right">$${price.toFixed(2)}</td>
+          <td class="text-right">$${lineTotal.toFixed(2)}</td>
+        </tr>
+      `;
+  }).join('');
+
+  const TAX_RATE = 0.0825; // 8.25%
+  const taxAmount = totalAmount * TAX_RATE;
+  const grandTotal = totalAmount + taxAmount;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Invoice - ${event.name}</title>
+        <style>
+            body { font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 20mm; color: #1f2937; background: #f9fafb; line-height: 1.5; }
+            .invoice-wrapper { max-width: 800px; margin: auto; padding: 40px; background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border-radius: 12px; }
+            table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; }
+            table td { padding: 12px 16px; vertical-align: top; }
+            .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f3f4f6; padding-bottom: 30px; }
+            .company-info { font-size: 14px; color: #4b5563; }
+            .company-name { font-size: 28px; font-weight: 800; color: #f54900; margin-bottom: 6px; letter-spacing: -0.5px; }
+            .invoice-details { text-align: right; }
+            .invoice-title { font-size: 32px; font-weight: 800; color: #111827; margin-bottom: 8px; letter-spacing: -0.5px; text-transform: uppercase; }
+            .invoice-meta { font-size: 14px; color: #4b5563; }
+            .event-info { margin-bottom: 30px; background: #fdf2f8; padding: 20px; border-radius: 8px; border: 1px solid #fce7f3; }
+            .event-info h3 { margin: 0 0 10px 0; color: #be185d; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+            .event-info p { margin: 0; color: #111827; font-size: 15px; }
+            .items-table { margin-top: 20px; }
+            .items-table th { padding: 12px 16px; background: #f9fafb; color: #4b5563; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e5e7eb; border-top: 1px solid #e5e7eb; }
+            .items-table th.text-center { text-align: center; }
+            .items-table th.text-right { text-align: right; }
+            .items-table td.text-left { text-align: left; }
+            .items-table td.text-center { text-align: center; }
+            .items-table td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
+            .item-row td { border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #111827; }
+            .item-row td.text-left { font-weight: 500; }
+            .item-row:last-child td { border-bottom: none; }
+            .total-section { width: 320px; float: right; margin-top: 30px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+            .total-row { display: flex; justify-content: space-between; padding: 12px 20px; font-size: 14px; color: #4b5563; }
+            .total-row.grand-total { border-top: 1px solid #e5e7eb; font-size: 20px; font-weight: 800; color: #111827; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+            .grand-total .amount { color: #f54900; }
+            .footer { margin-top: 80px; text-align: center; color: #6b7280; font-size: 13px; clear: both; border-top: 1px solid #e5e7eb; padding-top: 24px; }
+            
+            @media print {
+                body { background: #fff; padding: 0; }
+                .invoice-wrapper { box-shadow: none; border: none; padding: 20px; max-width: 100%; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="invoice-wrapper">
+            <div class="header-info">
+                <div class="company-info">
+                    <div class="company-name">Catering Co.</div>
+                    123 Event Street<br>
+                    Suite 100<br>
+                    City, State 12345<br>
+                    contact@catering.com
+                </div>
+                <div class="invoice-details">
+                    <div class="invoice-title">Invoice</div>
+                    <div class="invoice-meta">
+                        <strong>Invoice Number:</strong> ${invoiceNumber}<br>
+                        <strong>Date:</strong> ${invoiceDate}
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-info">
+                <h3>Event Overview</h3>
+                <p>
+                    <strong>${event.name}</strong> • ${eventDate}
+                </p>
+            </div>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th class="text-left">Cocktail</th>
+                        <th class="text-center">Servings</th>
+                        <th class="text-right">Price</th>
+                        <th class="text-right">Line Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span>$${totalAmount.toFixed(2)}</span>
+                </div>
+                <div class="total-row">
+                    <span>Tax (8.25%)</span>
+                    <span>$${taxAmount.toFixed(2)}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total Due</span>
+                    <span class="amount">$${grandTotal.toFixed(2)}</span>
+                </div>
+            </div>
+
+            <div class="footer">
+                Thank you for your business! Please make checks payable to Catering Co.<br>
+                For payment questions, please contact us at billing@catering.com.
+            </div>
+        </div>
+    </body>
+    </html>
+  `
+}
+
+export const generateClientInvoicePdf = (batches: BatchState[], event: any) => {
+  const htmlContent = generateInvoiceHtml(batches, event)
+  openPdfWindow(htmlContent)
+}

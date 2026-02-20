@@ -2,7 +2,10 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Trash2, ExternalLink } from "lucide-react"
+import { Trash2, ExternalLink, FileText } from "lucide-react"
+import { generateClientInvoicePdf } from "@/features/batch-calculator/lib/pdf-generator"
+import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
+import type { BatchState, CocktailRecipe } from "@/features/batch-calculator/types"
 
 interface EventRecipe {
     cocktailId: number
@@ -25,6 +28,7 @@ interface EventCardProps {
 
 export function EventCard({ event, onDeleted }: EventCardProps) {
     const [deleting, setDeleting] = useState(false)
+    const [generating, setGenerating] = useState(false)
 
     const formattedEventDate = new Date(event.eventDate).toLocaleDateString("en-US", {
         year: "numeric",
@@ -40,6 +44,7 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
     })
 
     const recipeIds = event.recipes.map(r => r.cocktailId).join(",")
+    const servings = event.recipes.map(r => r.servings).join(",")
 
     const handleDelete = async () => {
         if (!confirm(`Delete "${event.name}"? This cannot be undone.`)) return
@@ -55,6 +60,45 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
         } catch {
             alert("Failed to delete event. Please try again.")
             setDeleting(false)
+        }
+    }
+
+    const handleInvoice = async () => {
+        setGenerating(true)
+        try {
+            const cocktailsRes = await fetch('/api/cocktails')
+
+            if (!cocktailsRes.ok) throw new Error("Failed to fetch cocktail data")
+
+            const cocktailsData = await cocktailsRes.json()
+            const allCocktails: CocktailRecipe[] = cocktailsData.cocktails || []
+
+            // Map event recipes to full cocktail data
+            const batches: BatchState[] = event.recipes.map((r, index): BatchState | null => {
+                const cocktail = allCocktails.find(c => c.id === r.cocktailId)
+                if (!cocktail) return null
+
+                return {
+                    id: index + 1,
+                    selectedCocktail: cocktail,
+                    editableRecipe: JSON.parse(JSON.stringify(cocktail)) as CocktailRecipe, // Create a deep copy
+                    servings: r.servings,
+                    targetLiters: FIXED_BATCH_LITERS
+                }
+            }).filter((b): b is BatchState => b !== null)
+
+            if (batches.length === 0) {
+                alert("Could not find recipe data for this event. The recipes may have been deleted.")
+                return
+            }
+
+            generateClientInvoicePdf(batches, event)
+
+        } catch (error) {
+            console.error("Error generating invoice:", error)
+            alert("Failed to generate invoice. Please try again.")
+        } finally {
+            setGenerating(false)
         }
     }
 
@@ -95,8 +139,16 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
                     >
                         <Trash2 className="w-4 h-4" />
                     </button>
+                    <button
+                        onClick={handleInvoice}
+                        disabled={generating}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    >
+                        <FileText className="w-3.5 h-3.5" />
+                        {generating ? "..." : "Invoice"}
+                    </button>
                     <Link
-                        href={`/batch-calculator/review?recipes=${recipeIds}`}
+                        href={`/batch-calculator/review?recipes=${recipeIds}&servings=${servings}`}
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors"
                     >
                         <ExternalLink className="w-3.5 h-3.5" />

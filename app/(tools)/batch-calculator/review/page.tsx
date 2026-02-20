@@ -128,6 +128,11 @@ function BatchReviewContent() {
         return ids ? ids.split(",").map(id => parseInt(id, 10)).filter(id => !isNaN(id)) : []
     }, [searchParams])
 
+    const savedServings = useMemo(() => {
+        const s = searchParams.get("servings")
+        return s ? s.split(",").map(v => parseInt(v, 10)) : []
+    }, [searchParams])
+
     const { cocktails, loading } = useCocktails({ enabled: true })
     const [batches, setBatches] = useState<BatchState[]>([])
     const [measureSystem, setMeasureSystem] = useState<'us' | 'metric'>('us')
@@ -167,12 +172,12 @@ function BatchReviewContent() {
             id: index + 1,
             selectedCocktail: cocktail,
             editableRecipe: JSON.parse(JSON.stringify(cocktail)),
-            servings: "" as const,
+            servings: (savedServings[index] ?? 0) > 0 ? (savedServings[index] ?? 0) : "" as const,
             targetLiters: FIXED_BATCH_LITERS
         }))
 
         setBatches(newBatches)
-    }, [cocktails, loading, recipeIds, batches.length])
+    }, [cocktails, loading, recipeIds, savedServings, batches.length])
 
     const handleServingsChange = useCallback((id: number, value: string) => {
         setBatches(prev => prev.map(batch => {
