@@ -5,15 +5,16 @@ import { FileText, DollarSign, ShoppingCart, Info } from "lucide-react"
 import type { BatchState } from "@/features/batch-calculator/types"
 import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 import { formatNumber, CONVERSION_FACTORS, calculateSingleServingLiquidVolumeML, combineAmountAndUnit, parseAmount } from "@/features/batch-calculator/lib/calculations"
-import { generateShoppingListPdf, generateBatchCalculationsPdf } from "@/features/batch-calculator/lib/pdf-generator"
+import { generateOrderListPdf, generateClientInvoicePdf } from "@/features/batch-calculator/lib/pdf-generator"
 
 interface ReviewBatchSheetProps {
     batches: BatchState[]
     measureSystem: 'us' | 'metric'
     liquorPrices?: LiquorPriceMap
+    eventName?: string
 }
 
-export function ReviewBatchSheet({ batches, measureSystem, liquorPrices }: ReviewBatchSheetProps) {
+export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventName }: ReviewBatchSheetProps) {
     // Misc cost % (default 15%, persisted in localStorage)
     const [miscCostPercent, setMiscCostPercent] = useState<number>(() => {
         const saved = localStorage.getItem("batchMiscCostPercent")
@@ -237,35 +238,21 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices }: Revie
                             </div>
                         </div>
                     </div>
-
-                    {/* Avg per batch */}
-                    {financials.totalBatches > 0 && (
-                        <div className="mt-4 pt-4 border-t border-[#f54900]/10 space-y-2">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Avg. Cost / 20L Batch</span>
-                                <span className="text-sm font-mono font-medium text-gray-900">
-                                    ${formatNumber(financials.totalCost / financials.totalBatches, 2)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Avg. Revenue / 20L Batch</span>
-                                <span className="text-sm font-mono font-medium text-gray-900">
-                                    ${formatNumber(financials.totalRevenue / financials.totalBatches, 2)}
-                                </span>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <div className="pt-6 border-t border-[#f54900]/10 grid grid-cols-2 gap-3">
                     <button
-                        onClick={() => generateBatchCalculationsPdf(batches)}
+                        onClick={() => generateClientInvoicePdf(batches, {
+                            id: Date.now(),
+                            name: eventName || "Untitled Event",
+                            eventDate: new Date().toISOString(),
+                        })}
                         className="flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 transition-colors text-gray-900"
                     >
-                        <FileText className="text-sm mr-1 w-4 h-4" /> Batch Sheets
+                        <FileText className="text-sm mr-1 w-4 h-4" /> Invoice
                     </button>
                     <button
-                        onClick={() => generateShoppingListPdf(batches, liquorPrices)}
+                        onClick={() => generateOrderListPdf(batches, liquorPrices, eventName)}
                         className="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-xs font-medium text-white bg-[#f54900] hover:bg-[#d13e00] transition-colors shadow-sm"
                     >
                         <ShoppingCart className="text-sm mr-1 w-4 h-4" /> Order List

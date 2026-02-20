@@ -75,7 +75,7 @@ export default function SavedEventsPage() {
 
                 {/* Events grid */}
                 {events.length > 0 && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="flex flex-col gap-6">
                         {events.map(event => (
                             <EventCard key={event.id} event={event} onDeleted={handleDeleted} />
                         ))}

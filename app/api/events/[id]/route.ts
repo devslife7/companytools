@@ -14,6 +14,27 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
     }
 
+    // Get password from request body
+    const body = await _request.json().catch(() => ({}))
+    const { password } = body
+
+    // Validate password
+    const requiredPassword = process.env.DELETE_RECIPE_PASSWORD
+    if (!requiredPassword) {
+      console.error('DELETE_RECIPE_PASSWORD environment variable is not set')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
+    if (!password || password !== requiredPassword) {
+      return NextResponse.json(
+        { error: 'Incorrect password' },
+        { status: 401 }
+      )
+    }
+
     await prisma.savedEvent.delete({ where: { id: eventId } })
     return NextResponse.json({ success: true })
   } catch (error: any) {

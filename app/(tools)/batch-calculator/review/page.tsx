@@ -26,23 +26,25 @@ import { ReviewDrinkSelection } from "@/features/batch-calculator/components/Rev
 import { ReviewBatchSheet } from "@/features/batch-calculator/components/ReviewBatchSheet"
 import { BatchingInstructionsModal } from "@/features/batch-calculator/components/BatchingInstructionsModal"
 import { RecipeModal } from "@/features/batch-calculator/components/RecipeModal"
+import { EditRecipeModal } from "@/features/batch-calculator/components/EditRecipeModal"
 
 // ── Save Event Modal ──────────────────────────────────────────────────────────
 
 interface SaveEventModalProps {
     eventName: string
     onClose: () => void
-    onSave: (eventDate: string) => Promise<void>
+    onSave: (eventDate: string, eventName: string) => Promise<void>
     saveStatus: "idle" | "saving" | "saved" | "error"
 }
 
 function SaveEventModal({ eventName, onClose, onSave, saveStatus }: SaveEventModalProps) {
     const [eventDate, setEventDate] = useState("")
+    const [editableName, setEditableName] = useState(eventName || "Untitled Event")
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!eventDate) return
-        await onSave(eventDate)
+        await onSave(eventDate, editableName.trim() || "Untitled Event")
     }
 
     return (
@@ -60,12 +62,19 @@ function SaveEventModal({ eventName, onClose, onSave, saveStatus }: SaveEventMod
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="event-name" className="block text-sm font-medium text-gray-700 mb-1">
                             Event Name
                         </label>
-                        <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 font-medium">
-                            {eventName || "Untitled Event"}
-                        </p>
+                        <input
+                            id="event-name"
+                            type="text"
+                            value={editableName}
+                            onChange={(e) => setEditableName(e.target.value)}
+                            placeholder="Untitled Event"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-[#f54900] focus:border-[#f54900] outline-none"
+                            autoFocus
+                            onFocus={(e) => e.target.select()}
+                        />
                     </div>
 
                     <div>
@@ -141,10 +150,10 @@ function BatchReviewContent() {
     // UI State
     const [viewingBatch, setViewingBatch] = useState<BatchState | null>(null)
     const [viewingRecipe, setViewingRecipe] = useState<BatchState | null>(null)
+    const [editingRecipe, setEditingRecipe] = useState<BatchState | null>(null)
     const [eventName, setEventName] = useState("Untitled Event")
     const [bulkServings, setBulkServings] = useState<string>("")
-    const [undoData, setUndoData] = useState<{ batch: BatchState, index: number } | null>(null)
-    const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const [removedIds, setRemovedIds] = useState<number[]>([])
 
     // Save modal state
     const [saveModalOpen, setSaveModalOpen] = useState(false)
@@ -188,52 +197,53 @@ function BatchReviewContent() {
         }))
     }, [])
 
+    const activeBatches = useMemo(() => batches.filter(b => !removedIds.includes(b.id)), [batches, removedIds])
+
     const handleRemoveDrink = useCallback((id: number) => {
-        let removed: { batch: BatchState; index: number } | null = null
+        setRemovedIds(prev => {
+            if (prev.includes(id)) return prev
+            const newRemoved = [...prev, id]
 
-        setBatches(prev => {
-            const index = prev.findIndex(b => b.id === id)
-            if (index === -1) return prev
-            removed = { batch: prev[index], index }
-            const newBatches = prev.filter(b => b.id !== id)
-            const newRecipeIds = newBatches.map(b => b.selectedCocktail?.id).filter(Boolean)
-            router.replace(`/batch-calculator/review?recipes=${newRecipeIds.join(",")}`, { scroll: false })
-            return newBatches
+            setBatches(currentBatches => {
+                const updatedActive = currentBatches.filter(b => !newRemoved.includes(b.id))
+                const newRecipeIds = updatedActive.map(b => b.selectedCocktail?.id).filter(Boolean)
+                setTimeout(() => {
+                    router.replace(`/batch-calculator/review?recipes=${newRecipeIds.join(",")}`, { scroll: false })
+                }, 0)
+                return currentBatches
+            })
+
+            return newRemoved
         })
-
-        if (removed) {
-            setUndoData(removed)
-            if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
-            undoTimerRef.current = setTimeout(() => setUndoData(null), 5000)
-        }
     }, [router])
 
-    const handleUndo = useCallback(() => {
-        if (!undoData) return
+    const handleRestoreDrink = useCallback((id: number) => {
+        setRemovedIds(prev => {
+            if (!prev.includes(id)) return prev
+            const newRemoved = prev.filter(r => r !== id)
 
-        setBatches(prev => {
-            const newBatches = [...prev]
-            if (undoData.index >= 0 && undoData.index <= newBatches.length) {
-                newBatches.splice(undoData.index, 0, undoData.batch)
-            } else {
-                newBatches.push(undoData.batch)
-            }
-            const newRecipeIds = newBatches.map(b => b.selectedCocktail?.id).filter(Boolean)
-            router.replace(`/batch-calculator/review?recipes=${newRecipeIds.join(",")}`, { scroll: false })
-            return newBatches
+            setBatches(currentBatches => {
+                const updatedActive = currentBatches.filter(b => !newRemoved.includes(b.id))
+                const newRecipeIds = updatedActive.map(b => b.selectedCocktail?.id).filter(Boolean)
+                setTimeout(() => {
+                    router.replace(`/batch-calculator/review?recipes=${newRecipeIds.join(",")}`, { scroll: false })
+                }, 0)
+                return currentBatches
+            })
+
+            return newRemoved
         })
-        setUndoData(null)
-    }, [undoData, router])
+    }, [router])
 
     const handleApplyBulkServings = () => {
         const num = parseInt(bulkServings, 10)
         if (!isNaN(num) && num >= 0) {
-            setBatches(prev => prev.map(b => ({ ...b, servings: num })))
+            setBatches(prev => prev.map(b => removedIds.includes(b.id) ? b : { ...b, servings: num }))
         }
     }
 
     const handlePrint = () => {
-        generatePdfReport(batches, liquorPrices)
+        generatePdfReport(activeBatches, liquorPrices)
     }
 
     const handleUpdateBatch = useCallback((updatedBatch: BatchState) => {
@@ -241,16 +251,16 @@ function BatchReviewContent() {
         setViewingBatch(prev => prev && prev.id === updatedBatch.id ? updatedBatch : prev)
     }, [])
 
-    const handleSaveEvent = async (eventDate: string) => {
+    const handleSaveEvent = async (eventDate: string, name: string) => {
         setSaveStatus("saving")
         try {
             const res = await fetch('/api/events', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: eventName || "Untitled Event",
+                    name: name || eventName || "Untitled Event",
                     eventDate,
-                    recipes: batches
+                    recipes: activeBatches
                         .filter(b => b.selectedCocktail != null)
                         .map(b => ({
                             cocktailId: b.selectedCocktail!.id,
@@ -262,6 +272,7 @@ function BatchReviewContent() {
 
             if (!res.ok) throw new Error('Save failed')
 
+            setEventName(name || eventName || "Untitled Event")
             setSaveStatus("idle")
             setSaveModalOpen(false)
             setSavedToast(true)
@@ -294,24 +305,22 @@ function BatchReviewContent() {
             <header className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
                 <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-20 items-center">
-                        <div className="flex items-center gap-4">
-                            <Link href={`/batch-calculator?recipes=${recipeIds.join(",")}`}>
-                                <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-lg bg-gray-100 text-gray-500 border border-dashed border-gray-300 hover:bg-gray-200 hover:text-gray-700 transition-colors">
-                                    <ArrowLeft className="w-5 h-5" />
-                                </div>
+                        <div className="flex items-center gap-5">
+                            <Link
+                                href={`/batch-calculator?recipes=${recipeIds.join(",")}`}
+                                className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                Back
                             </Link>
 
-                            <div className="flex flex-col">
-                                <input
-                                    className="block w-full text-lg font-bold leading-tight bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-[#f54900] focus:ring-0 p-0 placeholder-gray-400 transition-colors text-gray-900"
-                                    placeholder="Untitled Event"
-                                    type="text"
-                                    value={eventName}
-                                    onChange={(e) => setEventName(e.target.value)}
-                                />
-                                <p className="text-xs flex items-center gap-1 mt-0.5">
-                                    <span className="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide border border-gray-200">Draft</span>
+                            <div className="w-px h-6 bg-gray-200" />
+
+                            <div className="flex flex-col gap-1">
+                                <p className="text-lg font-bold leading-tight text-gray-900">
+                                    {eventName || <span className="text-gray-300 font-normal">New event…</span>}
                                 </p>
+                                <span className="bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border border-gray-200 self-start">Draft</span>
                             </div>
                         </div>
 
@@ -342,39 +351,62 @@ function BatchReviewContent() {
                     <div className="lg:col-span-7 space-y-6">
                         <div className="flex items-center justify-between mb-2">
                             <h2 className="text-xl font-bold text-gray-900">Drink Selection</h2>
-                            <span className="text-sm font-medium text-gray-500">{batches.length} items selected</span>
+                            <span className="text-sm font-medium text-gray-500">{activeBatches.length} items selected</span>
                         </div>
 
                         {/* Bulk Actions */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-3 w-full">
-                                <div className="p-2 rounded-lg bg-gray-100 text-gray-500">
-                                    <Settings2 className="w-5 h-5" />
-                                </div>
-                                <label htmlFor="bulk-servings" className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                                    Set Target Servings for all
-                                </label>
-                            </div>
-                            <div className="flex items-center gap-3 w-full sm:w-auto">
-                                <div className="relative rounded-md shadow-sm w-full sm:w-32">
-                                    <input
-                                        id="bulk-servings"
-                                        className="focus:ring-[#f54900] focus:border-[#f54900] block w-full sm:text-sm border-gray-200 rounded-lg pl-3 pr-10 py-2 font-semibold bg-white text-gray-900 placeholder:text-gray-400"
-                                        placeholder="100"
-                                        type="number"
-                                        value={bulkServings}
-                                        onChange={(e) => setBulkServings(e.target.value)}
-                                    />
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <span className="text-gray-500 sm:text-xs">qty</span>
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center gap-3 w-full">
+                                    <div className="p-2 rounded-lg bg-gray-100 text-gray-500">
+                                        <Settings2 className="w-5 h-5" />
                                     </div>
+                                    <label htmlFor="bulk-servings" className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                                        Set Target Servings for all
+                                    </label>
                                 </div>
-                                <button
-                                    onClick={handleApplyBulkServings}
-                                    className="flex items-center justify-center px-4 py-2 bg-[#f54900] text-white rounded-lg text-sm font-medium hover:bg-[#d13e00] transition-colors shadow-sm whitespace-nowrap"
-                                >
-                                    Apply
-                                </button>
+                                <div className="flex items-center gap-3 w-full sm:w-auto">
+                                    <div className="relative rounded-md shadow-sm w-full sm:w-32">
+                                        <input
+                                            id="bulk-servings"
+                                            className="focus:ring-[#f54900] focus:border-[#f54900] block w-full sm:text-sm border-gray-200 rounded-lg pl-3 pr-10 py-2 font-semibold bg-white text-gray-900 placeholder:text-gray-400"
+                                            placeholder="100"
+                                            type="number"
+                                            value={bulkServings}
+                                            onChange={(e) => setBulkServings(e.target.value)}
+                                        />
+                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <span className="text-gray-500 sm:text-xs">qty</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleApplyBulkServings}
+                                        className="flex items-center justify-center px-4 py-2 bg-[#f54900] text-white rounded-lg text-sm font-medium hover:bg-[#d13e00] transition-colors shadow-sm whitespace-nowrap"
+                                    >
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 pt-4 mt-4 border-t border-gray-100 justify-end sm:justify-start">
+                                <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider mr-1">Quick Presets:</span>
+                                {[50, 100, 150, 200, 250, 300].map(qty => {
+                                    const isActive = bulkServings === qty.toString();
+                                    return (
+                                        <button
+                                            key={qty}
+                                            onClick={() => {
+                                                setBulkServings(qty.toString());
+                                            }}
+                                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm border ${isActive
+                                                ? 'bg-[#f54900] text-white border-[#f54900]'
+                                                : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-[#f54900] hover:text-white hover:border-[#f54900]'
+                                                }`}
+                                        >
+                                            {qty}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -389,6 +421,9 @@ function BatchReviewContent() {
                                     measureSystem="metric"
                                     onViewBatching={setViewingBatch}
                                     onViewRecipe={setViewingRecipe}
+                                    onEditRecipe={setEditingRecipe}
+                                    isRemoved={removedIds.includes(batch.id)}
+                                    onRestore={handleRestoreDrink}
                                 />
                             ))}
                         </div>
@@ -407,27 +442,15 @@ function BatchReviewContent() {
                     <div className="lg:col-span-5 sticky top-24">
                         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full max-h-[calc(100vh-140px)]">
                             <ReviewBatchSheet
-                                batches={batches}
+                                batches={activeBatches}
                                 measureSystem="metric"
                                 liquorPrices={liquorPrices}
+                                eventName={eventName}
                             />
                         </div>
                     </div>
                 </div>
             </main>
-
-            {/* Undo Toast */}
-            {undoData && (
-                <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-4 z-50">
-                    <span className="text-sm font-medium">Drink removed</span>
-                    <button
-                        onClick={handleUndo}
-                        className="text-[#f54900] font-bold text-sm hover:text-[#ff7a45] transition-colors uppercase tracking-wide"
-                    >
-                        Undo
-                    </button>
-                </div>
-            )}
 
             {/* Saved Toast */}
             {savedToast && (
@@ -466,6 +489,24 @@ function BatchReviewContent() {
                     batch={viewingBatch}
                     onClose={() => setViewingBatch(null)}
                     onUpdate={handleUpdateBatch}
+                />
+            )}
+
+            {/* Edit Recipe Modal */}
+            {editingRecipe && (
+                <EditRecipeModal
+                    isOpen={true}
+                    mode="edit"
+                    onClose={() => setEditingRecipe(null)}
+                    recipe={editingRecipe.selectedCocktail}
+                    cocktailId={undefined}
+                    onSave={(updatedRecipe) => {
+                        handleUpdateBatch({
+                            ...editingRecipe,
+                            selectedCocktail: updatedRecipe
+                        })
+                        setEditingRecipe(null)
+                    }}
                 />
             )}
         </div>

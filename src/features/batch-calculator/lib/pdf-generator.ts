@@ -522,3 +522,148 @@ export const generateClientInvoicePdf = (batches: BatchState[], event: any) => {
   const htmlContent = generateInvoiceHtml(batches, event)
   openPdfWindow(htmlContent)
 }
+
+// Generate Order List HTML (invoice-style design)
+const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap, eventName?: string) => {
+  const reportData = batches.filter(
+    b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
+  )
+  const grandTotals = calculateGrandTotals(reportData, priceMap)
+  const orderDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  const orderNumber = `ORD-${Date.now().toString().slice(-6)}`
+
+  const hasPrices = grandTotals.liquor.some(item => item.estimatedCost != null)
+
+  const renderSection = (title: string, color: string, bg: string, items: typeof grandTotals.liquor, showBottles: boolean) => {
+    if (items.length === 0) return ''
+    const rows = items.map(item => `
+      <tr class="item-row">
+        <td class="text-left">${item.name}</td>
+        <td class="text-center">${formatOrderUnit((item as any).orderUnit, (item as any).orderUnitValue)}</td>
+        ${showBottles ? `<td class="text-center">${!isAngosturaBitters(item.name) && item.bottles > 0
+          ? `<span class="bottle-exact">(${formatNumber(item.bottles)})</span> <strong>${Math.ceil(item.bottles)}</strong>`
+          : '—'}</td>` : `<td class="text-center">—</td>`}
+        <td class="text-right">${hasPrices && item.estimatedCost != null ? `$${item.estimatedCost.toFixed(2)}` : '—'}</td>
+      </tr>
+    `).join('')
+
+    return `
+      <tr class="section-header" style="background:${bg};">
+        <td colspan="4" style="padding:10px 16px; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:${color}; border-bottom:2px solid ${color}20;">${title}</td>
+      </tr>
+      ${rows}
+    `
+  }
+
+  const liquorSection = renderSection('Liquor Items', '#f54900', '#fff7f4', grandTotals.liquor, true)
+  const sodaSection = renderSection('Soda & Mixers', '#0369a1', '#f0f9ff', grandTotals.soda as any, false)
+  const otherSection = renderSection('Other Items', '#047857', '#f0fdf4', grandTotals.other as any, false)
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Order List${eventName ? ` — ${eventName}` : ''}</title>
+        <style>
+            body { font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 20mm; color: #1f2937; background: #f9fafb; line-height: 1.5; }
+            .wrapper { max-width: 800px; margin: auto; padding: 40px; background: #ffffff; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); border-radius: 12px; }
+            .header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f3f4f6; padding-bottom: 30px; }
+            .company-name { font-size: 28px; font-weight: 800; color: #f54900; margin-bottom: 6px; letter-spacing: -0.5px; }
+            .company-info { font-size: 14px; color: #4b5563; }
+            .doc-details { text-align: right; }
+            .doc-title { font-size: 32px; font-weight: 800; color: #111827; margin-bottom: 8px; letter-spacing: -0.5px; text-transform: uppercase; }
+            .doc-meta { font-size: 14px; color: #4b5563; }
+            .event-bar { margin-bottom: 28px; background: #fff7f4; padding: 16px 20px; border-radius: 8px; border: 1px solid #fed7c3; display: flex; align-items: center; gap: 12px; }
+            .event-bar-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #f54900; }
+            .event-bar-name { font-size: 15px; font-weight: 600; color: #111827; }
+            table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+            thead th { padding: 12px 16px; background: #f9fafb; color: #4b5563; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e5e7eb; }
+            thead th.text-left { text-align: left; }
+            thead th.text-center { text-align: center; }
+            thead th.text-right { text-align: right; }
+            .item-row td { padding: 11px 16px; font-size: 14px; color: #111827; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+            .item-row:last-child td { border-bottom: none; }
+            .item-row td.text-left { font-weight: 500; }
+            .item-row td.text-center { text-align: center; }
+            .item-row td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
+            .bottle-exact { font-size: 11px; color: #9ca3af; font-weight: 400; }
+            .total-section { width: 280px; float: right; margin-top: 28px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+            .total-row { display: flex; justify-content: space-between; padding: 12px 20px; font-size: 14px; color: #4b5563; border-bottom: 1px solid #f3f4f6; }
+            .total-row:last-child { border-bottom: none; }
+            .total-row.grand-total { font-size: 18px; font-weight: 800; color: #111827; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+            .grand-total .amount { color: #f54900; }
+            .footer { margin-top: 80px; text-align: center; color: #6b7280; font-size: 13px; clear: both; border-top: 1px solid #e5e7eb; padding-top: 24px; }
+            @media print {
+                body { background: #fff; padding: 0; }
+                .wrapper { box-shadow: none; border: none; padding: 20px; max-width: 100%; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="header-info">
+                <div class="company-info">
+                    <div class="company-name">Catering Co.</div>
+                    123 Event Street<br>
+                    Suite 100<br>
+                    City, State 12345<br>
+                    contact@catering.com
+                </div>
+                <div class="doc-details">
+                    <div class="doc-title">Order List</div>
+                    <div class="doc-meta">
+                        <strong>Order #:</strong> ${orderNumber}<br>
+                        <strong>Date:</strong> ${orderDate}
+                    </div>
+                </div>
+            </div>
+
+            ${eventName ? `
+            <div class="event-bar">
+                <span class="event-bar-label">Event</span>
+                <span class="event-bar-name">${eventName}</span>
+            </div>
+            ` : ''}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-left">Ingredient</th>
+                        <th class="text-center">Qty Needed</th>
+                        <th class="text-center">Bottles (750ml)</th>
+                        <th class="text-right">Est. Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${liquorSection}
+                    ${sodaSection}
+                    ${otherSection}
+                </tbody>
+            </table>
+
+            ${hasPrices && grandTotals.totalLiquorCost > 0 ? `
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Liquor Cost</span>
+                    <span>$${grandTotals.totalLiquorCost.toFixed(2)}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Est. Total</span>
+                    <span class="amount">$${grandTotals.totalLiquorCost.toFixed(2)}</span>
+                </div>
+            </div>
+            ` : ''}
+
+            <div class="footer">
+                Generated by Catering Co. internal tools &mdash; for internal use only.
+            </div>
+        </div>
+    </body>
+    </html>
+  `
+}
+
+export const generateOrderListPdf = (batches: BatchState[], priceMap?: LiquorPriceMap, eventName?: string) => {
+  const htmlContent = generateOrderListHtml(batches, priceMap, eventName)
+  openPdfWindow(htmlContent)
+}

@@ -935,7 +935,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
                     }
                   }}
                   placeholder="Enter password"
-                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 text-base md:text-base min-h-[44px] md:min-h-0"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400 focus:ring-0 text-gray-900 text-base md:text-base min-h-[44px] md:min-h-0 transition-colors"
                   autoFocus
                   inputMode="text"
                 />
