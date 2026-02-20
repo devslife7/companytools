@@ -7,6 +7,7 @@ import {
     ArrowLeft,
     Save,
     FileDown,
+    ChevronDown,
     Settings2,
     Plus,
     X
@@ -15,7 +16,7 @@ import {
 // Types
 import type { BatchState } from "@/features/batch-calculator/types"
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
-import { generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
+import { generateShoppingListPdf, generateBatchCalculationsPdf, generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
 import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 
 // Hooks
@@ -161,6 +162,10 @@ function BatchReviewContent() {
     const [savedToast, setSavedToast] = useState(false)
     const savedToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+    // Export dropdown state
+    const [exportOpen, setExportOpen] = useState(false)
+    const exportRef = useRef<HTMLDivElement>(null)
+
     // Fetch liquor prices
     useEffect(() => {
         fetch('/api/liquor-prices')
@@ -181,7 +186,7 @@ function BatchReviewContent() {
             id: index + 1,
             selectedCocktail: cocktail,
             editableRecipe: JSON.parse(JSON.stringify(cocktail)),
-            servings: (savedServings[index] ?? 0) > 0 ? (savedServings[index] ?? 0) : "" as const,
+            servings: (savedServings[index] ?? 0) > 0 ? (savedServings[index] ?? 0) : 100,
             targetLiters: FIXED_BATCH_LITERS
         }))
 
@@ -242,9 +247,6 @@ function BatchReviewContent() {
         }
     }
 
-    const handlePrint = () => {
-        generatePdfReport(activeBatches, liquorPrices)
-    }
 
     const handleUpdateBatch = useCallback((updatedBatch: BatchState) => {
         setBatches(prev => prev.map(b => b.id === updatedBatch.id ? updatedBatch : b))
@@ -325,13 +327,45 @@ function BatchReviewContent() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={handlePrint}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-all shadow-sm"
-                            >
-                                <FileDown className="w-4 h-4" />
-                                Export PDF
-                            </button>
+                            <div className="relative" ref={exportRef}>
+                                <div className="flex items-stretch border border-gray-300 rounded-lg shadow-sm overflow-hidden bg-white">
+                                    <button
+                                        onClick={() => generatePdfReport(activeBatches, liquorPrices)}
+                                        className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <FileDown className="w-4 h-4" />
+                                        Export PDF
+                                    </button>
+                                    <div className="w-px bg-gray-300" />
+                                    <button
+                                        onClick={() => setExportOpen(o => !o)}
+                                        onBlur={(e) => { if (!exportRef.current?.contains(e.relatedTarget as Node)) setExportOpen(false) }}
+                                        className="flex items-center px-2.5 text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors"
+                                        aria-label="More export options"
+                                    >
+                                        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${exportOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                </div>
+                                {exportOpen && (
+                                    <div className="absolute right-0 top-full mt-1.5 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30">
+                                        <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Export individual</p>
+                                        <button
+                                            onMouseDown={() => { generateBatchCalculationsPdf(activeBatches); setExportOpen(false) }}
+                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                        >
+                                            <FileDown className="w-3.5 h-3.5 text-gray-400" />
+                                            Batch Sheets
+                                        </button>
+                                        <button
+                                            onMouseDown={() => { generateShoppingListPdf(activeBatches, liquorPrices); setExportOpen(false) }}
+                                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                                        >
+                                            <FileDown className="w-3.5 h-3.5 text-gray-400" />
+                                            Shopping List
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 onClick={() => { setSaveStatus("idle"); setSaveModalOpen(true) }}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-[#f54900] text-white rounded-lg text-sm font-semibold hover:bg-[#d13e00] transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
