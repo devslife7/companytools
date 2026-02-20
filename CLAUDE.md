@@ -60,5 +60,9 @@ Selected recipes are passed to the review page via URL query params (`?recipes=1
 - Mark client components explicitly with `"use client"` — pages are server-rendered by default.
 - Always use the Prisma singleton from `src/lib/db/prisma.ts` in API routes.
 
+## UI Work
+
+Before making any UI changes — new components, layout modifications, style tweaks — **read `DESIGN_SYSTEM.md` first** and follow it exactly. It documents the project's colors, typography, spacing, border radius, shadows, component patterns, and layout conventions. Do not introduce new design tokens or styling patterns that aren't already in the design system without updating that file.
+
 ## Do Not
 - Do not run `npm run db:seed` without asking the user first.
