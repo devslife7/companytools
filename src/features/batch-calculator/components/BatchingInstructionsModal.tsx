@@ -1,7 +1,17 @@
 import React from 'react'
 import { X, FlaskConical, ClipboardList } from 'lucide-react'
 import type { BatchState } from '../types'
-import { calculateBatch, formatNumber, LITER_TO_ML } from '../lib/calculations'
+import {
+    calculateBatch,
+    calculateSingleServingLiquidVolumeML,
+    formatNumber,
+    LITER_TO_ML,
+    FIXED_BATCH_LITERS,
+    BOTTLE_SIZE_ML,
+    combineAmountAndUnit,
+    parseAmount,
+    CONVERSION_FACTORS,
+} from '../lib/calculations'
 import { isLiquorItem, isSodaItem } from '../lib/ingredient-helpers'
 
 interface BatchingInstructionsModalProps {
@@ -16,6 +26,27 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
     const activeRecipe = batch.editableRecipe || batch.selectedCocktail
     const servings = batch.servings
     const numServings = typeof servings === 'number' ? servings : 0
+
+    // 20L batching logic
+    const twentyLiterML = FIXED_BATCH_LITERS * LITER_TO_ML
+    const singleServingVolumeML = calculateSingleServingLiquidVolumeML(activeRecipe)
+    const totalBatchML = activeRecipe.ingredients.reduce((sum, ing) => {
+        const calc = calculateBatch(numServings, ing.amount, ing.unit)
+        return calc.unitType === 'liquid' ? sum + calc.ml : sum
+    }, 0)
+    const shouldShow20LBatch = totalBatchML > twentyLiterML && singleServingVolumeML > 0
+
+    const perBatchIngredients = shouldShow20LBatch
+        ? activeRecipe.ingredients.map(ing => {
+            const amountString = combineAmountAndUnit(ing.amount, ing.unit)
+            const { baseAmount, unit, type } = parseAmount(amountString)
+            if (type !== 'liquid') return { name: ing.name, ml: 0, bottles: 0, isLiquid: false }
+            const ingredientML = baseAmount * (CONVERSION_FACTORS[unit] || 0)
+            const proportion = ingredientML / singleServingVolumeML
+            const finalML = twentyLiterML * proportion
+            return { name: ing.name, ml: finalML, bottles: finalML / BOTTLE_SIZE_ML, isLiquid: true }
+        })
+        : []
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -68,7 +99,10 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                                 <tr>
                                     <th className="px-3 sm:px-5 py-3 font-bold">Ingredient</th>
                                     <th className="px-3 sm:px-5 py-3 text-right font-bold w-24 sm:w-32 border-l border-gray-200">Single</th>
-                                    <th className="px-3 sm:px-5 py-3 text-right font-bold text-[#f54900] w-32 sm:w-40 border-l border-gray-200 bg-[#f54900]/5">Batch Total</th>
+                                    <th className={`px-3 sm:px-5 py-3 text-right font-bold text-[#f54900] w-32 sm:w-40 border-l border-gray-200 ${!shouldShow20LBatch ? 'bg-[#f54900]/5' : ''}`}>Batch Total</th>
+                                    {shouldShow20LBatch && (
+                                        <th className="px-3 sm:px-5 py-3 text-right font-bold text-[#f54900] w-32 sm:w-40 border-l border-gray-200 bg-[#f54900]/5">Per {FIXED_BATCH_LITERS}L</th>
+                                    )}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 bg-white">
@@ -80,7 +114,7 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                                             <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-right text-gray-500 font-medium border-l border-gray-100">
                                                 {ing.amount} <span className="text-xs text-gray-400">{ing.unit}</span>
                                             </td>
-                                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-right font-mono font-bold text-gray-900 border-l border-gray-100 bg-[#f54900]/[0.02]">
+                                            <td className={`px-3 sm:px-5 py-2.5 sm:py-3 text-right font-mono font-bold text-gray-900 border-l border-gray-100 ${!shouldShow20LBatch ? 'bg-[#f54900]/[0.02]' : ''}`}>
                                                 {calculated.unitType === 'liquid' && !isSodaItem(ing.name) ? (
                                                     <div className="flex flex-col items-end">
                                                         <span>{formatNumber(calculated.ml / LITER_TO_ML, 2)} L</span>
@@ -94,6 +128,25 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                                                     <span className="text-gray-400 font-normal">N/A</span>
                                                 )}
                                             </td>
+                                            {shouldShow20LBatch && (() => {
+                                                const batchIng = perBatchIngredients[idx]
+                                                return (
+                                                    <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-right font-mono font-bold text-gray-900 border-l border-gray-100 bg-[#f54900]/[0.02]">
+                                                        {batchIng?.isLiquid && !isSodaItem(ing.name) ? (
+                                                            <div className="flex flex-col items-end">
+                                                                <span>{formatNumber(batchIng.ml / LITER_TO_ML, 2)} L</span>
+                                                                {isLiquorItem(ing.name) && (
+                                                                    <span className="text-[10px] text-gray-500 font-normal mt-0.5">
+                                                                        {formatNumber(batchIng.bottles, 1)} btls (750ml)
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-gray-400 font-normal">N/A</span>
+                                                        )}
+                                                    </td>
+                                                )
+                                            })()}
                                         </tr>
                                     )
                                 })}
@@ -111,17 +164,11 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                             {activeRecipe.instructions || "No specific instructions provided for this recipe."}
                         </div>
                     </div>
+
+
                 </div>
 
-                {/* Footer */}
-                <div className="p-4 px-6 border-t border-gray-100 bg-gray-50/50 flex justify-end rounded-b-xl">
-                    <button
-                        onClick={onClose}
-                        className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm active:scale-95"
-                    >
-                        Close Window
-                    </button>
-                </div>
+
             </div>
         </div>
     )

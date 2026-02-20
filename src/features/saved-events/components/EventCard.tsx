@@ -50,6 +50,7 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
 
     const recipeIds = event.recipes.map(r => r.cocktailId).join(",")
     const servings = event.recipes.map(r => r.servings).join(",")
+    const dateParam = event.eventDate.slice(0, 10) // YYYY-MM-DD
 
     const recipeSummary = event.recipes
         .map(r => r.servings > 0 ? `${r.cocktailName} ×${r.servings}` : r.cocktailName)
@@ -147,7 +148,7 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
                         <span className="hidden sm:inline">{generating ? "…" : "Invoice"}</span>
                     </button>
                     <Link
-                        href={`/batch-calculator/review?recipes=${recipeIds}&servings=${servings}&name=${encodeURIComponent(event.name)}&date=${event.eventDate}`}
+                        href={`/batch-calculator/review?recipes=${recipeIds}&servings=${servings}&name=${encodeURIComponent(event.name)}&date=${dateParam}`}
                         className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                         <ExternalLink className="w-3.5 h-3.5" />

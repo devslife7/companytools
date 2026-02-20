@@ -887,7 +887,7 @@ export const EditRecipeModal: React.FC<EditRecipeModalProps> = ({
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  {mode === 'create' ? 'Create Recipe' : 'Save Changes'}
+                  {mode === 'create' ? 'Create Recipe' : 'Save'}
                 </>
               )}
             </button>

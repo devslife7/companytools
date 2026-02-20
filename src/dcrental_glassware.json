@@ -1,0 +1,74 @@
+[
+    {
+        "name": "CLEAR CAN GLASS 16OZ.",
+        "capacity_oz": 16,
+        "price": 1.60,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/566231.jpeg?itok=Wy7zZje3"
+    },
+    {
+        "name": "DOUBLE ROCKS GLASS SOLAR RIPPLE CLEAR",
+        "capacity_oz": 10,
+        "price": 1.50,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/517828.jpeg?itok=cYK8hKOn"
+    },
+    {
+        "name": "ALL PURPOSE WINE REVERSA (16OZ.)",
+        "capacity_oz": 16,
+        "price": 1.30,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453731.jpeg?itok=ttzp7yNP"
+    },
+    {
+        "name": "WINE GLASS BUDAPEST (WRAP STEM) 11OZ.",
+        "capacity_oz": 11,
+        "price": 1.00,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/440919.jpeg?itok=bzPHp90z"
+    },
+    {
+        "name": "ALL PURPOSE CHAMPAGNE GLASS",
+        "capacity_oz": 8,
+        "price": 1.25,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/588152.jpeg?itok=BK5qrXvY"
+    },
+    {
+        "name": "CHAMPAGNE GLASS DECO FLUTE",
+        "capacity_oz": 7,
+        "price": 1.30,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287778.jpeg?itok=Uv4dUBSe"
+    },
+    {
+        "name": "HIGHBALL GLASS 6\"",
+        "capacity_oz": 13,
+        "price": 0.90,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287855.jpeg?itok=tRwz_lP6"
+    },
+    {
+        "name": "DOUBLE ROCKS GLASS CLEAR (ORIGINAL)",
+        "capacity_oz": 10,
+        "price": 1.00,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/398053.jpeg?itok=k5H1cJvQ"
+    },
+    {
+        "name": "WHITE WINE GLASS LIDO CLEAR",
+        "capacity_oz": 10,
+        "price": 0.90,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287801.jpeg?itok=cO1GGtjx"
+    },
+    {
+        "name": "WATER GLASS LIDO CLEAR",
+        "capacity_oz": 12,
+        "price": 1.30,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287800.jpeg?itok=Upn72GLH"
+    },
+    {
+        "name": "ALL PURPOSE BAR LIDO CLEAR",
+        "capacity_oz": 11,
+        "price": 0.90,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287798.jpeg?itok=ejulqP7-"
+    },
+    {
+        "name": "ALL PURPOSE WINE REVERSA",
+        "capacity_oz": 12,
+        "price": 1.30,
+        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/588154.jpeg?itok=ujHz1TgU"
+    }
+]

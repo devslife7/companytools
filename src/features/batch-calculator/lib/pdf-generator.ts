@@ -388,6 +388,8 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
   const invoiceDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const invoiceNumber = `INV-${event.id.toString().padStart(4, '0')}`;
 
+  const GLASSWARE_RATE = 2.00; // per glass
+
   let totalAmount = 0;
 
   const tableRows = batches.map(batch => {
@@ -407,6 +409,32 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
         </tr>
       `;
   }).join('');
+
+  // Glassware rental — group by glass type, sum servings
+  const glassTotals: Record<string, number> = {};
+  batches.forEach(batch => {
+    const recipe = batch.editableRecipe;
+    if (!recipe?.glassType) return;
+    const servings = typeof batch.servings === 'number' ? batch.servings : parseInt(batch.servings || '0', 10);
+    if (servings <= 0) return;
+    glassTotals[recipe.glassType] = (glassTotals[recipe.glassType] || 0) + servings;
+  });
+
+  let glasswareTotal = 0;
+  const glasswareRows = Object.entries(glassTotals).map(([glassType, qty]) => {
+    const lineTotal = qty * GLASSWARE_RATE;
+    glasswareTotal += lineTotal;
+    return `
+        <tr class="item-row glassware-row">
+          <td class="text-left">${glassType} Glass Rental</td>
+          <td class="text-center">${qty}</td>
+          <td class="text-right">$${GLASSWARE_RATE.toFixed(2)}</td>
+          <td class="text-right">$${lineTotal.toFixed(2)}</td>
+        </tr>
+      `;
+  }).join('');
+
+  totalAmount += glasswareTotal;
 
   const TAX_RATE = 0.0825; // 8.25%
   const taxAmount = totalAmount * TAX_RATE;
@@ -441,6 +469,9 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
             .item-row td { border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #111827; }
             .item-row td.text-left { font-weight: 500; }
             .item-row:last-child td { border-bottom: none; }
+            .section-label-row td { padding: 8px 16px; border-bottom: 1px solid #e5e7eb; }
+            .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #6b7280; background: #f9fafb; }
+            .glassware-row td { color: #374151; }
             .total-section { width: 320px; float: right; margin-top: 30px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
             .total-row { display: flex; justify-content: space-between; padding: 12px 20px; font-size: 14px; color: #4b5563; }
             .total-row.grand-total { border-top: 1px solid #e5e7eb; font-size: 20px; font-weight: 800; color: #111827; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
@@ -482,14 +513,23 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th class="text-left">Cocktail</th>
-                        <th class="text-center">Servings</th>
-                        <th class="text-right">Price</th>
+                        <th class="text-left">Description</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-right">Unit Price</th>
                         <th class="text-right">Line Total</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <tr class="section-label-row">
+                        <td colspan="4" class="section-label">Cocktail Service</td>
+                    </tr>
                     ${tableRows}
+                    ${glasswareRows ? `
+                    <tr class="section-label-row">
+                        <td colspan="4" class="section-label">Glassware Rental</td>
+                    </tr>
+                    ${glasswareRows}
+                    ` : ''}
                 </tbody>
             </table>
 

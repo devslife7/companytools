@@ -33,13 +33,14 @@ import { EditRecipeModal } from "@/features/batch-calculator/components/EditReci
 
 interface SaveEventModalProps {
     eventName: string
+    initialDate?: string
     onClose: () => void
     onSave: (eventDate: string, eventName: string) => Promise<void>
     saveStatus: "idle" | "saving" | "saved" | "error"
 }
 
-function SaveEventModal({ eventName, onClose, onSave, saveStatus }: SaveEventModalProps) {
-    const [eventDate, setEventDate] = useState("")
+function SaveEventModal({ eventName, initialDate, onClose, onSave, saveStatus }: SaveEventModalProps) {
+    const [eventDate, setEventDate] = useState(initialDate || "")
     const [editableName, setEditableName] = useState(eventName || "Untitled Event")
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -142,6 +143,8 @@ function BatchReviewContent() {
         const s = searchParams.get("servings")
         return s ? s.split(",").map(v => parseInt(v, 10)) : []
     }, [searchParams])
+
+    const savedDate = searchParams.get("date") ?? ""
 
     const { cocktails, loading } = useCocktails({ enabled: true })
     const [batches, setBatches] = useState<BatchState[]>([])
@@ -285,6 +288,10 @@ function BatchReviewContent() {
             setSavedToast(true)
             if (savedToastTimerRef.current) clearTimeout(savedToastTimerRef.current)
             savedToastTimerRef.current = setTimeout(() => setSavedToast(false), 5000)
+            // Persist date in URL so re-opening the modal pre-fills it
+            const params = new URLSearchParams(searchParams.toString())
+            params.set("date", eventDate)
+            router.replace(`/batch-calculator/review?${params.toString()}`, { scroll: false })
         } catch {
             setSaveStatus("error")
         }
@@ -397,61 +404,63 @@ function BatchReviewContent() {
                         </div>
 
                         {/* Bulk Actions */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="flex items-center gap-3 w-full">
-                                    <div className="p-2 rounded-lg bg-gray-100 text-gray-500">
-                                        <Settings2 className="w-5 h-5" />
-                                    </div>
-                                    <label htmlFor="bulk-servings" className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                                        Set Target Servings for all
-                                    </label>
-                                </div>
-                                <div className="flex items-center gap-3 w-full sm:w-auto">
-                                    <div className="relative rounded-md shadow-sm w-full sm:w-32">
-                                        <input
-                                            id="bulk-servings"
-                                            className="focus:ring-[#f54900] focus:border-[#f54900] block w-full sm:text-sm border-gray-200 rounded-lg pl-3 pr-10 py-2 font-semibold bg-white text-gray-900 placeholder:text-gray-400"
-                                            placeholder="100"
-                                            type="number"
-                                            value={bulkServings}
-                                            onChange={(e) => setBulkServings(e.target.value)}
-                                        />
-                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <span className="text-gray-500 sm:text-xs">qty</span>
+                        {activeBatches.length > 1 && (
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3 w-full">
+                                        <div className="p-2 rounded-lg bg-gray-100 text-gray-500">
+                                            <Settings2 className="w-5 h-5" />
                                         </div>
+                                        <label htmlFor="bulk-servings" className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                                            Set Target Servings for all
+                                        </label>
                                     </div>
-                                    <button
-                                        onClick={handleApplyBulkServings}
-                                        className="flex items-center justify-center px-4 py-2 bg-[#f54900] text-white rounded-lg text-sm font-medium hover:bg-[#d13e00] transition-colors shadow-sm whitespace-nowrap"
-                                    >
-                                        Apply
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="pt-4">
-                                <div className="flex gap-2">
-                                {[50, 100, 150, 200, 250, 300].map(qty => {
-                                    const isActive = bulkServings === qty.toString();
-                                    return (
+                                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                                        <div className="relative rounded-md shadow-sm w-full sm:w-32">
+                                            <input
+                                                id="bulk-servings"
+                                                className="focus:ring-[#f54900] focus:border-[#f54900] block w-full sm:text-sm border-gray-200 rounded-lg pl-3 pr-10 py-2 font-semibold bg-white text-gray-900 placeholder:text-gray-400"
+                                                placeholder="100"
+                                                type="number"
+                                                value={bulkServings}
+                                                onChange={(e) => setBulkServings(e.target.value)}
+                                            />
+                                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                <span className="text-gray-500 sm:text-xs">qty</span>
+                                            </div>
+                                        </div>
                                         <button
-                                            key={qty}
-                                            onClick={() => {
-                                                setBulkServings(qty.toString());
-                                            }}
-                                            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all shadow-sm border ${isActive
-                                                ? 'bg-[#f54900] text-white border-[#f54900]'
-                                                : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-[#f54900] hover:text-white hover:border-[#f54900]'
-                                                }`}
+                                            onClick={handleApplyBulkServings}
+                                            className="flex items-center justify-center px-4 py-2 bg-[#f54900] text-white rounded-lg text-sm font-medium hover:bg-[#d13e00] transition-colors shadow-sm whitespace-nowrap"
                                         >
-                                            {qty}
+                                            Apply
                                         </button>
-                                    );
-                                })}
+                                    </div>
+                                </div>
+
+                                <div className="pt-4">
+                                    <div className="flex gap-2">
+                                        {[50, 100, 150, 200, 250, 300].map(qty => {
+                                            const isActive = bulkServings === qty.toString();
+                                            return (
+                                                <button
+                                                    key={qty}
+                                                    onClick={() => {
+                                                        setBulkServings(qty.toString());
+                                                    }}
+                                                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all shadow-sm border ${isActive
+                                                        ? 'bg-[#f54900] text-white border-[#f54900]'
+                                                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-[#f54900] hover:text-white hover:border-[#f54900]'
+                                                        }`}
+                                                >
+                                                    {qty}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Batch List */}
                         <div className="space-y-4">
@@ -512,6 +521,7 @@ function BatchReviewContent() {
             {saveModalOpen && (
                 <SaveEventModal
                     eventName={eventName}
+                    initialDate={savedDate}
                     onClose={() => setSaveModalOpen(false)}
                     onSave={handleSaveEvent}
                     saveStatus={saveStatus}
@@ -542,11 +552,12 @@ function BatchReviewContent() {
                     mode="edit"
                     onClose={() => setEditingRecipe(null)}
                     recipe={editingRecipe.selectedCocktail}
-                    cocktailId={undefined}
+                    cocktailId={editingRecipe.selectedCocktail?.id}
                     onSave={(updatedRecipe) => {
                         handleUpdateBatch({
                             ...editingRecipe,
-                            selectedCocktail: updatedRecipe
+                            selectedCocktail: updatedRecipe,
+                            editableRecipe: updatedRecipe
                         })
                         setEditingRecipe(null)
                     }}
