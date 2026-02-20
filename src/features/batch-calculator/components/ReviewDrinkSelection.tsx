@@ -99,9 +99,9 @@ export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ b
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:border-[#f54900]/30 transition-all">
-            <div className="p-5 flex flex-col sm:flex-row gap-6">
+            <div className="p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-6">
                 {/* Image */}
-                <div className="relative w-full sm:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative w-full sm:w-32 h-48 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     {selectedCocktail.image ? (
                         <img
                             alt={selectedCocktail.name}
@@ -212,7 +212,7 @@ export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ b
                                         key={qty}
                                         type="button"
                                         onClick={() => onServingsChange(id, qty.toString())}
-                                        className={`flex-1 px-1 py-1.5 text-xs font-semibold rounded-md transition-all shadow-sm border ${isActive
+                                        className={`flex-1 px-1 py-2 sm:py-1.5 text-xs font-semibold rounded-md transition-all shadow-sm border ${isActive
                                                 ? 'bg-[#f54900] text-white border-[#f54900]'
                                                 : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-[#f54900] hover:text-white hover:border-[#f54900]'
                                             }`}

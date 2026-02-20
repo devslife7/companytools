@@ -40,18 +40,18 @@ export function RecipeModal({ batch, onClose }: RecipeModalProps) {
                 <div className="p-6 overflow-y-auto">
                     {/* Meta info */}
                     <div className="flex flex-wrap gap-4 mb-6 text-sm">
-                        <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[140px]">
+                        <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[110px]">
                             <span className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">Method</span>
                             <span className="text-lg font-medium text-gray-900">{selectedCocktail.method || 'Build'}</span>
                         </div>
                         {selectedCocktail.glassType && (
-                            <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[140px]">
+                            <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[110px]">
                                 <span className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">Glassware</span>
                                 <span className="text-lg font-medium text-gray-900">{selectedCocktail.glassType}</span>
                             </div>
                         )}
                         {selectedCocktail.abv != null && selectedCocktail.abv > 0 && (
-                            <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[100px]">
+                            <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[90px]">
                                 <span className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">ABV</span>
                                 <span className="text-lg font-medium text-gray-900">{selectedCocktail.abv}%</span>
                             </div>
@@ -69,15 +69,15 @@ export function RecipeModal({ batch, onClose }: RecipeModalProps) {
                         <table className="w-full text-sm text-left">
                             <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-200">
                                 <tr>
-                                    <th className="px-5 py-3 font-bold">Ingredient</th>
-                                    <th className="px-5 py-3 text-right font-bold w-40 border-l border-gray-200">Amount</th>
+                                    <th className="px-3 sm:px-5 py-3 font-bold">Ingredient</th>
+                                    <th className="px-3 sm:px-5 py-3 text-right font-bold w-28 sm:w-40 border-l border-gray-200">Amount</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 bg-white">
                                 {selectedCocktail.ingredients.map((ing, idx) => (
                                     <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-5 py-3 font-semibold text-gray-900">{ing.name}</td>
-                                        <td className="px-5 py-3 text-right text-gray-700 font-medium border-l border-gray-100">
+                                        <td className="px-3 sm:px-5 py-2.5 sm:py-3 font-semibold text-gray-900">{ing.name}</td>
+                                        <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-right text-gray-700 font-medium border-l border-gray-100">
                                             {ing.amount} <span className="text-xs text-gray-400">{ing.unit}</span>
                                         </td>
                                     </tr>

@@ -2,7 +2,7 @@ import React from 'react'
 import { X, FlaskConical, ClipboardList } from 'lucide-react'
 import type { BatchState } from '../types'
 import { calculateBatch, formatNumber, LITER_TO_ML } from '../lib/calculations'
-import { isLiquorItem } from '../lib/ingredient-helpers'
+import { isLiquorItem, isSodaItem } from '../lib/ingredient-helpers'
 
 interface BatchingInstructionsModalProps {
     batch: BatchState | null
@@ -50,12 +50,12 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                             <span className="text-2xl font-bold text-[#f54900] tracking-tight">{numServings} <span className="text-sm font-medium text-gray-400">servings</span></span>
                         </div>
 
-                        <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[140px]">
+                        <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-1 min-w-[110px]">
                             <span className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">Glassware</span>
                             <span className="text-lg font-medium text-gray-900">{activeRecipe.glassType || 'N/A'}</span>
                         </div>
 
-                        <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-[2] min-w-[200px]">
+                        <div className="bg-white rounded-lg p-3 px-4 border border-gray-200 shadow-sm flex-[2] min-w-[110px]">
                             <span className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">Method</span>
                             <span className="text-lg font-medium text-gray-900">{activeRecipe.method || 'Build in tin'}</span>
                         </div>
@@ -66,9 +66,9 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                         <table className="w-full text-sm text-left">
                             <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-200">
                                 <tr>
-                                    <th className="px-5 py-3 font-bold">Ingredient</th>
-                                    <th className="px-5 py-3 text-right font-bold w-32 border-l border-gray-200">Single</th>
-                                    <th className="px-5 py-3 text-right font-bold text-[#f54900] w-40 border-l border-gray-200 bg-[#f54900]/5">Batch Total</th>
+                                    <th className="px-3 sm:px-5 py-3 font-bold">Ingredient</th>
+                                    <th className="px-3 sm:px-5 py-3 text-right font-bold w-24 sm:w-32 border-l border-gray-200">Single</th>
+                                    <th className="px-3 sm:px-5 py-3 text-right font-bold text-[#f54900] w-32 sm:w-40 border-l border-gray-200 bg-[#f54900]/5">Batch Total</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 bg-white">
@@ -76,12 +76,12 @@ export function BatchingInstructionsModal({ batch, onClose }: BatchingInstructio
                                     const calculated = calculateBatch(numServings, ing.amount, ing.unit)
                                     return (
                                         <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                                            <td className="px-5 py-3 font-semibold text-gray-900">{ing.name}</td>
-                                            <td className="px-5 py-3 text-right text-gray-500 font-medium border-l border-gray-100">
+                                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 font-semibold text-gray-900">{ing.name}</td>
+                                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-right text-gray-500 font-medium border-l border-gray-100">
                                                 {ing.amount} <span className="text-xs text-gray-400">{ing.unit}</span>
                                             </td>
-                                            <td className="px-5 py-3 text-right font-mono font-bold text-gray-900 border-l border-gray-100 bg-[#f54900]/[0.02]">
-                                                {calculated.unitType === 'liquid' ? (
+                                            <td className="px-3 sm:px-5 py-2.5 sm:py-3 text-right font-mono font-bold text-gray-900 border-l border-gray-100 bg-[#f54900]/[0.02]">
+                                                {calculated.unitType === 'liquid' && !isSodaItem(ing.name) ? (
                                                     <div className="flex flex-col items-end">
                                                         <span>{formatNumber(calculated.ml / LITER_TO_ML, 2)} L</span>
                                                         {isLiquorItem(ing.name) && (

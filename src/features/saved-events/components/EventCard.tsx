@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
-import { Trash2, ExternalLink, FileText, Loader2 } from "lucide-react"
+import { Trash2, ExternalLink, FileText, Loader2, MoreHorizontal } from "lucide-react"
 import { generateClientInvoicePdf } from "@/features/batch-calculator/lib/pdf-generator"
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
 import type { BatchState, CocktailRecipe } from "@/features/batch-calculator/types"
@@ -32,6 +32,16 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [deletePassword, setDeletePassword] = useState("")
     const [deletePasswordError, setDeletePasswordError] = useState<string | null>(null)
+    const [menuOpen, setMenuOpen] = useState(false)
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
 
     const eventDate = new Date(event.eventDate)
     const month = eventDate.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" }).toUpperCase()
@@ -109,7 +119,7 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
 
     return (
         <>
-            <div className="group flex items-center gap-5 px-5 py-4 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all">
+            <div className="group flex items-center gap-3 sm:gap-5 px-4 sm:px-5 py-3 sm:py-4 bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all">
                 {/* Date block */}
                 <div className="flex-shrink-0 w-11 text-center select-none">
                     <div className="text-[9px] font-bold uppercase tracking-widest text-[#f54900] leading-none">{month}</div>
@@ -131,26 +141,39 @@ export function EventCard({ event, onDeleted }: EventCardProps) {
                     <button
                         onClick={handleInvoice}
                         disabled={generating}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
                     >
                         <FileText className="w-3.5 h-3.5" />
-                        {generating ? "…" : "Invoice"}
+                        <span className="hidden sm:inline">{generating ? "…" : "Invoice"}</span>
                     </button>
                     <Link
-                        href={`/batch-calculator/review?recipes=${recipeIds}&servings=${servings}`}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                        href={`/batch-calculator/review?recipes=${recipeIds}&servings=${servings}&name=${encodeURIComponent(event.name)}&date=${event.eventDate}`}
+                        className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
                     >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        Re-open
+                        <span className="hidden sm:inline">Re-open</span>
                     </Link>
-                    <button
-                        onClick={() => { setShowDeleteConfirm(true); setDeletePassword(""); setDeletePasswordError(null) }}
-                        disabled={deleting}
-                        className="p-1.5 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                        aria-label="Delete event"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            onClick={() => setMenuOpen(o => !o)}
+                            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            aria-label="More options"
+                        >
+                            <MoreHorizontal className="w-4 h-4" />
+                        </button>
+                        {menuOpen && (
+                            <div className="absolute right-0 top-full mt-1 w-36 bg-white border border-gray-100 rounded-lg shadow-lg py-1 z-20">
+                                <button
+                                    onClick={() => { setMenuOpen(false); setShowDeleteConfirm(true); setDeletePassword(""); setDeletePasswordError(null) }}
+                                    disabled={deleting}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    Delete
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

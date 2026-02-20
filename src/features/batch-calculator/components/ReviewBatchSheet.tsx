@@ -146,12 +146,12 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventNa
                     <div className="flex items-center gap-1">
                         <button
                             onClick={() => handleMiscCostChange(miscCostPercent - 5)}
-                            className="w-5 h-5 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold flex items-center justify-center leading-none"
+                            className="w-7 h-7 sm:w-5 sm:h-5 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold flex items-center justify-center leading-none"
                         >−</button>
                         <span className="font-mono font-bold text-sm text-gray-900 w-10 text-center">{miscCostPercent}%</span>
                         <button
                             onClick={() => handleMiscCostChange(miscCostPercent + 5)}
-                            className="w-5 h-5 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold flex items-center justify-center leading-none"
+                            className="w-7 h-7 sm:w-5 sm:h-5 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold flex items-center justify-center leading-none"
                         >+</button>
                     </div>
                 </div>
@@ -174,7 +174,7 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventNa
                                     <div className="font-bold text-gray-900 text-sm">{item.name}</div>
                                     <span className="text-[10px] text-gray-400 font-medium">{item.servings} servings</span>
                                 </div>
-                                <div className="grid grid-cols-4 gap-1.5">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                                     <div>
                                         <span className="text-[10px] text-gray-500 uppercase font-bold block mb-0.5">Price (Ea)</span>
                                         <span className="font-mono font-bold text-gray-900 text-xs">
@@ -247,13 +247,13 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventNa
                             name: eventName || "Untitled Event",
                             eventDate: new Date().toISOString(),
                         })}
-                        className="flex items-center justify-center px-4 py-2 border border-gray-200 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 transition-colors text-gray-900"
+                        className="flex items-center justify-center px-4 py-2.5 border border-gray-200 rounded-lg text-xs font-medium bg-white hover:bg-gray-50 transition-colors text-gray-900"
                     >
                         <FileText className="text-sm mr-1 w-4 h-4" /> Invoice
                     </button>
                     <button
                         onClick={() => generateOrderListPdf(batches, liquorPrices, eventName)}
-                        className="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg text-xs font-medium text-white bg-[#f54900] hover:bg-[#d13e00] transition-colors shadow-sm"
+                        className="flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg text-xs font-medium text-white bg-[#f54900] hover:bg-[#d13e00] transition-colors shadow-sm"
                     >
                         <ShoppingCart className="text-sm mr-1 w-4 h-4" /> Order List
                     </button>

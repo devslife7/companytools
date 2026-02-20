@@ -152,7 +152,12 @@ function BatchReviewContent() {
     const [viewingBatch, setViewingBatch] = useState<BatchState | null>(null)
     const [viewingRecipe, setViewingRecipe] = useState<BatchState | null>(null)
     const [editingRecipe, setEditingRecipe] = useState<BatchState | null>(null)
-    const [eventName, setEventName] = useState("Untitled Event")
+    const [eventName, setEventName] = useState(() => searchParams.get("name") || "Untitled Event")
+    const savedEventDate = useMemo(() => {
+        const d = searchParams.get("date")
+        if (!d) return null
+        return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
+    }, [searchParams])
     const [bulkServings, setBulkServings] = useState<string>("")
     const [removedIds, setRemovedIds] = useState<number[]>([])
 
@@ -304,37 +309,40 @@ function BatchReviewContent() {
     return (
         <div className="min-h-screen font-sans pb-24 transition-colors duration-200">
             {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
-                <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-20 items-center">
-                        <div className="flex items-center gap-5">
+            <header className="bg-white border-b border-gray-200 sticky top-14 md:top-0 z-20 shadow-sm">
+                <div className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-14 sm:h-16 items-center gap-2">
+                        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
                             <Link
                                 href={`/batch-calculator?recipes=${recipeIds.join(",")}`}
-                                className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+                                className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors flex-shrink-0"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                Back
+                                <span className="hidden sm:inline">Back</span>
                             </Link>
 
                             <div className="w-px h-6 bg-gray-200" />
 
-                            <div className="flex flex-col gap-1">
-                                <p className="text-lg font-bold leading-tight text-gray-900">
+                            <div className="flex flex-col gap-0.5 min-w-0">
+                                <p className="text-sm sm:text-base font-bold leading-tight text-gray-900 truncate">
                                     {eventName || <span className="text-gray-300 font-normal">New event…</span>}
                                 </p>
-                                <span className="bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border border-gray-200 self-start">Draft</span>
+                                {savedEventDate
+                                    ? <span className="hidden sm:inline text-xs text-gray-400">{savedEventDate}</span>
+                                    : <span className="hidden sm:inline-block bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border border-gray-200 self-start">Draft</span>
+                                }
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                             <div className="relative" ref={exportRef}>
                                 <div className="flex items-stretch border border-gray-300 rounded-lg shadow-sm overflow-hidden bg-white">
                                     <button
                                         onClick={() => generatePdfReport(activeBatches, liquorPrices)}
-                                        className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+                                        className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         <FileDown className="w-4 h-4" />
-                                        Export PDF
+                                        <span className="hidden sm:inline">Export PDF</span>
                                     </button>
                                     <div className="w-px bg-gray-300" />
                                     <button
@@ -368,18 +376,18 @@ function BatchReviewContent() {
                             </div>
                             <button
                                 onClick={() => { setSaveStatus("idle"); setSaveModalOpen(true) }}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-[#f54900] text-white rounded-lg text-sm font-semibold hover:bg-[#d13e00] transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-[#f54900] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#d13e00] transition-all shadow-md"
                             >
                                 <Save className="w-4 h-4" />
-                                Save Event
+                                <span className="hidden sm:inline">Save Event</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
                     {/* Left Column: Drink Selection */}
                     <div className="lg:col-span-7 space-y-6">
@@ -422,8 +430,8 @@ function BatchReviewContent() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-2 pt-4 mt-4 border-t border-gray-100 justify-end sm:justify-start">
-                                <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider mr-1">Quick Presets:</span>
+                            <div className="pt-4">
+                                <div className="flex gap-2">
                                 {[50, 100, 150, 200, 250, 300].map(qty => {
                                     const isActive = bulkServings === qty.toString();
                                     return (
@@ -432,7 +440,7 @@ function BatchReviewContent() {
                                             onClick={() => {
                                                 setBulkServings(qty.toString());
                                             }}
-                                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all shadow-sm border ${isActive
+                                            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all shadow-sm border ${isActive
                                                 ? 'bg-[#f54900] text-white border-[#f54900]'
                                                 : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-[#f54900] hover:text-white hover:border-[#f54900]'
                                                 }`}
@@ -441,6 +449,7 @@ function BatchReviewContent() {
                                         </button>
                                     );
                                 })}
+                                </div>
                             </div>
                         </div>
 
@@ -473,8 +482,8 @@ function BatchReviewContent() {
                     </div>
 
                     {/* Right Column: Batching Sheet Summary */}
-                    <div className="lg:col-span-5 sticky top-24">
-                        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full max-h-[calc(100vh-140px)]">
+                    <div className="lg:col-span-5 lg:sticky lg:top-20">
+                        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full lg:max-h-[calc(100vh-96px)]">
                             <ReviewBatchSheet
                                 batches={activeBatches}
                                 measureSystem="metric"
