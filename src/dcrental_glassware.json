@@ -1,74 +1,1724 @@
-[
+{
+  "all-purpose-barware": [
     {
-        "name": "CLEAR CAN GLASS 16OZ.",
-        "capacity_oz": 16,
-        "price": 1.60,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/566231.jpeg?itok=Wy7zZje3"
+      "name": "CLEAR CAN GLASS 16OZ.",
+      "capacity_oz": 16,
+      "price": 1.6,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/566231.jpeg?itok=Wy7zZje3"
     },
     {
-        "name": "DOUBLE ROCKS GLASS SOLAR RIPPLE CLEAR",
-        "capacity_oz": 10,
-        "price": 1.50,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/517828.jpeg?itok=cYK8hKOn"
+      "name": "DOUBLE ROCKS GLASS SOLAR RIPPLE CLEAR",
+      "capacity_oz": 10,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/517828.jpeg?itok=cYK8hKOn"
     },
     {
-        "name": "ALL PURPOSE WINE REVERSA (16OZ.)",
-        "capacity_oz": 16,
-        "price": 1.30,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453731.jpeg?itok=ttzp7yNP"
+      "name": "ALL PURPOSE WINE REVERSA (16OZ.)",
+      "capacity_oz": 16,
+      "price": 1.3,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453731.jpeg?itok=ttzp7yNP"
     },
     {
-        "name": "WINE GLASS BUDAPEST (WRAP STEM) 11OZ.",
-        "capacity_oz": 11,
-        "price": 1.00,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/440919.jpeg?itok=bzPHp90z"
+      "name": "WINE GLASS BUDAPEST (WRAP STEM) 11OZ.",
+      "capacity_oz": 11,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/440919.jpeg?itok=bzPHp90z"
     },
     {
-        "name": "ALL PURPOSE CHAMPAGNE GLASS",
-        "capacity_oz": 8,
-        "price": 1.25,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/588152.jpeg?itok=BK5qrXvY"
+      "name": "ALL PURPOSE CHAMPAGNE GLASS",
+      "capacity_oz": 8,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/588152.jpeg?itok=BK5qrXvY"
     },
     {
-        "name": "CHAMPAGNE GLASS DECO FLUTE",
-        "capacity_oz": 7,
-        "price": 1.30,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287778.jpeg?itok=Uv4dUBSe"
+      "name": "CHAMPAGNE GLASS DECO FLUTE",
+      "capacity_oz": 7,
+      "price": 1.3,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287778.jpeg?itok=Uv4dUBSe"
     },
     {
-        "name": "HIGHBALL GLASS 6\"",
-        "capacity_oz": 13,
-        "price": 0.90,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287855.jpeg?itok=tRwz_lP6"
+      "name": "HIGHBALL GLASS 6\"",
+      "capacity_oz": 13,
+      "price": 0.9,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287855.jpeg?itok=tRwz_lP6"
     },
     {
-        "name": "DOUBLE ROCKS GLASS CLEAR (ORIGINAL)",
-        "capacity_oz": 10,
-        "price": 1.00,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/398053.jpeg?itok=k5H1cJvQ"
+      "name": "DOUBLE ROCKS GLASS CLEAR (ORIGINAL)",
+      "capacity_oz": 10,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/398053.jpeg?itok=k5H1cJvQ"
     },
     {
-        "name": "WHITE WINE GLASS LIDO CLEAR",
-        "capacity_oz": 10,
-        "price": 0.90,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287801.jpeg?itok=cO1GGtjx"
+      "name": "WHITE WINE GLASS LIDO CLEAR",
+      "capacity_oz": 10,
+      "price": 0.9,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287801.jpeg?itok=cO1GGtjx"
     },
     {
-        "name": "WATER GLASS LIDO CLEAR",
-        "capacity_oz": 12,
-        "price": 1.30,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287800.jpeg?itok=Upn72GLH"
+      "name": "WATER GLASS LIDO CLEAR",
+      "capacity_oz": 12,
+      "price": 1.3,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287800.jpeg?itok=Upn72GLH"
     },
     {
-        "name": "ALL PURPOSE BAR LIDO CLEAR",
-        "capacity_oz": 11,
-        "price": 0.90,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287798.jpeg?itok=ejulqP7-"
+      "name": "ALL PURPOSE BAR LIDO CLEAR",
+      "capacity_oz": 11,
+      "price": 0.9,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287798.jpeg?itok=ejulqP7-"
     },
     {
-        "name": "ALL PURPOSE WINE REVERSA",
-        "capacity_oz": 12,
-        "price": 1.30,
-        "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/588154.jpeg?itok=ujHz1TgU"
+      "name": "ALL PURPOSE WINE REVERSA",
+      "capacity_oz": 12,
+      "price": 1.3,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/588154.jpeg?itok=ujHz1TgU"
     }
-]
+  ],
+  "colored-barware": [
+    {
+      "name": "DOUBLE ROCKS GLASS MELODIA SMOKE",
+      "capacity_oz": 13,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453597.jpeg?itok=7pvpQojN"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS MELODIA PLUM",
+      "capacity_oz": 13,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453596.jpeg?itok=uH15-pwj"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS MELODIA OCEAN",
+      "capacity_oz": 13,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453595.jpeg?itok=sNRpU_II"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS MELODIA GRASS",
+      "capacity_oz": 13,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453594.jpeg?itok=h9FGaQzH"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS LIGHT AMBER",
+      "capacity_oz": 12,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287810.jpeg?itok=le7hBMRW"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS SWIRL PLUM",
+      "capacity_oz": 10,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287817.jpeg?itok=z5iyvdTJ"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS SWIRL ORANGE",
+      "capacity_oz": 10,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287816.jpeg?itok=nZ69OhHU"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS SWIRL EMERALD",
+      "capacity_oz": 10,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287815.jpeg?itok=eWyPsSGA"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS SWIRL COBALT",
+      "capacity_oz": 10,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287814.jpeg?itok=ZfhB26-0"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS LIGHT BLUE",
+      "capacity_oz": 12,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287811.jpeg?itok=uPMNIJOI"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS LIGHT ORANGE",
+      "capacity_oz": 12,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287813.jpeg?itok=dXi3fQ7o"
+    },
+    {
+      "name": "CURVE HIGHBALL GLASS BLUE",
+      "capacity_oz": 16,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287802.jpeg?itok=k7a05b7o"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS LIGHT GREEN",
+      "capacity_oz": 12,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287812.jpeg?itok=TrbN93s0"
+    },
+    {
+      "name": "CURVE SHOT GLASS RED",
+      "capacity_oz": 2,
+      "price": 1,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287809.jpeg?itok=WOBvJVl_"
+    },
+    {
+      "name": "CURVE SHOT GLASS ORANGE",
+      "capacity_oz": 2,
+      "price": 1,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287808.jpeg?itok=NWNyJauB"
+    },
+    {
+      "name": "CURVE SHOT GLASS GREEN",
+      "capacity_oz": 2,
+      "price": 1,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287807.jpeg?itok=8L8qMnw0"
+    },
+    {
+      "name": "CURVE SHOT GLASS BLUE",
+      "capacity_oz": 2,
+      "price": 1,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287806.jpeg?itok=pMw7D6Px"
+    },
+    {
+      "name": "CURVE HIGHBALL GLASS RED",
+      "capacity_oz": 16,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287805.jpeg?itok=yd4ugVks"
+    },
+    {
+      "name": "CURVE HIGHBALL GLASS ORANGE",
+      "capacity_oz": 16,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287804.jpeg?itok=ljstdn5h"
+    },
+    {
+      "name": "CURVE HIGHBALL GLASS GREEN",
+      "capacity_oz": 16,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287803.jpeg?itok=g1HlTEE_"
+    }
+  ],
+  "colored-stemware": [
+    {
+      "name": "RED WINE GLASS MALIBU PLUM",
+      "capacity_oz": null,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/610284.jpeg?itok=xz6iC70D"
+    },
+    {
+      "name": "WATER GLASS MALIBU PLUM (HIGHBALL)",
+      "capacity_oz": null,
+      "price": 4.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/610284.jpeg?itok=xz6iC70D"
+    },
+    {
+      "name": "WHITE WINE GLASS MALIBU PLUM",
+      "capacity_oz": null,
+      "price": 4.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/610284.jpeg?itok=xz6iC70D"
+    },
+    {
+      "name": "GOBLET GLASS BIJOU AMETHYST",
+      "capacity_oz": 13,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/489732.jpeg?itok=f_b5R8uL"
+    },
+    {
+      "name": "GOBLET GLASS CAIRO GREEN",
+      "capacity_oz": 13,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/517829.jpeg?itok=XM_GIQaD"
+    },
+    {
+      "name": "RED WINE GLASS TRINITY SMOKE W/ GOLD RIM",
+      "capacity_oz": null,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/498337.jpeg?itok=Z01ZKI5k"
+    },
+    {
+      "name": "WHITE WINE GLASS TRINITY SMOKE W/ GOLD RIM",
+      "capacity_oz": null,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/498337.jpeg?itok=Z01ZKI5k"
+    },
+    {
+      "name": "RED WINE GLASS TRINITY AMBER W/ GOLD RIM",
+      "capacity_oz": null,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/498336.jpeg?itok=ckuUHGjV"
+    },
+    {
+      "name": "WATER GLASS TRINITY AMBER W/ GOLD RIM",
+      "capacity_oz": null,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/498336.jpeg?itok=ckuUHGjV"
+    },
+    {
+      "name": "WHITE WINE GLASS TRINITY AMBER W/ GOLD RIM",
+      "capacity_oz": null,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/498336.jpeg?itok=ckuUHGjV"
+    },
+    {
+      "name": "WATER GLASS MELODIA TEAL",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/446664.jpeg?itok=iugTHxkl"
+    },
+    {
+      "name": "RED WINE GLASS MELODIA TEAL",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/446664.jpeg?itok=iugTHxkl"
+    },
+    {
+      "name": "WHITE WINE GLASS MELODIA TEAL",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/446664.jpeg?itok=iugTHxkl"
+    },
+    {
+      "name": "RED WINE GLASS CROWN WHITE",
+      "capacity_oz": null,
+      "price": 3.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456082.jpeg?itok=J7qm5ZUn"
+    },
+    {
+      "name": "WHITE WINE GLASS CROWN WHITE",
+      "capacity_oz": null,
+      "price": 3.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456082.jpeg?itok=J7qm5ZUn"
+    },
+    {
+      "name": "WATER GLASS CROWN WHITE",
+      "capacity_oz": null,
+      "price": 3.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456082.jpeg?itok=J7qm5ZUn"
+    },
+    {
+      "name": "RED WINE GLASS HARP SILVER",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456083.jpeg?itok=s03y8ZJ3"
+    },
+    {
+      "name": "WHITE WINE GLASS HARP SILVER",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456083.jpeg?itok=s03y8ZJ3"
+    },
+    {
+      "name": "CHAMPAGNE GLASS HARP SILVER FLUTE",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456083.jpeg?itok=s03y8ZJ3"
+    },
+    {
+      "name": "WATER GLASS MELODIA SMOKE",
+      "capacity_oz": 13,
+      "price": 3.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/384822.jpeg?itok=iia109_D"
+    },
+    {
+      "name": "WATER GLASS MELODIA AMBER",
+      "capacity_oz": 13,
+      "price": 3.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/384817.jpeg?itok=PgtBT_XZ"
+    },
+    {
+      "name": "WATER GLASS MELODIA BLUSH",
+      "capacity_oz": 13,
+      "price": 3.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/384818.jpeg?itok=bxdHoAd3"
+    },
+    {
+      "name": "WATER GLASS MELODIA INDIGO",
+      "capacity_oz": 13,
+      "price": 3.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/610285.jpeg?itok=LsN3Y-2l"
+    },
+    {
+      "name": "WATER GLASS MELODIA MOSS",
+      "capacity_oz": 13,
+      "price": 3.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/384821.jpeg?itok=rWU1ZwSk"
+    },
+    {
+      "name": "GOBLET GLASS VISTA PURPLE",
+      "capacity_oz": 13,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287819.jpeg?itok=I8m3SGxx"
+    },
+    {
+      "name": "GOBLET GLASS VISTA BLUE",
+      "capacity_oz": 13,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287818.jpeg?itok=dXEbcr8A"
+    },
+    {
+      "name": "MARTINI GLASS BLACK MATTE W/ COPPER INSIDE",
+      "capacity_oz": 8,
+      "price": 4.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287820.jpeg?itok=dz_lKlQl"
+    },
+    {
+      "name": "MARTINI GLASS BLACK MATTE W/ GOLD INSIDE",
+      "capacity_oz": 8,
+      "price": 4.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287821.jpeg?itok=Hm-RyZxk"
+    },
+    {
+      "name": "WATER GLASS LIDO PINK",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287831.jpeg?itok=1daN5axy"
+    },
+    {
+      "name": "WATER GLASS TRIBECA GREEN",
+      "capacity_oz": 8,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287836.jpeg?itok=B4PYScI1"
+    },
+    {
+      "name": "WATER GLASS TRIBECA BLUE",
+      "capacity_oz": 8,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287834.jpeg?itok=W3FxDBv2"
+    },
+    {
+      "name": "WATER GLASS TRIBECA FROSTED",
+      "capacity_oz": 8,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287835.jpeg?itok=cS5eVFfz"
+    },
+    {
+      "name": "WATER GLASS LIDO FUCHSIA",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287827.jpeg?itok=WbzPubuX"
+    },
+    {
+      "name": "WATER GLASS LIDO COBALT BLUE",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287824.jpeg?itok=ZcVn_XL4"
+    },
+    {
+      "name": "WATER GLASS LIDO WHITE",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287833.jpeg?itok=jiBrC2GI"
+    },
+    {
+      "name": "WATER GLASS LIDO BLACK",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287822.jpeg?itok=zhzZ9lCK"
+    },
+    {
+      "name": "WATER GLASS LIDO FROSTED",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287826.jpeg?itok=SYXLV-tZ"
+    },
+    {
+      "name": "WATER GLASS LIDO BLUE",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287823.jpeg?itok=EMBSjKDr"
+    },
+    {
+      "name": "WATER GLASS LIDO GOLD",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287828.jpeg?itok=2Kcys7G1"
+    },
+    {
+      "name": "WHITE WINE GLASS BRAVO PURPLE",
+      "capacity_oz": 8,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287676.jpeg?itok=JAxB_6ws"
+    },
+    {
+      "name": "CHAMPAGNE GLASS BRAVO PURPLE FLUTE",
+      "capacity_oz": 6,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287770.jpeg?itok=G-WqfFUS"
+    },
+    {
+      "name": "WATER GLASS LIDO TANGERINE",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287832.jpeg?itok=qTzsaQdn"
+    },
+    {
+      "name": "WATER GLASS LIDO HUNTER GREEN",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287829.jpeg?itok=T3RCGg97"
+    },
+    {
+      "name": "WATER GLASS LIDO LIME GREEN",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287830.jpeg?itok=5gXSVm58"
+    },
+    {
+      "name": "WATER GLASS GREEN",
+      "capacity_oz": null,
+      "price": 2.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287716.jpeg?itok=m9-E2x0s"
+    },
+    {
+      "name": "WATER GLASS LIDO CRANBERRY",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287825.jpeg?itok=9J4xNpFw"
+    }
+  ],
+  "cordials-and-specialty-glassware": [
+    {
+      "name": "ALL PURPOSE MINI FOOTED GLASS (5OZ)",
+      "capacity_oz": 5,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/594371.jpeg?itok=ubnXdtJX"
+    },
+    {
+      "name": "CHAMPAGNE GLASS COUPE (5OZ.)",
+      "capacity_oz": 5,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/465169.jpeg?itok=raDs8YSX"
+    },
+    {
+      "name": "SHOT GLASS FLARED (2.5OZ)",
+      "capacity_oz": 2.5,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/594369.jpeg?itok=YQeheku3"
+    },
+    {
+      "name": "MARTINI GLASS STEMLESS MINI (6OZ.)",
+      "capacity_oz": 6,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/465172.jpeg?itok=udaDX8xA"
+    },
+    {
+      "name": "DESSERT GLASS RIBBED (9OZ.)",
+      "capacity_oz": 9,
+      "price": 2.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/465171.jpeg?itok=fzusbU1y"
+    },
+    {
+      "name": "8.5\" CARAFE GLASS (34OZ)",
+      "capacity_oz": 34,
+      "price": 6.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/456093.jpeg?itok=FwjLIzvy"
+    },
+    {
+      "name": "WATER / ICE TEA GOBLET CLASSICO (13.5OZ)",
+      "capacity_oz": 13.5,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/424395.jpeg?itok=agDp-4k7"
+    },
+    {
+      "name": "SHERRY GLASS MELODIA (2OZ)",
+      "capacity_oz": 2,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/453690.jpeg?itok=SViwNFoz"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TRUMPET FLUTE",
+      "capacity_oz": 6,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287795.jpeg?itok=N7VVcIh3"
+    },
+    {
+      "name": "DESSERT GLASS 3.5\"",
+      "capacity_oz": null,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287852.jpeg?itok=MhmPwbPG"
+    },
+    {
+      "name": "3\" GLASS LUMINA TASTER W/ STEM",
+      "capacity_oz": null,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/416967.jpeg?itok=t1uJuE4_"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TWIST COUPE",
+      "capacity_oz": null,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287796.jpeg?itok=bULFNGpo"
+    },
+    {
+      "name": "SHERRY GLASS CRYSTAL 6OZ",
+      "capacity_oz": 6,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287875.jpeg?itok=ur5W4410"
+    },
+    {
+      "name": "7\" CARAFE GLASS (8OZ)",
+      "capacity_oz": 8,
+      "price": 3.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/285825.jpeg?itok=6DfS-H2h"
+    },
+    {
+      "name": "SINGLE ROCKS CLEAR",
+      "capacity_oz": null,
+      "price": 0.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/286215.jpeg?itok=k0Zd4Sok"
+    },
+    {
+      "name": "MASON JAR WITH HANDLE ( 14 oz )",
+      "capacity_oz": 14,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287867.jpeg?itok=rqgJp0Mf"
+    },
+    {
+      "name": "BEER MUG WIDE RIM / HEAVY BASE",
+      "capacity_oz": null,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287840.jpeg?itok=PVLHcKPI"
+    },
+    {
+      "name": "CHAMPAGNE GLASS COUPE - LARGE",
+      "capacity_oz": null,
+      "price": 2.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287776.jpeg?itok=jZx5vHxs"
+    },
+    {
+      "name": "BRANDY SNIFTER - ALL PURPOSE 12 OZ.",
+      "capacity_oz": 12,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287843.jpeg?itok=HQ-206jh"
+    },
+    {
+      "name": "SHERRY GLASS TALL 8\" / 6 OZ.",
+      "capacity_oz": 6,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287878.jpeg?itok=WK50IhIE"
+    },
+    {
+      "name": "4 OZ. QUILTED CANNING JAR",
+      "capacity_oz": 4,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/286538.jpeg?itok=60GRfKpK"
+    },
+    {
+      "name": "5 OZ. ROCCO CANNING JAR",
+      "capacity_oz": 5,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/286539.jpeg?itok=0fA0qrn8"
+    },
+    {
+      "name": "MARTINI GLASS TRIBECA",
+      "capacity_oz": 7,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287865.jpeg?itok=ry_MNFyF"
+    },
+    {
+      "name": "MASON JAR - NO HANDLE ( 16 oz, )",
+      "capacity_oz": 16,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287866.jpeg?itok=pte-etRR"
+    },
+    {
+      "name": "COLLINS GLASS 5.5\" TALL CYLINDER / 10 OZ.",
+      "capacity_oz": 10,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287848.jpeg?itok=hIdWrVW4"
+    },
+    {
+      "name": "PILSNER/ DESSERT GLASS - MINI",
+      "capacity_oz": null,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287872.jpeg?itok=3a_R9J9m"
+    },
+    {
+      "name": "WATER GLASS/BAR GLASS HAMMERED CLEAR",
+      "capacity_oz": null,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287880.jpeg?itok=ZvRBeuv-"
+    },
+    {
+      "name": "PINT BEER GLASS - 16OZ.",
+      "capacity_oz": 16,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287873.jpeg?itok=4G5z3vcx"
+    },
+    {
+      "name": "BRANDY SNIFTER CHATEAU 12 OZ.",
+      "capacity_oz": 12,
+      "price": 2.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287845.jpeg?itok=hnluRy3G"
+    },
+    {
+      "name": "BRANDY SNIFTER CHATEAU 30 OZ.",
+      "capacity_oz": 30,
+      "price": 4.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287846.jpeg?itok=Ij-KRW8W"
+    },
+    {
+      "name": "MARTINI GLASS HAMMERED CLEAR",
+      "capacity_oz": null,
+      "price": 2.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287860.jpeg?itok=hBNOVoUu"
+    },
+    {
+      "name": "COLLINS GLASS 5\" TALL CYLINDER / 8 OZ.",
+      "capacity_oz": 8,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287847.jpeg?itok=_BGzrFJW"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS ROUNDED CLEAR GLASS",
+      "capacity_oz": null,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287854.jpeg?itok=BEinKt_g"
+    },
+    {
+      "name": "BEVERAGE GLASS 10OZ",
+      "capacity_oz": 10,
+      "price": 0.9,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287841.jpeg?itok=QwG_puOO"
+    },
+    {
+      "name": "WHITE WINE GLASS EVA",
+      "capacity_oz": null,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287686.jpeg?itok=EcHZTqqE"
+    },
+    {
+      "name": "MARTINI GLASS MINI",
+      "capacity_oz": null,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287863.jpeg?itok=GuSrSmxM"
+    },
+    {
+      "name": "CYLINDER GLASS TALL 7\" REGULAR",
+      "capacity_oz": null,
+      "price": 2.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287851.jpeg?itok=b5eChkL3"
+    },
+    {
+      "name": "MARTINI GLASS STEMLESS",
+      "capacity_oz": null,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287864.jpeg?itok=y5sTobrq"
+    },
+    {
+      "name": "CURVE SHOT GLASS CLEAR",
+      "capacity_oz": null,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287850.jpeg?itok=c-IvYSxC"
+    },
+    {
+      "name": "CURVE HIGHBALL GLASS CLEAR",
+      "capacity_oz": null,
+      "price": 1.5,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287849.jpeg?itok=kuuIbi7F"
+    },
+    {
+      "name": "OLD FASHIONED GLASS",
+      "capacity_oz": null,
+      "price": 0.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287869.jpeg?itok=JtzC8LCW"
+    },
+    {
+      "name": "SHERRY GLASS NEW",
+      "capacity_oz": null,
+      "price": 0.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287876.jpeg?itok=Kt9sa7Nt"
+    },
+    {
+      "name": "BRANDY SNIFTER - ALL PURPOSE 8 OZ.",
+      "capacity_oz": 8,
+      "price": 0.95,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287844.jpeg?itok=O1wnUINx"
+    },
+    {
+      "name": "HURRICANE GLASS",
+      "capacity_oz": null,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287856.jpeg?itok=052vU5Kr"
+    },
+    {
+      "name": "ICE CREAM SUNDAE GLASS",
+      "capacity_oz": null,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287857.jpeg?itok=EJencJ6n"
+    },
+    {
+      "name": "MARTINI GLASS LARGE",
+      "capacity_oz": null,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287862.jpeg?itok=pXbFSH8R"
+    },
+    {
+      "name": "PILSNER GLASS",
+      "capacity_oz": null,
+      "price": 0.9,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287870.jpeg?itok=f_5L_Xw3"
+    },
+    {
+      "name": "VODKA GLASS",
+      "capacity_oz": null,
+      "price": 1.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287879.jpeg?itok=a1f8ZBuX"
+    },
+    {
+      "name": "BEER MUG",
+      "capacity_oz": null,
+      "price": 1.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287839.jpeg?itok=LnQ160yu"
+    },
+    {
+      "name": "MARGARITA GLASS",
+      "capacity_oz": null,
+      "price": 2.0,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287859.jpeg?itok=HVaBV5zc"
+    },
+    {
+      "name": "CHAMPAGNE GLASS COUPE",
+      "capacity_oz": null,
+      "price": 1.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287774.jpeg?itok=AhttmIOe"
+    }
+  ],
+  "pressed-glassware": [
+    {
+      "name": "DOUBLE ROCKS GLASS FRANKLIN",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/478405.jpeg?itok=WBRxIDGS"
+    },
+    {
+      "name": "HIGHBALL GLASS FRANKLIN",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/478405.jpeg?itok=WBRxIDGS"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS PICASSO",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/478404.jpeg?itok=7sFbrUXw"
+    },
+    {
+      "name": "HIGHBALL GLASS PICASSO",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/478404.jpeg?itok=7sFbrUXw"
+    },
+    {
+      "name": "CHAMPAGNE GLASS FIRENZE COUPE",
+      "capacity_oz": 9.0,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/448906.jpeg?itok=bNwKZuCt"
+    },
+    {
+      "name": "CHAMPAGNE GLASS OPERA COUPE",
+      "capacity_oz": 9.0,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/448904.jpeg?itok=C9Wkyhe0"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TUSCAN COUPE",
+      "capacity_oz": 7.0,
+      "price": 3.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/448902.jpeg?itok=RfDeNaUl"
+    },
+    {
+      "name": "CHAMPAGNE GLASS DANTE FLUTE",
+      "capacity_oz": null,
+      "price": 3.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388118.jpeg?itok=zFC05Zbc"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS DANTE",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388118.jpeg?itok=zFC05Zbc"
+    },
+    {
+      "name": "GOBLET GLASS DANTE",
+      "capacity_oz": null,
+      "price": 3.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388118.jpeg?itok=zFC05Zbc"
+    },
+    {
+      "name": "HIGHBALL GLASS DANTE",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388118.jpeg?itok=zFC05Zbc"
+    },
+    {
+      "name": "GOBLET GLASS FORUM CAMEO",
+      "capacity_oz": null,
+      "price": 3.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/457102.jpeg?itok=nvbsfZXM"
+    },
+    {
+      "name": "HIGHBALL GLASS FORUM CAMEO",
+      "capacity_oz": null,
+      "price": 3.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/457102.jpeg?itok=nvbsfZXM"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS FORUM CAMEO",
+      "capacity_oz": null,
+      "price": 3.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/457102.jpeg?itok=nvbsfZXM"
+    },
+    {
+      "name": "ALL PURPOSE WINE GLASS TIMELESS",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388121.jpeg?itok=vAfzVpV5"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TIMELESS COUPE",
+      "capacity_oz": null,
+      "price": 3.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388121.jpeg?itok=vAfzVpV5"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS TIMELESS",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388121.jpeg?itok=vAfzVpV5"
+    },
+    {
+      "name": "HIGHBALL GLASS TIMELESS",
+      "capacity_oz": null,
+      "price": 2.50,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388121.jpeg?itok=vAfzVpV5"
+    },
+    {
+      "name": "COCKTAIL GLASS TIMELESS",
+      "capacity_oz": null,
+      "price": 2.25,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/388121.jpeg?itok=vAfzVpV5"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS CUBIST",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/454025.jpeg?itok=YQQApjlE"
+    },
+    {
+      "name": "HIGHBALL GLASS CUBIST",
+      "capacity_oz": null,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/454025.jpeg?itok=YQQApjlE"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS ROSETTI",
+      "capacity_oz": 10.0,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287887.jpeg?itok=9aiy9hd3"
+    },
+    {
+      "name": "GOBLET GLASS PEARLS",
+      "capacity_oz": 13.0,
+      "price": 3.00,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287890.jpeg?itok=9-A_CpJB"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS PRESSED CLEAR ICE BLUE",
+      "capacity_oz": 10.0,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287885.jpeg?itok=hI5-1Nry"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS PRESSED CLEAR COBALT BLUE",
+      "capacity_oz": 10.0,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287884.jpeg?itok=omJhqgpR"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS PRESSED CLEAR PINK",
+      "capacity_oz": 10.0,
+      "price": 2.75,
+      "image_url": "https://dcrental.com/sites/default/files/styles/product_category_image/public/287886.jpeg?itok=jZBJYdSH"
+    }
+  ],
+  "stemware-patterns": [
+    {
+      "name": "RED WINE GLASS TULIP",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tulip.jpg"
+    },
+    {
+      "name": "WATER GLASS TULIP",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tulip.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS TULIP",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tulip.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TULIP FLUTE",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tulip.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS PRISM FLUTE",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Prism.jpg"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS PRISM",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Prism.jpg"
+    },
+    {
+      "name": "RED WINE GLASS PRISM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Prism.jpg"
+    },
+    {
+      "name": "WATER GLASS PRISM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Prism.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS PRISM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Prism.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS ELEGANT SMOKE FLUTE",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Smoke.jpg"
+    },
+    {
+      "name": "RED WINE GLASS ELEGANT SMOKE",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Smoke.jpg"
+    },
+    {
+      "name": "WATER GLASS ELEGANT SMOKE",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Smoke.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS ELEGANT SMOKE",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Smoke.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS ELEGANT GOLD FLUTE",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Gold.jpg"
+    },
+    {
+      "name": "RED WINE GLASS ELEGANT GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Gold.jpg"
+    },
+    {
+      "name": "WATER GLASS ELEGANT GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Gold.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS ELEGANT GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Elegant_Gold.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS REIDEL FLUTE",
+      "price": 4,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Riedel.jpg"
+    },
+    {
+      "name": "RED WINE GLASS REIDEL",
+      "price": 4,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Riedel.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS KING",
+      "price": 1.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/King.jpg"
+    },
+    {
+      "name": "RED WINE GLASS KING",
+      "price": 1.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/King.jpg"
+    },
+    {
+      "name": "WATER GLASS KING",
+      "price": 1.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/King.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS KING",
+      "price": 1.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/King.jpg"
+    },
+    {
+      "name": "WATER GLASS MELODIA CLEAR (STEM)",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Melodia_Clear.jpg"
+    },
+    {
+      "name": "WATER GLASS MELODIA CLEAR (HIGHBALL)",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Melodia_Clear.jpg"
+    },
+    {
+      "name": "RED WINE GLASS ALCHEMIST",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Alchemist.jpg"
+    },
+    {
+      "name": "WATER GLASS ALCHEMIST",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Alchemist.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS ALCHEMIST",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Alchemist.jpg"
+    },
+    {
+      "name": "RED WINE GLASS OASIS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Oasis.jpg"
+    },
+    {
+      "name": "WATER GLASS OASIS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Oasis.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS OASIS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Oasis.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS OASIS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Oasis.jpg"
+    },
+    {
+      "name": "WATER GLASS SIGNATURE",
+      "price": 0.85,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Signature.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS SIGNATURE",
+      "price": 0.85,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Signature.jpg"
+    },
+    {
+      "name": "RED WINE GLASS SIGNATURE",
+      "price": 0.85,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Signature.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS SIGNATURE FLUTE",
+      "price": 1.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Signature.jpg"
+    },
+    {
+      "name": "WATER GLASS VAN CLEEF",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Van%20Clef.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS VAN CLEEF",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Van%20Clef.jpg"
+    },
+    {
+      "name": "RED WINE GLASS VAN CLEEF",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Van%20Clef.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS VAN CLEEF",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Van%20Clef.jpg"
+    },
+    {
+      "name": "RED WINE GLASS TRIBECA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tribeca.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS TRIBECA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tribeca.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TRIBECA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Tribeca.jpg"
+    },
+    {
+      "name": "WATER GLASS TRAVIATA",
+      "price": 1.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Traviata.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS TRAVIATA",
+      "price": 1.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Traviata.jpg"
+    },
+    {
+      "name": "RED WINE GLASS TRAVIATA",
+      "price": 1.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Traviata.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS TRAVIATA",
+      "price": 1.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Traviata.jpg"
+    },
+    {
+      "name": "WATER GLASS STEMLESS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Stemless.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS STEMLESS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Stemless.jpg"
+    },
+    {
+      "name": "RED WINE GLASS STEMLESS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Stemless.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS STEMLESS",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Stemless.jpg"
+    },
+    {
+      "name": "WATER GLASS IMPERIAL PLATINUM RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Platinum.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS IMPERIAL PLATINUM RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Platinum.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS IMPERIAL PLATINUM RIM FLUTE",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Platinum.jpg"
+    },
+    {
+      "name": "RED WINE GLASS IMPERIAL PLATINUM WHITE RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Platinum.jpg"
+    },
+    {
+      "name": "WATER GLASS MURANO",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Murano.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS MURANO",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Murano.jpg"
+    },
+    {
+      "name": "RED WINE GLASS MURANO",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Murano.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS MURANO FLUTE",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Murano.jpg"
+    },
+    {
+      "name": "WATER GLASS SATURN GOLD",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Saturn_Gold.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS SATURN GOLD",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Saturn_Gold.jpg"
+    },
+    {
+      "name": "RED WINE GLASS SATURN GOLD",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Saturn_Gold.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS SATURN GOLD",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Saturn_Gold.jpg"
+    },
+    {
+      "name": "MARTINI GLASS SATURN GOLD",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Saturn_Gold.jpg"
+    },
+    {
+      "name": "WATER GLASS IMPERIAL GOLD RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Gold.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS IMPERIAL GOLD RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Gold.jpg"
+    },
+    {
+      "name": "RED WINE GLASS IMPERIAL GOLD RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Gold.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS IMPERIAL GOLD RIM FLUTE",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Gold.jpg"
+    },
+    {
+      "name": "HIGHBALL GLASS IMPERIAL GOLD RIM",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Imperial_Gold.jpg"
+    },
+    {
+      "name": "WATER GLASS GOLD RIM REVERSA",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Gold_Rim_Reversa.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS GOLD RIM REVERSA",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Gold_Rim_Reversa.jpg"
+    },
+    {
+      "name": "RED WINE GLASS GOLD RIM REVERSA",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Gold_Rim_Reversa.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS GOLD RIM REVERSA",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Gold_Rim_Reversa.jpg"
+    },
+    {
+      "name": "WATER GLASS EMPIRE PLATINUM RIM",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Empire_Platinum.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS EMPIRE PLATINUM RIM",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Empire_Platinum.jpg"
+    },
+    {
+      "name": "RED WINE GLASS EMPIRE PLATINUM RIM",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Empire_Platinum.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS EMPIRE PLATINUM RIM",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Empire_Platinum.jpg"
+    },
+    {
+      "name": "RED WINE GLASS CATALINA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Catalina.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS CATALINA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Catalina.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS CATALINA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Catalina.jpg"
+    },
+    {
+      "name": "WATER GLASS CATALINA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Catalina.jpg"
+    },
+    {
+      "name": "WATER GLASS HONEYCOMB GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Honeycomb_Gold.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS HONEYCOMB GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Honeycomb_Gold.jpg"
+    },
+    {
+      "name": "RED WINE GLASS HONEYCOMB GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Honeycomb_Gold.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS HONEYCOMB GOLD",
+      "price": 3.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Honeycomb_Gold.jpg"
+    },
+    {
+      "name": "WATER GLASS FLAMINGO",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Flamingo.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS FLAMINGO",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Flamingo.jpg"
+    },
+    {
+      "name": "RED WINE GLASS FLAMINGO",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Flamingo.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS FLAMINGO FLUTE",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Flamingo.jpg"
+    },
+    {
+      "name": "WATER GLASS ETCHED",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Etched.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS ETCHED FLUTE",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Etched.jpg"
+    },
+    {
+      "name": "RED WINE GLASS ETCHED",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Etched.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS ETCHED",
+      "price": 3,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Etched.jpg"
+    },
+    {
+      "name": "WATER GLASS DIAMOND CUT",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Diamond_Cut.jpg"
+    },
+    {
+      "name": "RED WINE GLASS DIAMOND CUT",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Diamond_Cut.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS DIAMOND CUT",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Diamond_Cut.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS DIAMOND CUT",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Diamond_Cut.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS CRYSTAL",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Crystal.jpg"
+    },
+    {
+      "name": "RED WINE GLASS CRYSTAL",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Crystal.jpg"
+    },
+    {
+      "name": "WATER GLASS COPENHAGEN",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Copenhagen.jpg"
+    },
+    {
+      "name": "RED WINE GLASS COPENHAGEN",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Copenhagen.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS COPENHAGEN",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Copenhagen.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS COPENHAGEN FLUTE",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Copenhagen.jpg"
+    },
+    {
+      "name": "RED WINE GLASS CHOPIN",
+      "price": 1,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chopin.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS CHOPIN",
+      "price": 1,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chopin.jpg"
+    },
+    {
+      "name": "WATER GLASS CHOPIN",
+      "price": 1,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chopin.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS CHATEAU",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "RED WINE GLASS CHATEAU BURGUNDY",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "RED WINE GLASS CHATEAU BALLOON",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS CHATEAU FLUTE",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "RED WINE GLASS CHATEAU BORDEAUX",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "WATER GLASS CHATEAU",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "TASTING WINE GLASS CHATEAU",
+      "price": 2,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Chateau.jpg"
+    },
+    {
+      "name": "WATER GLASS ABERDEEN",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Aberdeen.jpg"
+    },
+    {
+      "name": "RED WINE GLASS ABERDEEN",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Aberdeen.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS ABERDEEN",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Aberdeen.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS ABERDEEN",
+      "price": 2.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Aberdeen.jpg"
+    },
+    {
+      "name": "WATER GLASS BELVEDERE",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Belvedere.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS BELVEDERE",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Belvedere.jpg"
+    },
+    {
+      "name": "RED WINE GLASS BELVEDERE",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Belvedere.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS BELVEDERE",
+      "price": 2.25,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Belvedere.jpg"
+    },
+    {
+      "name": "WATER GLASS BARCELONA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Barcelona.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS BARCELONA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Barcelona.jpg"
+    },
+    {
+      "name": "RED WINE GLASS BARCELONA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Barcelona.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS BARCELONA",
+      "price": 1.5,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Barcelona.jpg"
+    },
+    {
+      "name": "CHAMPAGNE GLASS ASHFORD",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Ashford.jpg"
+    },
+    {
+      "name": "WHITE WINE GLASS ASHFORD",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Ashford.jpg"
+    },
+    {
+      "name": "RED WINE GLASS ASHFORD",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Ashford.jpg"
+    },
+    {
+      "name": "WATER GLASS ASHFORD",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Ashford.jpg"
+    },
+    {
+      "name": "DOUBLE ROCKS GLASS ASHFORD",
+      "price": 2.75,
+      "capacity_oz": null,
+      "image_url": "https://dcrental.com/sites/default/files/products/Ashford.jpg"
+    }
+  ]
+}
