@@ -7,12 +7,14 @@ import {
     GlassWater,
     Library,
     CalendarDays,
+    LayoutDashboard,
     User,
     Menu,
     X
 } from "lucide-react"
 
 const navItems = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Gallery", href: "/batch-calculator", icon: Library },
     { name: "Saved Events", href: "/saved-events", icon: CalendarDays },
 ]
