@@ -13,7 +13,7 @@ interface ServingsInputProps {
 }
 
 // Quick select presets (most common values)
-const QUICK_PRESETS = [50, 100, 150, 200, 250]
+const QUICK_PRESETS = [50, 100, 150, 200, 250, 300]
 
 // Full dropdown options from 20 to 800 in intervals of 20, plus 50, 150, and 250
 const DROPDOWN_OPTIONS = [
@@ -184,29 +184,28 @@ export const ServingsInput: React.FC<ServingsInputProps> = React.memo(
 
         {/* Quick preset buttons - separate from the input */}
         {!disabled && (
-          <div className="mt-2 w-full">
-            <div className="flex items-center gap-1.5 flex-nowrap w-full">
-              <span className="text-xs text-gray-500 mr-1">Quick:</span>
+          <div className="mt-3 w-full">
+            <div className="flex items-center gap-2 flex-nowrap w-full">
               {QUICK_PRESETS.map(preset => (
                 <button
                   key={preset}
                   type="button"
                   onClick={() => handlePresetClick(preset)}
-                  className={`px-3 py-1 text-xs font-medium rounded-full border transition-all duration-200 ${
+                  className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-150 ${
                     value === preset
-                      ? "bg-orange-500 text-white border-orange-500 shadow-sm"
-                      : "bg-white text-gray-600 border-gray-300 hover:border-orange-400 hover:text-orange-600"
+                      ? "bg-[#f54900] text-white shadow-sm"
+                      : "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700"
                   }`}
                 >
                   {preset}
                 </button>
               ))}
-              {isCustomValue && (
-                <span className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600 border border-gray-200 whitespace-nowrap">
-                  Custom: {value}
-                </span>
-              )}
             </div>
+            {isCustomValue && (
+              <span className="mt-1.5 inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500">
+                Custom: {value}
+              </span>
+            )}
           </div>
         )}
       </div>

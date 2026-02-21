@@ -15,6 +15,7 @@ import {
 
 // Types
 import type { BatchState } from "@/features/batch-calculator/types"
+import type { GlasswareItem } from "@/features/batch-calculator/components/GlasswarePickerModal"
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
 import { generateShoppingListPdf, generateBatchCalculationsPdf, generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
 import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
@@ -163,6 +164,7 @@ function BatchReviewContent() {
     }, [searchParams])
     const [bulkServings, setBulkServings] = useState<string>("")
     const [removedIds, setRemovedIds] = useState<number[]>([])
+    const [selectedGlassware, setSelectedGlassware] = useState<Record<number, GlasswareItem | null>>({})
 
     // Save modal state
     const [saveModalOpen, setSaveModalOpen] = useState(false)
@@ -255,6 +257,10 @@ function BatchReviewContent() {
         }
     }
 
+
+    const handleGlasswareSelect = useCallback((batchId: number, item: GlasswareItem | null) => {
+        setSelectedGlassware(prev => ({ ...prev, [batchId]: item }))
+    }, [])
 
     const handleUpdateBatch = useCallback((updatedBatch: BatchState) => {
         setBatches(prev => prev.map(b => b.id === updatedBatch.id ? updatedBatch : b))
@@ -476,6 +482,8 @@ function BatchReviewContent() {
                                     onEditRecipe={setEditingRecipe}
                                     isRemoved={removedIds.includes(batch.id)}
                                     onRestore={handleRestoreDrink}
+                                    onGlasswareSelect={handleGlasswareSelect}
+                                    selectedGlass={selectedGlassware[batch.id] ?? null}
                                 />
                             ))}
                         </div>

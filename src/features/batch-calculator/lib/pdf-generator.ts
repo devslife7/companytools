@@ -82,6 +82,20 @@ const generateHtmlHeader = (title: string, showHeader: boolean = true, compactPa
 }
 
 // Helper function to generate shopping list HTML
+// Helper function to collect glassware totals from batches
+const collectGlasswareTotals = (batches: BatchState[]): Record<string, number> => {
+  const glassTotals: Record<string, number> = {}
+  batches.forEach(batch => {
+    const recipe = batch.editableRecipe
+    if (!recipe?.glassType) return
+    const servings = typeof batch.servings === 'number' ? batch.servings : parseInt(batch.servings || '0', 10)
+    if (servings <= 0) return
+    glassTotals[recipe.glassType] = (glassTotals[recipe.glassType] || 0) + servings
+  })
+  return glassTotals
+}
+
+// Helper function to generate shopping list HTML
 const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
   const reportData = batches.filter(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
@@ -191,6 +205,31 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
         )
         .join("")}
                 ` : ""}
+
+                ${(() => {
+                  const glassTotals = collectGlasswareTotals(reportData)
+                  const glassEntries = Object.entries(glassTotals)
+                  if (glassEntries.length === 0) return ''
+                  const totalGlasses = glassEntries.reduce((sum, [, qty]) => sum + qty, 0)
+                  return `
+                <tr>
+                    <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 1px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
+                        GLASSWARE RENTAL
+                    </td>
+                </tr>
+                ${glassEntries.map(([glassType, qty]) => `
+                    <tr class="total-row">
+                        <td class="text-left">${glassType} Glass</td>
+                        ${hasOrderUnits ? `<td class="text-left">${qty} each</td>` : ''}
+                        ${showBottles ? '<td>-</td>' : ''}
+                        ${showCost ? '<td>-</td>' : ''}
+                    </tr>
+                `).join('')}
+                <tr>
+                    <td colspan="${totalColumns}" style="text-align: right; font-weight: bold; background-color: #d0d0d0; padding: 4px 6px; font-size: 9.5pt;">TOTAL GLASSES: ${totalGlasses}</td>
+                </tr>
+                `
+                })()}
             </tbody>
         </table>
     </div>
@@ -388,8 +427,6 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
   const invoiceDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const invoiceNumber = `INV-${event.id.toString().padStart(4, '0')}`;
 
-  const GLASSWARE_RATE = 2.00; // per glass
-
   let totalAmount = 0;
 
   const tableRows = batches.map(batch => {
@@ -409,32 +446,6 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
         </tr>
       `;
   }).join('');
-
-  // Glassware rental — group by glass type, sum servings
-  const glassTotals: Record<string, number> = {};
-  batches.forEach(batch => {
-    const recipe = batch.editableRecipe;
-    if (!recipe?.glassType) return;
-    const servings = typeof batch.servings === 'number' ? batch.servings : parseInt(batch.servings || '0', 10);
-    if (servings <= 0) return;
-    glassTotals[recipe.glassType] = (glassTotals[recipe.glassType] || 0) + servings;
-  });
-
-  let glasswareTotal = 0;
-  const glasswareRows = Object.entries(glassTotals).map(([glassType, qty]) => {
-    const lineTotal = qty * GLASSWARE_RATE;
-    glasswareTotal += lineTotal;
-    return `
-        <tr class="item-row glassware-row">
-          <td class="text-left">${glassType} Glass Rental</td>
-          <td class="text-center">${qty}</td>
-          <td class="text-right">$${GLASSWARE_RATE.toFixed(2)}</td>
-          <td class="text-right">$${lineTotal.toFixed(2)}</td>
-        </tr>
-      `;
-  }).join('');
-
-  totalAmount += glasswareTotal;
 
   const TAX_RATE = 0.0825; // 8.25%
   const taxAmount = totalAmount * TAX_RATE;
@@ -471,7 +482,6 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
             .item-row:last-child td { border-bottom: none; }
             .section-label-row td { padding: 8px 16px; border-bottom: 1px solid #e5e7eb; }
             .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #6b7280; background: #f9fafb; }
-            .glassware-row td { color: #374151; }
             .total-section { width: 320px; float: right; margin-top: 30px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
             .total-row { display: flex; justify-content: space-between; padding: 12px 20px; font-size: 14px; color: #4b5563; }
             .total-row.grand-total { border-top: 1px solid #e5e7eb; font-size: 20px; font-weight: 800; color: #111827; background: #fff; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
@@ -524,12 +534,6 @@ const generateInvoiceHtml = (batches: BatchState[], event: any) => {
                         <td colspan="4" class="section-label">Cocktail Service</td>
                     </tr>
                     ${tableRows}
-                    ${glasswareRows ? `
-                    <tr class="section-label-row">
-                        <td colspan="4" class="section-label">Glassware Rental</td>
-                    </tr>
-                    ${glasswareRows}
-                    ` : ''}
                 </tbody>
             </table>
 
@@ -598,6 +602,23 @@ const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap,
   const liquorSection = renderSection('Liquor Items', '#f54900', '#fff7f4', grandTotals.liquor, true)
   const sodaSection = renderSection('Soda & Mixers', '#0369a1', '#f0f9ff', grandTotals.soda as any, false)
   const otherSection = renderSection('Other Items', '#047857', '#f0fdf4', grandTotals.other as any, false)
+
+  // Glassware rental section
+  const glassTotals = collectGlasswareTotals(reportData)
+  const glassEntries = Object.entries(glassTotals)
+  const glasswareSection = glassEntries.length > 0 ? `
+      <tr class="section-header" style="background:#fdf4ff;">
+        <td colspan="4" style="padding:10px 16px; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#7e22ce; border-bottom:2px solid #7e22ce20;">Glassware Rental</td>
+      </tr>
+      ${glassEntries.map(([glassType, qty]) => `
+      <tr class="item-row">
+        <td class="text-left">${glassType} Glass</td>
+        <td class="text-center">${qty} each</td>
+        <td class="text-center">—</td>
+        <td class="text-right">—</td>
+      </tr>
+      `).join('')}
+    ` : ''
 
   return `
     <!DOCTYPE html>
@@ -678,6 +699,7 @@ const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap,
                     ${liquorSection}
                     ${sodaSection}
                     ${otherSection}
+                    ${glasswareSection}
                 </tbody>
             </table>
 
