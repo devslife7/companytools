@@ -1,4 +1,14 @@
 import type { BatchState } from "../types"
+
+// Minimal type matching GlasswareItem from GlasswarePickerModal
+export interface DCRentalGlassSelection {
+  name: string
+  capacity_oz: number | null
+  price: number
+  image_url: string
+  category: string
+}
+export type GlasswareMap = Record<number, DCRentalGlassSelection | null>
 import {
   LITER_TO_ML,
   FIXED_BATCH_LITERS,
@@ -95,8 +105,35 @@ const collectGlasswareTotals = (batches: BatchState[]): Record<string, number> =
   return glassTotals
 }
 
+// Helper to aggregate DC Rental glassware selections into line items
+interface DCRentalLineItem {
+  name: string
+  capacity_oz: number | null
+  qty: number
+  pricePerGlass: number
+  totalCost: number
+}
+
+const collectDCRentalGlassware = (batches: BatchState[], glasswareMap?: GlasswareMap): DCRentalLineItem[] => {
+  if (!glasswareMap) return []
+  const aggregate: Record<string, DCRentalLineItem> = {}
+  batches.forEach(batch => {
+    const glass = glasswareMap[batch.id]
+    if (!glass) return
+    const qty = typeof batch.servings === 'number' ? batch.servings : parseInt(batch.servings || '0', 10)
+    if (qty <= 0) return
+    if (aggregate[glass.name]) {
+      aggregate[glass.name].qty += qty
+      aggregate[glass.name].totalCost += glass.price * qty
+    } else {
+      aggregate[glass.name] = { name: glass.name, capacity_oz: glass.capacity_oz, qty, pricePerGlass: glass.price, totalCost: glass.price * qty }
+    }
+  })
+  return Object.values(aggregate)
+}
+
 // Helper function to generate shopping list HTML
-const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
+const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap, glasswareMap?: GlasswareMap) => {
   const reportData = batches.filter(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
@@ -209,14 +246,24 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
                 ${(() => {
                   const glassTotals = collectGlasswareTotals(reportData)
                   const glassEntries = Object.entries(glassTotals)
-                  if (glassEntries.length === 0) return ''
-                  const totalGlasses = glassEntries.reduce((sum, [, qty]) => sum + qty, 0)
+                  const dcRental = collectDCRentalGlassware(reportData, glasswareMap)
+                  const hasGlassware = glassEntries.length > 0 || dcRental.length > 0
+                  if (!hasGlassware) return ''
+                  const rentalTotal = dcRental.reduce((sum, g) => sum + g.totalCost, 0)
                   return `
                 <tr>
                     <td colspan="${totalColumns}" style="background-color: #d0d0d0; font-weight: bold; padding: 4px 6px; border-top: 1px solid #000; border-bottom: 1px solid #000; font-size: 9.5pt; text-align: left;">
                         GLASSWARE RENTAL
                     </td>
                 </tr>
+                ${dcRental.map(g => `
+                    <tr class="total-row">
+                        <td class="text-left">${g.name}${g.capacity_oz != null ? ` (${g.capacity_oz}oz)` : ''}</td>
+                        ${hasOrderUnits ? `<td class="text-left">${g.qty} each</td>` : ''}
+                        ${showBottles ? '<td>-</td>' : ''}
+                        ${showCost ? `<td>$${g.totalCost.toFixed(2)}</td>` : ''}
+                    </tr>
+                `).join('')}
                 ${glassEntries.map(([glassType, qty]) => `
                     <tr class="total-row">
                         <td class="text-left">${glassType} Glass</td>
@@ -225,9 +272,12 @@ const generateShoppingListHtml = (batches: BatchState[], priceMap?: LiquorPriceM
                         ${showCost ? '<td>-</td>' : ''}
                     </tr>
                 `).join('')}
+                ${rentalTotal > 0 ? `
                 <tr>
-                    <td colspan="${totalColumns}" style="text-align: right; font-weight: bold; background-color: #d0d0d0; padding: 4px 6px; font-size: 9.5pt;">TOTAL GLASSES: ${totalGlasses}</td>
+                    <td colspan="${totalColumns - 1}" style="text-align: right; font-weight: bold; background-color: #d0d0d0; padding: 4px 6px;">RENTAL COST</td>
+                    <td style="font-weight: bold; background-color: #d0d0d0;">$${rentalTotal.toFixed(2)}</td>
                 </tr>
+                ` : ''}
                 `
                 })()}
             </tbody>
@@ -322,7 +372,7 @@ const generateBatchCalculationsHtml = (batches: BatchState[], extraTopMargin: bo
             <div class="batch-section">
                 <div class="batch-header">
                     <h3 class="batch-title">${recipe.name}${recipe.id ? ` #${recipe.id}` : ""}</h3>
-                    <div class="batch-method">${servingsNum > 0 ? `<strong>${servingsNum}pp</strong> | ` : ""}<strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
+                    <div class="batch-method">${servingsNum > 0 ? `<strong>Servings:</strong> ${servingsNum} | ` : ""}<strong>Method:</strong> ${recipe.method || "N/A"}${servingsNum > 0 ? ` | <strong>Total:</strong> ${formatNumber(totalServingsLiquidML / LITER_TO_ML)} L` : ""}</div>
                 </div>
                 ${recipe.instructions ? `<p style="margin: 4px 0 2px 0;"><strong>Instructions:</strong></p><p style="margin: 0 0 4px 0; white-space: pre-line;">${recipe.instructions}</p>` : ''}
 
@@ -403,8 +453,8 @@ const openPdfWindow = (htmlContent: string) => {
 }
 
 // Generate shopping list PDF only
-export const generateShoppingListPdf = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
-  const htmlContent = generateHtmlHeader("Cocktail Shopping List", false, true) + generateShoppingListHtml(batches, priceMap) + `</body></html>`
+export const generateShoppingListPdf = (batches: BatchState[], priceMap?: LiquorPriceMap, glasswareMap?: GlasswareMap) => {
+  const htmlContent = generateHtmlHeader("Cocktail Shopping List", false, true) + generateShoppingListHtml(batches, priceMap, glasswareMap) + `</body></html>`
   openPdfWindow(htmlContent)
 }
 
@@ -415,9 +465,9 @@ export const generateBatchCalculationsPdf = (batches: BatchState[]) => {
 }
 
 // Generate full report (both shopping list and batch calculations)
-export const generatePdfReport = (batches: BatchState[], priceMap?: LiquorPriceMap) => {
+export const generatePdfReport = (batches: BatchState[], priceMap?: LiquorPriceMap, glasswareMap?: GlasswareMap) => {
   // Generate both shopping list and batch calculations
-  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false, true) + generateShoppingListHtml(batches, priceMap) + generateBatchCalculationsHtml(batches, true) + `</body></html>`
+  const htmlContent = generateHtmlHeader("Cocktail Batching Production Sheet", false, true) + generateShoppingListHtml(batches, priceMap, glasswareMap) + generateBatchCalculationsHtml(batches, true) + `</body></html>`
   openPdfWindow(htmlContent)
 }
 
@@ -568,7 +618,7 @@ export const generateClientInvoicePdf = (batches: BatchState[], event: any) => {
 }
 
 // Generate Order List HTML (invoice-style design)
-const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap, eventName?: string) => {
+const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap, eventName?: string, glasswareMap?: GlasswareMap) => {
   const reportData = batches.filter(
     b => b.editableRecipe && ((typeof b.servings === "number" && b.servings > 0) || b.targetLiters > 0)
   )
@@ -603,19 +653,19 @@ const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap,
   const sodaSection = renderSection('Soda & Mixers', '#0369a1', '#f0f9ff', grandTotals.soda as any, false)
   const otherSection = renderSection('Other Items', '#047857', '#f0fdf4', grandTotals.other as any, false)
 
-  // Glassware rental section
-  const glassTotals = collectGlasswareTotals(reportData)
-  const glassEntries = Object.entries(glassTotals)
-  const glasswareSection = glassEntries.length > 0 ? `
+  // Glassware rental section — only DC Rental picker selections
+  const dcRental = collectDCRentalGlassware(reportData, glasswareMap)
+  const rentalTotal = dcRental.reduce((sum, g) => sum + g.totalCost, 0)
+  const glasswareSection = dcRental.length > 0 ? `
       <tr class="section-header" style="background:#fdf4ff;">
         <td colspan="4" style="padding:10px 16px; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#7e22ce; border-bottom:2px solid #7e22ce20;">Glassware Rental</td>
       </tr>
-      ${glassEntries.map(([glassType, qty]) => `
+      ${dcRental.map(g => `
       <tr class="item-row">
-        <td class="text-left">${glassType} Glass</td>
-        <td class="text-center">${qty} each</td>
+        <td class="text-left">${g.name}${g.capacity_oz != null ? ` (${g.capacity_oz}oz)` : ''}</td>
+        <td class="text-center">${g.qty} each · $${g.pricePerGlass.toFixed(2)}/glass</td>
         <td class="text-center">—</td>
-        <td class="text-right">—</td>
+        <td class="text-right">$${g.totalCost.toFixed(2)}</td>
       </tr>
       `).join('')}
     ` : ''
@@ -703,15 +753,21 @@ const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap,
                 </tbody>
             </table>
 
-            ${hasPrices && grandTotals.totalLiquorCost > 0 ? `
+            ${(hasPrices && grandTotals.totalLiquorCost > 0) || rentalTotal > 0 ? `
             <div class="total-section">
+                ${hasPrices && grandTotals.totalLiquorCost > 0 ? `
                 <div class="total-row">
                     <span>Liquor Cost</span>
                     <span>$${grandTotals.totalLiquorCost.toFixed(2)}</span>
-                </div>
+                </div>` : ''}
+                ${rentalTotal > 0 ? `
+                <div class="total-row">
+                    <span>Glassware Rental</span>
+                    <span>$${rentalTotal.toFixed(2)}</span>
+                </div>` : ''}
                 <div class="total-row grand-total">
                     <span>Est. Total</span>
-                    <span class="amount">$${grandTotals.totalLiquorCost.toFixed(2)}</span>
+                    <span class="amount">$${(grandTotals.totalLiquorCost + rentalTotal).toFixed(2)}</span>
                 </div>
             </div>
             ` : ''}
@@ -725,7 +781,7 @@ const generateOrderListHtml = (batches: BatchState[], priceMap?: LiquorPriceMap,
   `
 }
 
-export const generateOrderListPdf = (batches: BatchState[], priceMap?: LiquorPriceMap, eventName?: string) => {
-  const htmlContent = generateOrderListHtml(batches, priceMap, eventName)
+export const generateOrderListPdf = (batches: BatchState[], priceMap?: LiquorPriceMap, eventName?: string, glasswareMap?: GlasswareMap) => {
+  const htmlContent = generateOrderListHtml(batches, priceMap, eventName, glasswareMap)
   openPdfWindow(htmlContent)
 }

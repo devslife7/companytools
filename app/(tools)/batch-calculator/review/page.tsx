@@ -18,6 +18,7 @@ import type { BatchState } from "@/features/batch-calculator/types"
 import type { GlasswareItem } from "@/features/batch-calculator/components/GlasswarePickerModal"
 import { FIXED_BATCH_LITERS } from "@/features/batch-calculator/lib/calculations"
 import { generateShoppingListPdf, generateBatchCalculationsPdf, generatePdfReport } from "@/features/batch-calculator/lib/pdf-generator"
+import type { GlasswareMap } from "@/features/batch-calculator/lib/pdf-generator"
 import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 
 // Hooks
@@ -164,7 +165,7 @@ function BatchReviewContent() {
     }, [searchParams])
     const [bulkServings, setBulkServings] = useState<string>("")
     const [removedIds, setRemovedIds] = useState<number[]>([])
-    const [selectedGlassware, setSelectedGlassware] = useState<Record<number, GlasswareItem | null>>({})
+    const [selectedGlassware, setSelectedGlassware] = useState<GlasswareMap>({})
 
     // Save modal state
     const [saveModalOpen, setSaveModalOpen] = useState(false)
@@ -259,7 +260,7 @@ function BatchReviewContent() {
 
 
     const handleGlasswareSelect = useCallback((batchId: number, item: GlasswareItem | null) => {
-        setSelectedGlassware(prev => ({ ...prev, [batchId]: item }))
+        setSelectedGlassware(prev => ({ ...prev, [batchId]: item ?? null }))
     }, [])
 
     const handleUpdateBatch = useCallback((updatedBatch: BatchState) => {
@@ -351,10 +352,11 @@ function BatchReviewContent() {
                             <div className="relative" ref={exportRef}>
                                 <div className="flex items-stretch border border-gray-300 rounded-lg shadow-sm overflow-hidden bg-white">
                                     <button
-                                        onClick={() => generatePdfReport(activeBatches, liquorPrices)}
+                                        onClick={() => generatePdfReport(activeBatches, liquorPrices, selectedGlassware)}
                                         className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
                                     >
                                         <FileDown className="w-4 h-4" />
+                                        <span className="sm:hidden">PDF</span>
                                         <span className="hidden sm:inline">Export PDF</span>
                                     </button>
                                     <div className="w-px bg-gray-300" />
@@ -378,7 +380,7 @@ function BatchReviewContent() {
                                             Batch Sheets
                                         </button>
                                         <button
-                                            onMouseDown={() => { generateShoppingListPdf(activeBatches, liquorPrices); setExportOpen(false) }}
+                                            onMouseDown={() => { generateShoppingListPdf(activeBatches, liquorPrices, selectedGlassware); setExportOpen(false) }}
                                             className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                                         >
                                             <FileDown className="w-3.5 h-3.5 text-gray-400" />
@@ -392,6 +394,7 @@ function BatchReviewContent() {
                                 className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-[#f54900] text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-[#d13e00] transition-all shadow-md"
                             >
                                 <Save className="w-4 h-4" />
+                                <span className="sm:hidden">Save</span>
                                 <span className="hidden sm:inline">Save Event</span>
                             </button>
                         </div>
@@ -506,6 +509,7 @@ function BatchReviewContent() {
                                 measureSystem="metric"
                                 liquorPrices={liquorPrices}
                                 eventName={eventName}
+                                glasswareMap={selectedGlassware}
                             />
                         </div>
                     </div>
