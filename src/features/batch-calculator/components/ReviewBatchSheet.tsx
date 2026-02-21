@@ -6,15 +6,17 @@ import type { BatchState } from "@/features/batch-calculator/types"
 import type { LiquorPriceMap } from "@/features/batch-calculator/lib/grand-totals"
 import { formatNumber, CONVERSION_FACTORS, calculateSingleServingLiquidVolumeML, combineAmountAndUnit, parseAmount } from "@/features/batch-calculator/lib/calculations"
 import { generateOrderListPdf, generateClientInvoicePdf } from "@/features/batch-calculator/lib/pdf-generator"
+import type { GlasswareMap } from "@/features/batch-calculator/lib/pdf-generator"
 
 interface ReviewBatchSheetProps {
     batches: BatchState[]
     measureSystem: 'us' | 'metric'
     liquorPrices?: LiquorPriceMap
     eventName?: string
+    glasswareMap?: GlasswareMap
 }
 
-export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventName }: ReviewBatchSheetProps) {
+export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventName, glasswareMap }: ReviewBatchSheetProps) {
     // Misc cost % (default 15%, persisted in localStorage)
     const [miscCostPercent, setMiscCostPercent] = useState<number>(() => {
         const saved = localStorage.getItem("batchMiscCostPercent")
@@ -252,7 +254,7 @@ export function ReviewBatchSheet({ batches, measureSystem, liquorPrices, eventNa
                         <FileText className="text-sm mr-1 w-4 h-4" /> Invoice
                     </button>
                     <button
-                        onClick={() => generateOrderListPdf(batches, liquorPrices, eventName)}
+                        onClick={() => generateOrderListPdf(batches, liquorPrices, eventName, glasswareMap)}
                         className="flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg text-xs font-medium text-white bg-[#f54900] hover:bg-[#d13e00] transition-colors shadow-sm"
                     >
                         <ShoppingCart className="text-sm mr-1 w-4 h-4" /> Order List

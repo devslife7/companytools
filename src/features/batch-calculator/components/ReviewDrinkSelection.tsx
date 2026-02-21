@@ -1,9 +1,11 @@
 import React, { useMemo } from "react"
-import { Trash2, Users, MoreVertical, Pencil, RotateCcw } from "lucide-react"
+import { Trash2, Users, MoreVertical, Pencil, RotateCcw, Wine } from "lucide-react"
 
 // Types
 import type { BatchState } from "@/features/batch-calculator/types"
 import { calculateSingleServingLiquidVolumeML, formatNumber, LITER_TO_ML, GALLON_TO_ML } from "@/features/batch-calculator/lib/calculations"
+import { GlasswarePickerModal } from "@/features/batch-calculator/components/GlasswarePickerModal"
+import type { GlasswareItem } from "@/features/batch-calculator/components/GlasswarePickerModal"
 
 // Props
 interface ReviewDrinkSelectionProps {
@@ -16,11 +18,14 @@ interface ReviewDrinkSelectionProps {
     onEditRecipe?: (batch: BatchState) => void
     isRemoved?: boolean
     onRestore?: (id: number) => void
+    onGlasswareSelect?: (batchId: number, item: GlasswareItem | null) => void
+    selectedGlass?: GlasswareItem | null
 }
 
-export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measureSystem = 'metric', onViewBatching, onViewRecipe, onEditRecipe, isRemoved, onRestore }: ReviewDrinkSelectionProps) {
+export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ batch, onServingsChange, onRemove, measureSystem = 'metric', onViewBatching, onViewRecipe, onEditRecipe, isRemoved, onRestore, onGlasswareSelect, selectedGlass }: ReviewDrinkSelectionProps) {
     const { id, selectedCocktail, servings } = batch
     const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+    const [glassPickerOpen, setGlassPickerOpen] = React.useState(false)
     const menuRef = React.useRef<HTMLDivElement>(null)
 
     React.useEffect(() => {
@@ -227,11 +232,22 @@ export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ b
             </div>
 
             <div className="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-between items-center text-sm">
-                <span className="text-gray-500">
+                <span className="text-gray-500 flex items-center flex-wrap gap-2">
                     Includes <span className="font-medium text-gray-900">{formatNumber(singleServingOz, 1)} oz</span> per serving
+                    {selectedGlass && (
+                        <span className="inline-flex items-center gap-1 text-xs text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5 font-medium">
+                            🥂 {selectedGlass.name}{selectedGlass.capacity_oz != null ? ` · ${selectedGlass.capacity_oz}oz` : ""} · ${selectedGlass.price.toFixed(2)}/glass
+                        </span>
+                    )}
                 </span>
                 <div className="flex items-center gap-4">
-                    {/* Action links */}
+                    <button
+                        onClick={() => setGlassPickerOpen(true)}
+                        className="text-gray-500 hover:text-gray-800 font-medium text-xs uppercase tracking-wide flex items-center gap-1"
+                    >
+                        <Wine className="w-3.5 h-3.5" />
+                        {selectedGlass ? 'Change Glassware' : 'Add Glassware'}
+                    </button>
                     <button
                         onClick={() => onViewBatching?.(batch)}
                         className="text-[#f54900] hover:text-[#d13e00] font-medium text-xs uppercase tracking-wide flex items-center"
@@ -240,6 +256,12 @@ export const ReviewDrinkSelection = React.memo(function ReviewDrinkSelection({ b
                     </button>
                 </div>
             </div>
+            <GlasswarePickerModal
+                isOpen={glassPickerOpen}
+                onClose={() => setGlassPickerOpen(false)}
+                selectedGlass={selectedGlass}
+                onSelect={(item) => { onGlasswareSelect?.(id, item); setGlassPickerOpen(false) }}
+            />
         </div>
     )
 })
