@@ -14,6 +14,7 @@ interface FeedbackEntry {
 }
 
 const PAGES = [
+  "Dashboard",
   "Batch Calculator — Gallery",
   "Batch Calculator — Review",
   "Saved Events",
