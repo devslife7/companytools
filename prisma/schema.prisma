@@ -70,6 +70,17 @@ model SavedEvent {
   @@map("saved_events")
 }
 
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  type      String   @db.VarChar(20)
+  page      String   @db.VarChar(100)
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([type])
+  @@map("feedback")
+}
+
 enum CocktailMethod {
   Shake
   Build

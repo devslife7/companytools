@@ -8,6 +8,7 @@ import {
     Library,
     CalendarDays,
     LayoutDashboard,
+    MessageSquarePlus,
     User,
     Menu,
     X
@@ -17,6 +18,7 @@ const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Gallery", href: "/batch-calculator", icon: Library },
     { name: "Saved Events", href: "/saved-events", icon: CalendarDays },
+    { name: "Feedback", href: "/feedback", icon: MessageSquarePlus },
 ]
 
 function SidebarContent({ pathname, onNavClick }: { pathname: string; onNavClick?: () => void }) {

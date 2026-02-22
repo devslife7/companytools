@@ -25,11 +25,16 @@ export default function DashboardPage() {
       fetch("/api/cocktails").then((r) => r.json()),
       fetch("/api/liquor-prices").then((r) => r.json()),
     ])
-      .then(([eventsRes, cocktailsRes, priceMap]) => {
-        const dashboard = computeDashboardData(eventsRes.events ?? [], cocktailsRes, priceMap)
+      .then(([eventsRes, cocktailsRes, pricesRes]) => {
+        const events = eventsRes.events ?? []
+        const cocktails = cocktailsRes.cocktails ?? cocktailsRes
+        const dashboard = computeDashboardData(events, cocktails, pricesRes)
         setData(dashboard)
       })
-      .catch(() => setError("Failed to load dashboard data"))
+      .catch((err) => {
+        console.error("Dashboard fetch error:", err)
+        setError("Failed to load dashboard data")
+      })
       .finally(() => setLoading(false))
   }, [])
 
